@@ -50,7 +50,7 @@ public class UserControllerTest {
                 User.builder()
                 .id(123456789L)
                 .email("peter@hotmail.com")
-                .password("test1234")
+                .password("i50M6NBwORO5FVH+bNGbyc0qtPsrNpma3wCPvAK+Bpg=$6NVhMN3A3i4NOcqzezrc5crwrhteyM1cVo2TZrlMOsE=")
                 .build());
 
         this.mockMvc.perform(post("/user/register")

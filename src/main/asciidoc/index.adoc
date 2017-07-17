@@ -1,0 +1,79 @@
+= API Guide
+Traitor's Town API;
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+[[overview]]
+= Overview
+
+[[overview-http-verbs]]
+== HTTP verbs
+
+The API of Traitor's Town tries to adhere as closely as possible to standard HTTP and REST conventions in its use of HTTP verbs.
+
+|===
+| Verb | Usage
+
+| `GET`
+| Used to retrieve a resource
+
+| `POST`
+| Used to create a new resource
+
+| `PUT`
+| Used to update an existent resource idempotently.
+
+| `DELETE`
+| Used to delete a resource
+|===
+
+[[overview-http-status-codes]]
+== HTTP status codes
+
+The API of Traitor's Town tries to adhere as closely as possible to standard HTTP and REST conventions in its
+use of HTTP status codes.
+
+|===
+| Status code | Usage
+
+| `200 OK`
+| The request completed successfully
+
+| `400 Bad Request`
+| The request was malformed. The response body will include an error providing further information
+
+| `401 Unauthorized`
+| The request did not provide authentication information or the information provided was not valid.
+
+| `403 Forbidden`
+| The request was valid, the authentication was successful but the user does not have access to the specific resource.
+
+| `404 Not Found`
+| The requested resource did not exist
+
+| `500 Internal Server Error`
+| An internal server error occurred. Please report and support us in resolving these internal errors, as they are unexpected and can lead to faulty behaviour.
+|===
+
+[[resources]]
+= Resources
+
+[[register]]
+== Register with Traitor's Town
+A `POST` request to create a new user.
+
+=== Request structure
+
+include::{snippets}/register/http-request.adoc[]
+
+=== Example request
+
+include::{snippets}/register/curl-request.adoc[]
+
+=== Example response
+
+include::{snippets}/register/http-response.adoc[]

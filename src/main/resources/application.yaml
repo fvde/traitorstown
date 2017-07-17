@@ -1,0 +1,28 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+
+---
+# dev
+spring:
+  profiles: default
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/traitorstown
+    username: root
+    password: root
+    driver-class-name: com.mysql.jdbc.Driver
+
+---
+#production environment
+spring:
+  profiles: production
+  datasource:
+    url:
+    username:
+    password:

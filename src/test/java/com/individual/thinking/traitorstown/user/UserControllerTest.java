@@ -55,8 +55,7 @@ public class UserControllerTest {
 
         this.mockMvc.perform(post("/user/register")
                 .content(readFileFromResource("registration.json"))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andDo(document("register",

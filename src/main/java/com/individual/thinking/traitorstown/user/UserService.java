@@ -6,17 +6,21 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+class UserService {
 
     private final UserRepository userRepository;
 
-    public User register(String email, String password) throws Exception {
+    User register(String email, String password) throws Exception {
 
         if (userRepository.findByEmail(email).isPresent()){
-            throw new EmailAlreadyRegisteredException();
+            throw new EmailAlreadyInUseException("Email already in use!");
         }
 
-        User user = new User(email, Password.getSaltedHash(password));
+        User user = User.builder()
+                .email(email)
+                .password(Password.getSaltedHash(password))
+                .build();
+
         userRepository.save(user);
 
         return user;

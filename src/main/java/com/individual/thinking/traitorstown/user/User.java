@@ -1,19 +1,27 @@
 package com.individual.thinking.traitorstown.user;
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.experimental.Tolerate;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-@Data
-public class User {
+@Entity
+@Builder
+@Getter
+class User {
 
     @Id
     @GeneratedValue
     private Long id;
 
     @Column(unique=true)
-    private final String email;
-    private final String password;
+    private String email;
+    private String password;
+
+    @Tolerate
+    User() {}
 }

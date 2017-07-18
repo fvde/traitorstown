@@ -54,7 +54,7 @@ public class UserControllerTest {
                 .token("6NVhMN3A3i4NOcqzezrc5crwrhteyM1cVo2TZrlMOsE=")
                 .build());
 
-        this.mockMvc.perform(post("/user/register")
+        this.mockMvc.perform(post("/users/register")
                 .content(readFileFromResource("registration.json"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -78,7 +78,7 @@ public class UserControllerTest {
                 .token("6NVhMN3A3i4NOcqzezrc5crwrhteyM1cVo2TZrlMOsE=")
                 .build());
 
-        this.mockMvc.perform(post("/user/login")
+        this.mockMvc.perform(post("/users/login")
                 .content(readFileFromResource("login.json"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

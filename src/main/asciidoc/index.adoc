@@ -96,16 +96,56 @@ include::{snippets}/login/http-response.adoc[]
 
 [[game]]
 == Game
+
+=== Create New Game
 A `POST` request to create a new game.
 
-=== Request structure
+==== Request structure
 
 include::{snippets}/post-game/http-request.adoc[]
 
-=== Example request
+==== Example request
 
 include::{snippets}/post-game/curl-request.adoc[]
 
-=== Example response
+==== Example response
 
 include::{snippets}/post-game/http-response.adoc[]
+
+=== Get games by status
+A `GET` request to get games by status.
+
+=== Request structure
+
+include::{snippets}/get-games/http-request.adoc[]
+
+=== Request parameters
+
+include::{snippets}/get-games/request-parameters.adoc[]
+
+=== Example request
+
+include::{snippets}/get-games/curl-request.adoc[]
+
+=== Example response
+
+include::{snippets}/get-games/http-response.adoc[]
+
+=== Get Game by id
+A `GET` request to get games by id.
+
+==== Request structure
+
+include::{snippets}/get-games-id/http-request.adoc[]
+
+==== Path parameters
+
+include::{snippets}/get-games-id/path-parameters.adoc[]
+
+=== Example request
+
+include::{snippets}/get-games-id/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/get-games-id/http-response.adoc[]

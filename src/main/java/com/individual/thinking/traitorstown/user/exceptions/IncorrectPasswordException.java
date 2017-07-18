@@ -6,5 +6,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
 public class IncorrectPasswordException extends Exception {
     public IncorrectPasswordException(String message) {
+        super(message);
     }
 }

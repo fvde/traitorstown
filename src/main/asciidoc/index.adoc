@@ -93,3 +93,19 @@ include::{snippets}/login/curl-request.adoc[]
 === Example response
 
 include::{snippets}/login/http-response.adoc[]
+
+[[game]]
+== Game
+A `POST` request to create a new game.
+
+=== Request structure
+
+include::{snippets}/post-game/http-request.adoc[]
+
+=== Example request
+
+include::{snippets}/post-game/curl-request.adoc[]
+
+=== Example response
+
+include::{snippets}/post-game/http-response.adoc[]

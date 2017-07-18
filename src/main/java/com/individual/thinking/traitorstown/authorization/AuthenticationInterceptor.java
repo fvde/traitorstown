@@ -1,6 +1,7 @@
 package com.individual.thinking.traitorstown.authorization;
 
-import com.individual.thinking.traitorstown.model.User;
+import com.individual.thinking.traitorstown.Configuration;
+import com.individual.thinking.traitorstown.user.User;
 import com.individual.thinking.traitorstown.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
 
     private static final String TOKEN = "token";
-    private static final String PLAYER = "player";
-
     private final UserService userService;
 
     @Override
@@ -34,7 +33,7 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
         }
 
         User user = userService.getUserByToken(token);
-        request.setAttribute(PLAYER, user.getPlayer());
+        request.setAttribute(Configuration.AUTHENTICATION_KEY, user.getPlayer());
         return true;
     }
 

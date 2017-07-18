@@ -1,6 +1,5 @@
 package com.individual.thinking.traitorstown.user;
 
-import com.individual.thinking.traitorstown.model.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;

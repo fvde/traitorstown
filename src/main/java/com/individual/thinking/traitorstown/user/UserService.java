@@ -1,7 +1,6 @@
 package com.individual.thinking.traitorstown.user;
 
 import com.individual.thinking.traitorstown.model.Player;
-import com.individual.thinking.traitorstown.model.User;
 import com.individual.thinking.traitorstown.user.encryption.Secure;
 import com.individual.thinking.traitorstown.user.exceptions.EmailAlreadyInUseException;
 import com.individual.thinking.traitorstown.user.exceptions.IncorrectPasswordException;

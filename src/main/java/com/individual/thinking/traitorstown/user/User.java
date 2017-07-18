@@ -1,5 +1,6 @@
-package com.individual.thinking.traitorstown.model;
+package com.individual.thinking.traitorstown.user;
 
+import com.individual.thinking.traitorstown.model.Player;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.Tolerate;
@@ -24,6 +25,7 @@ public class User {
     private String token;
 
     @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "player_id")
     private Player player;
 
     @Tolerate

@@ -1,5 +1,6 @@
 package com.individual.thinking.traitorstown.user;
 
+import com.individual.thinking.traitorstown.model.Player;
 import com.individual.thinking.traitorstown.model.User;
 import com.individual.thinking.traitorstown.user.encryption.Secure;
 import com.individual.thinking.traitorstown.user.exceptions.EmailAlreadyInUseException;
@@ -26,6 +27,7 @@ public class UserService {
                 .email(email)
                 .password(Secure.getSaltedHash(password))
                 .token(Secure.getToken())
+                .player(new Player())
                 .build();
 
         userRepository.save(user);

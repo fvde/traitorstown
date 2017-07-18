@@ -4,8 +4,6 @@ import com.individual.thinking.traitorstown.model.Game;
 import com.individual.thinking.traitorstown.model.GameStatus;
 import lombok.Data;
 
-import java.util.stream.Collectors;
-
 @Data
 class GameRepresentation {
     private final Long id;
@@ -16,7 +14,7 @@ class GameRepresentation {
     static GameRepresentation fromGame(Game game){
         return new GameRepresentation(game.getId(),
                 game.getPlayers().size(),
-                game.getPlayers().stream().filter(p -> p.getReady()).collect(Collectors.toList()).size(),
+                game.getReadyPlayers(),
                 game.getStatus());
     }
 }

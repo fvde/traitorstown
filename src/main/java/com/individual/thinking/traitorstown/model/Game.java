@@ -5,6 +5,7 @@ import lombok.Data;
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Data
@@ -27,5 +28,9 @@ public class Game {
 
     public void removePlayer(Player player) {
         players.remove(player);
+    }
+
+    public Integer getReadyPlayers(){
+        return players.stream().filter(Player::getReady).collect(Collectors.toList()).size();
     }
 }

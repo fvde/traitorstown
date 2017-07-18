@@ -115,19 +115,19 @@ include::{snippets}/post-games/http-response.adoc[]
 === Get games by status
 A `GET` request to get games by status.
 
-=== Request structure
+==== Request structure
 
 include::{snippets}/get-games/http-request.adoc[]
 
-=== Request parameters
+==== Request parameters
 
 include::{snippets}/get-games/request-parameters.adoc[]
 
-=== Example request
+==== Example request
 
 include::{snippets}/get-games/curl-request.adoc[]
 
-=== Example response
+==== Example response
 
 include::{snippets}/get-games/http-response.adoc[]
 
@@ -187,3 +187,22 @@ include::{snippets}/delete-games-gameId-players-playerId/curl-request.adoc[]
 ==== Example response
 
 include::{snippets}/delete-games-gameId-players-playerId/http-response.adoc[]
+
+=== Set a player's status
+A `PUT` request to either set a player to be ready to play or not
+
+==== Request structure
+
+include::{snippets}/put-games-gameId-players-playerId/http-request.adoc[]
+
+==== Path parameters
+
+include::{snippets}/put-games-gameId-players-playerId/path-parameters.adoc[]
+
+==== Example request
+
+include::{snippets}/put-games-gameId-players-playerId/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/put-games-gameId-players-playerId/http-response.adoc[]

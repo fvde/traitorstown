@@ -15,6 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.restdocs.JUnitRestDocumentation;
+import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -30,9 +31,7 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
@@ -58,6 +57,15 @@ public class GameControllerTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
+    private Long validUserId = 62532532L;
+    private Long validGameId = 97217217L;
+    private String validToken = "1srioisp5mb07drbbejqni519eib2pti";
+    private FieldDescriptor[] gameDescription = {
+            fieldWithPath("id").description("Game id"),
+            fieldWithPath("players").description("Players in the game"),
+            fieldWithPath("playersReady").description("Players that have set themselves to ready"),
+            fieldWithPath("status").description("Game status")};
+
     @Before
     public void setup() throws Exception {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
@@ -66,7 +74,7 @@ public class GameControllerTest {
 
         when(authenticationInterceptor.preHandle(any(), any(), any())).thenAnswer(invocation -> {
             MockHttpServletRequest request = (MockHttpServletRequest) invocation.getArguments()[0];
-            request.setAttribute(Configuration.AUTHENTICATION_KEY, new Player() {{ setId(1L);}});
+            request.setAttribute(Configuration.AUTHENTICATION_KEY, new Player() {{ setId(validUserId); setGameId(validGameId);}});
             return true;
         });
     }
@@ -76,19 +84,14 @@ public class GameControllerTest {
         when(gameService.createNewGame()).thenReturn(new Game());
 
         this.mockMvc.perform(post("/games")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("token", "1srioisp5mb07drbbejqni519eib2pti")
-                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .header("token", validToken)
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andDo(document("post-games",
                         requestHeaders(headerWithName("Content-Type").description("Request content type, currently only supporting application/json")),
                         requestHeaders(headerWithName("token").description("API access token. Obtain through Registration or Login")),
-                        responseFields(
-                                fieldWithPath("id").description("User id"),
-                                fieldWithPath("players").description("Players in the game"),
-                                fieldWithPath("status").description("Game status")
-                        )));
+                        responseFields(gameDescription)));
     }
 
     @Test
@@ -101,10 +104,9 @@ public class GameControllerTest {
         when(gameService.getGamesByStatus(any())).thenReturn(Collections.singletonList(game));
 
         this.mockMvc.perform(get("/games")
+                .header("token", validToken)
                 .param("status", "OPEN")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("token", "1srioisp5mb07drbbejqni519eib2pti")
-                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andDo(document("get-games",
@@ -115,21 +117,16 @@ public class GameControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("[]").description("List of games")
-                        ).andWithPrefix("[].",
-                                fieldWithPath("id").description("Game id"),
-                                fieldWithPath("players").description("Players in the game"),
-                                fieldWithPath("playersReady").description("Players that have set themselves to ready"),
-                                fieldWithPath("status").description("Game status")
-                        )));
+                        ).andWithPrefix("[].", gameDescription)));
     }
 
     @Test
     public void getGame() throws Exception, GameNotFoundException {
-        when(gameService.getGameById(6L)).thenReturn(new Game());
+        when(gameService.getGameById(validGameId)).thenReturn(new Game());
 
-        this.mockMvc.perform(get("/games/{gameId}", 6L)
+        this.mockMvc.perform(get("/games/{gameId}", validGameId)
+                .header("token", validToken)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("token", "1srioisp5mb07drbbejqni519eib2pti")
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andDo(print())
@@ -137,22 +134,17 @@ public class GameControllerTest {
                         requestHeaders(headerWithName("Content-Type").description("Request content type, currently only supporting application/json")),
                         requestHeaders(headerWithName("token").description("API access token. Obtain through Registration or Login")),
                         pathParameters(parameterWithName("gameId").description("The id of the requested game")),
-                        responseFields(
-                                fieldWithPath("id").description("Game id"),
-                                fieldWithPath("players").description("Players in the game"),
-                                fieldWithPath("playersReady").description("Players that have set themselves to ready"),
-                                fieldWithPath("status").description("Game status")
-                        )));
+                        responseFields(gameDescription)));
     }
 
     @Test
     public void addPlayer() throws Exception, GameNotFoundException {
         when(gameService.addPlayerToGame(anyLong(), any())).thenReturn(new Game());
 
-        this.mockMvc.perform(post("/games/{gameId}/players", 6L)
+        this.mockMvc.perform(post("/games/{gameId}/players", validGameId)
+                .header("token", validToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(readFileFromResource("player.json"))
-                .header("token", "1srioisp5mb07drbbejqni519eib2pti")
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andDo(print())
@@ -160,22 +152,35 @@ public class GameControllerTest {
                         requestHeaders(headerWithName("Content-Type").description("Request content type, currently only supporting application/json")),
                         requestHeaders(headerWithName("token").description("API access token. Obtain through Registration or Login")),
                         pathParameters(parameterWithName("gameId").description("The id of the requested game")),
-                        responseFields(
-                                fieldWithPath("id").description("Game id"),
-                                fieldWithPath("players").description("Players in the game"),
-                                fieldWithPath("playersReady").description("Players that have set themselves to ready"),
-                                fieldWithPath("status").description("Game status")
-                        )));
+                        responseFields(gameDescription)));
     }
 
     @Test
     public void removePlayer() throws Exception, GameNotFoundException {
         when(gameService.removePlayerFromGame(anyLong(), any())).thenReturn(new Game());
 
-        this.mockMvc.perform(delete("/games/{gameId}/players/{playerId}", 6L, 1L)
+        this.mockMvc.perform(delete("/games/{gameId}/players/{playerId}", validGameId, validUserId)
+                .header("token", validToken)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andDo(document("put-games-gameId-players-playerId",
+                        requestHeaders(headerWithName("Content-Type").description("Request content type, currently only supporting application/json")),
+                        requestHeaders(headerWithName("token").description("API access token. Obtain through Registration or Login")),
+                        pathParameters(
+                                parameterWithName("gameId").description("The id of the requested game"),
+                                parameterWithName("playerId").description("The id of the player to be removed from the game")),
+                        responseFields(gameDescription)));
+    }
+
+    @Test
+    public void setPlayerReady() throws Exception, GameNotFoundException {
+        when(gameService.setPlayerReady(anyLong(), any(), any())).thenReturn(new Game());
+
+        this.mockMvc.perform(put("/games/{gameId}/players/{playerId}", validGameId, validUserId)
+                .header("token", validToken)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("token", "1srioisp5mb07drbbejqni519eib2pti")
-                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .content(readFileFromResource("player_ready.json")))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andDo(document("delete-games-gameId-players-playerId",
@@ -184,11 +189,6 @@ public class GameControllerTest {
                         pathParameters(
                                 parameterWithName("gameId").description("The id of the requested game"),
                                 parameterWithName("playerId").description("The id of the player to be removed from the game")),
-                        responseFields(
-                                fieldWithPath("id").description("Game id"),
-                                fieldWithPath("players").description("Players in the game"),
-                                fieldWithPath("playersReady").description("Players that have set themselves to ready"),
-                                fieldWithPath("status").description("Game status")
-                        )));
+                        responseFields(gameDescription)));
     }
 }

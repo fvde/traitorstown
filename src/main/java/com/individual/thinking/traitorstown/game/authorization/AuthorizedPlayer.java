@@ -1,6 +1,7 @@
 package com.individual.thinking.traitorstown.game.authorization;
 
 import com.individual.thinking.traitorstown.Configuration;
+import com.individual.thinking.traitorstown.game.exceptions.PlayerUnauthorizedException;
 import com.individual.thinking.traitorstown.model.Player;
 import lombok.Getter;
 
@@ -12,5 +13,17 @@ public class AuthorizedPlayer {
 
     public AuthorizedPlayer(ServletRequest request) {
         player = (Player) request.getAttribute(Configuration.AUTHENTICATION_KEY);
+    }
+
+    public AuthorizedPlayer authorize(Long gameId, Long playerId) throws PlayerUnauthorizedException {
+        if (gameId != null && !player.getGameId().equals(gameId)){
+            throw new PlayerUnauthorizedException("Each player may only edit games that they are in");
+        }
+
+        if (player == null || !player.getId().equals(playerId)){
+            throw new PlayerUnauthorizedException("Each player may only edit their own attributes");
+        }
+
+        return this;
     }
 }

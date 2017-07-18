@@ -1,9 +1,9 @@
 package com.individual.thinking.traitorstown.game;
 
 import com.individual.thinking.traitorstown.game.authorization.AuthorizedPlayer;
+import com.individual.thinking.traitorstown.game.exceptions.CannotJoinRunningGameException;
 import com.individual.thinking.traitorstown.game.exceptions.GameNotFoundException;
 import com.individual.thinking.traitorstown.game.exceptions.PlayerUnauthorizedException;
-import com.individual.thinking.traitorstown.model.Game;
 import com.individual.thinking.traitorstown.model.GameStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +21,8 @@ public class GameController {
     private final GameService gameService;
 
     @PostMapping("/games")
-    public Game createNewGame() throws Exception {
-        return gameService.createNewGame();
+    public GameRepresentation createNewGame() throws Exception {
+        return GameRepresentation.fromGame(gameService.createNewGame());
     }
 
     @GetMapping("/games")
@@ -36,24 +36,20 @@ public class GameController {
     }
 
     @PostMapping(path = "/games/{gameId}/players")
-    public GameRepresentation addPlayer(@PathVariable Long gameId, @RequestBody PlayerVo playerVo, HttpServletRequest request) throws GameNotFoundException, PlayerUnauthorizedException {
-        AuthorizedPlayer player = new AuthorizedPlayer(request);
-        authorize(player, playerVo.getId());
-
+    public GameRepresentation addPlayer(@PathVariable Long gameId, @RequestBody PlayerVo playerVo, HttpServletRequest request) throws GameNotFoundException, PlayerUnauthorizedException, CannotJoinRunningGameException {
+        AuthorizedPlayer player = new AuthorizedPlayer(request).authorize(null, playerVo.getId());
         return GameRepresentation.fromGame(gameService.addPlayerToGame(gameId, player.getPlayer()));
     }
 
     @DeleteMapping(path = "/games/{gameId}/players/{playerId}")
     public GameRepresentation removePlayer(@PathVariable Long gameId, @PathVariable Long playerId, HttpServletRequest request) throws GameNotFoundException, PlayerUnauthorizedException {
-        AuthorizedPlayer player = new AuthorizedPlayer(request);
-        authorize(player, playerId);
-
+        AuthorizedPlayer player = new AuthorizedPlayer(request).authorize(gameId, playerId);
         return GameRepresentation.fromGame(gameService.removePlayerFromGame(gameId, player.getPlayer()));
     }
 
-    private void authorize(AuthorizedPlayer player, Long playerId) throws PlayerUnauthorizedException {
-        if (player == null || player.getPlayer() == null || !player.getPlayer().getId().equals(playerId)){
-            throw new PlayerUnauthorizedException("Each player may only edit their own attributes");
-        }
+    @PutMapping(path = "/games/{gameId}/players/{playerId}")
+    public GameRepresentation setPlayerReady(@PathVariable Long gameId, @PathVariable Long playerId, @RequestBody PlayerReadyVo playerReadyVo, HttpServletRequest request) throws GameNotFoundException, PlayerUnauthorizedException {
+        AuthorizedPlayer player = new AuthorizedPlayer(request).authorize(gameId, playerId);
+        return GameRepresentation.fromGame(gameService.setPlayerReady(gameId, player.getPlayer(), playerReadyVo.getReady()));
     }
 }

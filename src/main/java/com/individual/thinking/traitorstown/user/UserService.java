@@ -16,7 +16,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    User register(String email, String password) throws Exception {
+    protected User register(String email, String password) throws Exception {
 
         if (userRepository.findByEmail(email).isPresent()){
             throw new EmailAlreadyInUseException("Email already in use!");
@@ -34,7 +34,7 @@ public class UserService {
         return user;
     }
 
-    User login(String email, String password) throws Exception {
+    protected User login(String email, String password) throws Exception {
         Optional<User> user = userRepository.findByEmail(email);
 
         if (!user.isPresent()){

@@ -8,7 +8,7 @@ class PlayerRepresentation {
     private final Long id;
     private final Boolean ready;
 
-    static PlayerRepresentation fromPlayer(Player player){
+    protected static PlayerRepresentation fromPlayer(Player player){
         return new PlayerRepresentation(player.getId(),
                 player.getReady());
     }

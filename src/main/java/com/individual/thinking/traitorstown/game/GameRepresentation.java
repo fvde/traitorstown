@@ -13,7 +13,7 @@ class GameRepresentation {
     private final List<PlayerRepresentation> players;
     private final GameStatus status;
 
-    static GameRepresentation fromGame(Game game){
+    protected static GameRepresentation fromGame(Game game){
         return new GameRepresentation(game.getId(),
                 game.getPlayers().stream().map(PlayerRepresentation::fromPlayer).collect(Collectors.toList()),
                 game.getStatus());

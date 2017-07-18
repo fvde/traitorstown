@@ -18,15 +18,15 @@ class GameService {
     private final GameRepository gameRepository;
     private final PlayerRepository playerRepository;
 
-    Game createNewGame() {
+    protected Game createNewGame() {
         return gameRepository.save(new Game());
     }
 
-    List<Game> getGamesByStatus(GameStatus status) {
+    protected List<Game> getGamesByStatus(GameStatus status) {
         return gameRepository.findByStatus(status);
     }
 
-    Game addPlayerToGame(Long gameId, Player player) throws GameNotFoundException, CannotJoinRunningGameException {
+    protected Game addPlayerToGame(Long gameId, Player player) throws GameNotFoundException, CannotJoinRunningGameException {
         Game game = getGameById(gameId);
 
         if (!game.getStatus().equals(GameStatus.OPEN)){
@@ -38,14 +38,14 @@ class GameService {
         return game;
     }
 
-    Game removePlayerFromGame(Long gameId, Player player) throws GameNotFoundException {
+    protected Game removePlayerFromGame(Long gameId, Player player) throws GameNotFoundException {
         Game game = getGameById(gameId);
         game.removePlayer(player);
         gameRepository.save(game);
         return game;
     }
 
-    Game getGameById(Long id) throws GameNotFoundException {
+    protected Game getGameById(Long id) throws GameNotFoundException {
         Game game = gameRepository.findOne(id);
 
         if (game == null){
@@ -55,7 +55,7 @@ class GameService {
         return game;
     }
 
-    Game setPlayerReady(Long gameId, Player player, Boolean ready) throws GameNotFoundException {
+    protected Game setPlayerReady(Long gameId, Player player, Boolean ready) throws GameNotFoundException {
         Game game = getGameById(gameId);
         player.setReady(ready);
         playerRepository.save(player);

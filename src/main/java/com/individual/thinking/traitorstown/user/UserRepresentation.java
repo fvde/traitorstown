@@ -9,7 +9,7 @@ class UserRepresentation {
     private final String email;
     private final String token;
 
-    static UserRepresentation fromUser(User user){
+    protected static UserRepresentation fromUser(User user){
         return new UserRepresentation(user.getId(),
                 user.getPlayer() != null ? user.getPlayer().getId() : null,
                 user.getEmail(),

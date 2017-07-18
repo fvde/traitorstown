@@ -15,7 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.restdocs.JUnitRestDocumentation;
-import org.springframework.restdocs.payload.FieldDescriptor;
+import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -60,11 +60,25 @@ public class GameControllerTest {
     private Long validUserId = 62532532L;
     private Long validGameId = 97217217L;
     private String validToken = "1srioisp5mb07drbbejqni519eib2pti";
-    private FieldDescriptor[] gameDescription = {
+
+
+    private ResponseFieldsSnippet gameSnippet = responseFields(
             fieldWithPath("id").description("Game id"),
-            fieldWithPath("players").description("Players in the game"),
-            fieldWithPath("playersReady").description("Players that have set themselves to ready"),
-            fieldWithPath("status").description("Game status")};
+            fieldWithPath("status").description("Game status"),
+            fieldWithPath("players").description("Players in the game"))
+            .andWithPrefix("players[].",
+                fieldWithPath("id").description("Id of the player"),
+                fieldWithPath("ready").description("Indicates whether player is ready to play")
+    );
+
+    private ResponseFieldsSnippet multipleGameSnippet = responseFields(
+            fieldWithPath("[].id").description("Game id"),
+            fieldWithPath("[].status").description("Game status"),
+            fieldWithPath("[].players").description("Players in the game"))
+            .andWithPrefix("[].players[].",
+                    fieldWithPath("id").description("Id of the player"),
+                    fieldWithPath("ready").description("Indicates whether player is ready to play")
+            );
 
     @Before
     public void setup() throws Exception {
@@ -81,8 +95,7 @@ public class GameControllerTest {
 
     @Test
     public void createNewGame() throws Exception {
-        when(gameService.createNewGame()).thenReturn(new Game());
-
+        when(gameService.createNewGame()).thenReturn(new Game() {{addPlayer(new Player());}});
         this.mockMvc.perform(post("/games")
                 .header("token", validToken)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -91,7 +104,7 @@ public class GameControllerTest {
                 .andDo(document("post-games",
                         requestHeaders(headerWithName("Content-Type").description("Request content type, currently only supporting application/json")),
                         requestHeaders(headerWithName("token").description("API access token. Obtain through Registration or Login")),
-                        responseFields(gameDescription)));
+                        gameSnippet));
     }
 
     @Test
@@ -117,12 +130,12 @@ public class GameControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("[]").description("List of games")
-                        ).andWithPrefix("[].", gameDescription)));
+                        ), multipleGameSnippet));
     }
 
     @Test
     public void getGame() throws Exception, GameNotFoundException {
-        when(gameService.getGameById(validGameId)).thenReturn(new Game());
+        when(gameService.getGameById(validGameId)).thenReturn(new Game() {{addPlayer(new Player());}});
 
         this.mockMvc.perform(get("/games/{gameId}", validGameId)
                 .header("token", validToken)
@@ -134,12 +147,12 @@ public class GameControllerTest {
                         requestHeaders(headerWithName("Content-Type").description("Request content type, currently only supporting application/json")),
                         requestHeaders(headerWithName("token").description("API access token. Obtain through Registration or Login")),
                         pathParameters(parameterWithName("gameId").description("The id of the requested game")),
-                        responseFields(gameDescription)));
+                        gameSnippet));
     }
 
     @Test
     public void addPlayer() throws Exception, GameNotFoundException {
-        when(gameService.addPlayerToGame(anyLong(), any())).thenReturn(new Game());
+        when(gameService.addPlayerToGame(anyLong(), any())).thenReturn(new Game() {{addPlayer(new Player());}});
 
         this.mockMvc.perform(post("/games/{gameId}/players", validGameId)
                 .header("token", validToken)
@@ -152,12 +165,12 @@ public class GameControllerTest {
                         requestHeaders(headerWithName("Content-Type").description("Request content type, currently only supporting application/json")),
                         requestHeaders(headerWithName("token").description("API access token. Obtain through Registration or Login")),
                         pathParameters(parameterWithName("gameId").description("The id of the requested game")),
-                        responseFields(gameDescription)));
+                        gameSnippet));
     }
 
     @Test
     public void removePlayer() throws Exception, GameNotFoundException {
-        when(gameService.removePlayerFromGame(anyLong(), any())).thenReturn(new Game());
+        when(gameService.removePlayerFromGame(anyLong(), any())).thenReturn(new Game() {{addPlayer(new Player());}});
 
         this.mockMvc.perform(delete("/games/{gameId}/players/{playerId}", validGameId, validUserId)
                 .header("token", validToken)
@@ -170,12 +183,12 @@ public class GameControllerTest {
                         pathParameters(
                                 parameterWithName("gameId").description("The id of the requested game"),
                                 parameterWithName("playerId").description("The id of the player to be removed from the game")),
-                        responseFields(gameDescription)));
+                        gameSnippet));
     }
 
     @Test
     public void setPlayerReady() throws Exception, GameNotFoundException {
-        when(gameService.setPlayerReady(anyLong(), any(), any())).thenReturn(new Game());
+        when(gameService.setPlayerReady(anyLong(), any(), any())).thenReturn(new Game() {{addPlayer(new Player());}});
 
         this.mockMvc.perform(put("/games/{gameId}/players/{playerId}", validGameId, validUserId)
                 .header("token", validToken)
@@ -189,6 +202,6 @@ public class GameControllerTest {
                         pathParameters(
                                 parameterWithName("gameId").description("The id of the requested game"),
                                 parameterWithName("playerId").description("The id of the player to be removed from the game")),
-                        responseFields(gameDescription)));
+                        gameSnippet));
     }
 }

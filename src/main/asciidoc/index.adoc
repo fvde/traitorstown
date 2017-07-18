@@ -97,7 +97,7 @@ include::{snippets}/login/http-response.adoc[]
 [[game]]
 == Game
 
-=== Create New Game
+=== Create new game
 A `POST` request to create a new game.
 
 ==== Request structure
@@ -131,7 +131,7 @@ include::{snippets}/get-games/curl-request.adoc[]
 
 include::{snippets}/get-games/http-response.adoc[]
 
-=== Get Game by id
+=== Get game by id
 A `GET` request to get games by id.
 
 ==== Request structure
@@ -150,7 +150,7 @@ include::{snippets}/get-games-gameId/curl-request.adoc[]
 
 include::{snippets}/get-games-gameId/http-response.adoc[]
 
-=== Add player to Game
+=== Add player to game
 A `POST` request to add a player to a game.
 
 ==== Request structure
@@ -169,7 +169,7 @@ include::{snippets}/post-games-gameId-players/curl-request.adoc[]
 
 include::{snippets}/post-games-gameId-players/http-response.adoc[]
 
-=== Remove player from Game
+=== Remove player from game
 A `DELETE` request to remove a player from a game.
 
 ==== Request structure

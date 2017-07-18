@@ -5,9 +5,10 @@ import org.apache.tomcat.util.codec.binary.Base64;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+import java.math.BigInteger;
 import java.security.SecureRandom;
 
-public class Password {
+public class Secure {
 
     // The higher the number of iterations the more
     // expensive computing the hash is for us and
@@ -15,6 +16,7 @@ public class Password {
     private static final int iterations = 20*1000;
     private static final int saltLen = 32;
     private static final int desiredKeyLen = 256;
+    private static SecureRandom random = new SecureRandom();
 
     /** Computes a salted PBKDF2 hash of given plaintext password
      suitable for storing in a database.
@@ -35,6 +37,10 @@ public class Password {
         }
         String hashOfInput = hash(password, Base64.decodeBase64(saltAndPass[0]));
         return hashOfInput.equals(saltAndPass[1]);
+    }
+
+    public static String getToken(){
+        return new BigInteger(260, random).toString(32).substring(0, 32);
     }
 
     private static String hash(String password, byte[] salt) throws Exception {

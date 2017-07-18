@@ -63,7 +63,7 @@ public class UserControllerTest {
                         responseFields(
                                 fieldWithPath("id").description("User id"),
                                 fieldWithPath("email").description("User email"),
-                                fieldWithPath("password").description("Hashed user password")
+                                fieldWithPath("token").description("Access token, to be used to access secured API calls.")
                         )));
     }
 }

@@ -1,6 +1,6 @@
 package com.individual.thinking.traitorstown.user;
 
-import com.individual.thinking.traitorstown.user.encryption.Password;
+import com.individual.thinking.traitorstown.user.encryption.Secure;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +18,8 @@ class UserService {
 
         User user = User.builder()
                 .email(email)
-                .password(Password.getSaltedHash(password))
+                .password(Secure.getSaltedHash(password))
+                .token(Secure.getToken())
                 .build();
 
         userRepository.save(user);

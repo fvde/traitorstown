@@ -41,5 +41,7 @@ public class UserServiceTest {
         assertThat(userArgumentCaptor.getValue().getEmail(), is(email));
         assertThat(userArgumentCaptor.getValue().getPassword(), not(password));
         assertThat(userArgumentCaptor.getValue().getPassword().length(), greaterThan(32));
+        assertThat(userArgumentCaptor.getValue().getToken().length(), is(32));
+
     }
 }

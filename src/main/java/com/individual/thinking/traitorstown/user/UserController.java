@@ -16,9 +16,9 @@ public class UserController {
     @PostMapping("/user/register")
     public User register(@RequestBody RegistrationRequestVo registrationRequestVo) throws Exception {
 
-        log.info("Registering new user with email ", registrationRequestVo.getEmail());
+        log.info("Registering new user with email {}", registrationRequestVo.getEmail());
         User user = userService.register(registrationRequestVo.getEmail(), registrationRequestVo.getPassword());
-        log.info("Successfully registered user with email ", user.getEmail());
+        log.info("Successfully registered user with email {}", user.getEmail());
 
         return user;
     }

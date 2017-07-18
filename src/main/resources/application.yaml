@@ -8,6 +8,11 @@ spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
 
+logging:
+  level:
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+
+
 ---
 # dev
 spring:

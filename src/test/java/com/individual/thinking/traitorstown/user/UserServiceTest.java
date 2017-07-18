@@ -1,5 +1,7 @@
 package com.individual.thinking.traitorstown.user;
 
+import com.individual.thinking.traitorstown.user.exceptions.IncorrectPasswordException;
+import com.individual.thinking.traitorstown.user.exceptions.UserNotFoundException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -26,14 +28,11 @@ public class UserServiceTest {
 
     @Test
     public void shouldRegisterUser() throws Exception {
-
         String email = "hans@wurst.de";
         String password = "test";
 
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
-
         userService.register(email, password);
-
         ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(userArgumentCaptor.capture());
 
@@ -42,6 +41,18 @@ public class UserServiceTest {
         assertThat(userArgumentCaptor.getValue().getPassword(), not(password));
         assertThat(userArgumentCaptor.getValue().getPassword().length(), greaterThan(32));
         assertThat(userArgumentCaptor.getValue().getToken().length(), is(32));
+    }
 
+    @Test
+    public void shouldLoginUser() throws Exception, UserNotFoundException, IncorrectPasswordException {
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+        User newUser = userService.register("hans@wurst.de", "hcehucehuceh");
+        when(userRepository.findByEmail(newUser.getEmail())).thenReturn(Optional.of(newUser));
+        User user = userService.login(newUser.getEmail(), "hcehucehuceh");
+
+        assertThat(user, notNullValue());
+        assertThat(user.getToken(), notNullValue());
+        assertThat(user.getId(), is(newUser.getId()));
+        assertThat(user.getEmail(), is(newUser.getEmail()));
     }
 }

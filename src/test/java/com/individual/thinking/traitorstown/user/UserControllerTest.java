@@ -1,5 +1,7 @@
 package com.individual.thinking.traitorstown.user;
 
+import com.individual.thinking.traitorstown.user.exceptions.IncorrectPasswordException;
+import com.individual.thinking.traitorstown.user.exceptions.UserNotFoundException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,7 +52,7 @@ public class UserControllerTest {
                 User.builder()
                 .id(123456789L)
                 .email("peter@hotmail.com")
-                .password("i50M6NBwORO5FVH+bNGbyc0qtPsrNpma3wCPvAK+Bpg=$6NVhMN3A3i4NOcqzezrc5crwrhteyM1cVo2TZrlMOsE=")
+                .token("6NVhMN3A3i4NOcqzezrc5crwrhteyM1cVo2TZrlMOsE=")
                 .build());
 
         this.mockMvc.perform(post("/user/register")
@@ -59,6 +61,29 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andDo(document("register",
+                        requestHeaders(headerWithName("Content-Type").description("Request content type, currently only supporting application/json")),
+                        responseFields(
+                                fieldWithPath("id").description("User id"),
+                                fieldWithPath("email").description("User email"),
+                                fieldWithPath("token").description("Access token, to be used to access secured API calls.")
+                        )));
+    }
+
+    @Test
+    public void login() throws Exception, UserNotFoundException, IncorrectPasswordException {
+        when(userService.login(any(), any())).thenReturn(
+                User.builder()
+                .id(123456789L)
+                .email("peter@hotmail.com")
+                .token("6NVhMN3A3i4NOcqzezrc5crwrhteyM1cVo2TZrlMOsE=")
+                .build());
+
+        this.mockMvc.perform(post("/user/login")
+                .content(readFileFromResource("login.json"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andDo(document("login",
                         requestHeaders(headerWithName("Content-Type").description("Request content type, currently only supporting application/json")),
                         responseFields(
                                 fieldWithPath("id").description("User id"),

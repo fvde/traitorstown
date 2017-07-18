@@ -63,7 +63,7 @@ use of HTTP status codes.
 = Resources
 
 [[register]]
-== Register with Traitor's Town
+== Register
 A `POST` request to create a new user.
 
 === Request structure
@@ -77,3 +77,19 @@ include::{snippets}/register/curl-request.adoc[]
 === Example response
 
 include::{snippets}/register/http-response.adoc[]
+
+[[login]]
+== Login
+A `POST` request to create a new user.
+
+=== Request structure
+
+include::{snippets}/login/http-request.adoc[]
+
+=== Example request
+
+include::{snippets}/login/curl-request.adoc[]
+
+=== Example response
+
+include::{snippets}/login/http-response.adoc[]

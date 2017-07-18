@@ -81,7 +81,7 @@ public class GameControllerTest {
             );
 
     @Before
-    public void setup() throws Exception {
+    public void setUp() throws Exception {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .apply(documentationConfiguration(this.restDocumentation))
                 .build();

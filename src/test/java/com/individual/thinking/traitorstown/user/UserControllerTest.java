@@ -38,7 +38,7 @@ public class UserControllerTest {
     private UserService userService;
 
     @Before
-    public void setup(){
+    public void setUp(){
         this.mockMvc = MockMvcBuilders.standaloneSetup(new UserController(userService))
                 .apply(documentationConfiguration(this.restDocumentation))
                 .build();

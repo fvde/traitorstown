@@ -13,7 +13,7 @@ public class AuthenticationConfiguration extends WebMvcConfigurerAdapter {
 
     @Autowired
     @Qualifier("authenticationInterceptor")
-    HandlerInterceptor securityControllerInterceptor;
+    protected HandlerInterceptor securityControllerInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {

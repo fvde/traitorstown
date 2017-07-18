@@ -34,20 +34,18 @@ public class UserService {
         return user;
     }
 
-    User login(String email, String password) throws UserNotFoundException, IncorrectPasswordException {
+    User login(String email, String password) throws Exception {
         Optional<User> user = userRepository.findByEmail(email);
+
         if (!user.isPresent()){
             throw new UserNotFoundException("User not found");
         }
 
-        try {
-            if (Secure.check(password, user.get().getPassword()))
-                return user.get();
-        } catch (Exception e) {
-            throw new IncorrectPasswordException("Password incorrect", e);
+        if (!Secure.check(password, user.get().getPassword())){
+            throw new IncorrectPasswordException("Password incorrect");
         }
 
-        return null;
+        return user.get();
     }
 
     public User getUserByToken(String token) throws UserNotFoundException {

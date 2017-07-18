@@ -1,7 +1,5 @@
 package com.individual.thinking.traitorstown.user;
 
-import com.individual.thinking.traitorstown.user.exceptions.IncorrectPasswordException;
-import com.individual.thinking.traitorstown.user.exceptions.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +19,7 @@ public class UserController {
     }
 
     @PostMapping("/users/login")
-    public UserRepresentation login(@RequestBody LoginRequestVo loginRequestVo) throws UserNotFoundException, IncorrectPasswordException {
+    public UserRepresentation login(@RequestBody LoginRequestVo loginRequestVo) throws Exception {
         return UserRepresentation.fromUser(userService.login(loginRequestVo.getEmail(), loginRequestVo.getPassword()));
     }
 }

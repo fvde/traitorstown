@@ -1,7 +1,6 @@
 package com.individual.thinking.traitorstown.game;
 
 import com.individual.thinking.traitorstown.game.exceptions.GameNotFoundException;
-import com.individual.thinking.traitorstown.game.exceptions.PlayerNotFoundException;
 import com.individual.thinking.traitorstown.model.Game;
 import com.individual.thinking.traitorstown.model.GameStatus;
 import com.individual.thinking.traitorstown.model.Player;
@@ -12,27 +11,34 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class GameService {
+class GameService {
 
     private final GameRepository gameRepository;
     private final PlayerRepository playerRepository;
 
-    public Game createNewGame() {
+    Game createNewGame() {
         return gameRepository.save(new Game());
     }
 
-    public List<Game> getGamesByStatus(GameStatus status) {
+    List<Game> getGamesByStatus(GameStatus status) {
         return gameRepository.findByStatus(status);
     }
 
-    public Game addPlayerToGame(Long id, Player player) throws GameNotFoundException {
-        Game game = getGameById(id);
+    Game addPlayerToGame(Long gameId, Player player) throws GameNotFoundException {
+        Game game = getGameById(gameId);
         game.addPlayer(player);
         gameRepository.save(game);
         return game;
     }
 
-    public Game getGameById(Long id) throws GameNotFoundException {
+    Game removePlayerFromGame(Long gameId, Player player) throws GameNotFoundException {
+        Game game = getGameById(gameId);
+        game.removePlayer(player);
+        gameRepository.save(game);
+        return game;
+    }
+
+    Game getGameById(Long id) throws GameNotFoundException {
         Game game = gameRepository.findOne(id);
 
         if (game == null){
@@ -40,15 +46,5 @@ public class GameService {
         }
 
         return game;
-    }
-
-    public Player getPlayerbyId(Long id) throws PlayerNotFoundException {
-        Player player = playerRepository.findOne(id);
-
-        if (player == null){
-            throw new PlayerNotFoundException("Player not found");
-        }
-
-        return player;
     }
 }

@@ -3,8 +3,8 @@ package com.individual.thinking.traitorstown.model;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Data
@@ -16,14 +16,16 @@ public class Game {
 
     @OneToMany
     @JoinColumn(name = "game_id")
-    private List<Player> players = new ArrayList<>();
+    private Set<Player> players = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
     private GameStatus status = GameStatus.OPEN;
 
     public void addPlayer(Player player){
-        if (!players.contains(player)){
-            players.add(player);
-        }
+        players.add(player);
+    }
+
+    public void removePlayer(Player player) {
+        players.remove(player);
     }
 }

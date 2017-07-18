@@ -102,15 +102,15 @@ A `POST` request to create a new game.
 
 ==== Request structure
 
-include::{snippets}/post-game/http-request.adoc[]
+include::{snippets}/post-games/http-request.adoc[]
 
 ==== Example request
 
-include::{snippets}/post-game/curl-request.adoc[]
+include::{snippets}/post-games/curl-request.adoc[]
 
 ==== Example response
 
-include::{snippets}/post-game/http-response.adoc[]
+include::{snippets}/post-games/http-response.adoc[]
 
 === Get games by status
 A `GET` request to get games by status.
@@ -136,16 +136,54 @@ A `GET` request to get games by id.
 
 ==== Request structure
 
-include::{snippets}/get-games-id/http-request.adoc[]
+include::{snippets}/get-games-gameId/http-request.adoc[]
 
 ==== Path parameters
 
-include::{snippets}/get-games-id/path-parameters.adoc[]
+include::{snippets}/get-games-gameId/path-parameters.adoc[]
 
-=== Example request
+==== Example request
 
-include::{snippets}/get-games-id/curl-request.adoc[]
+include::{snippets}/get-games-gameId/curl-request.adoc[]
 
 ==== Example response
 
-include::{snippets}/get-games-id/http-response.adoc[]
+include::{snippets}/get-games-gameId/http-response.adoc[]
+
+=== Add player to Game
+A `POST` request to add a player to a game.
+
+==== Request structure
+
+include::{snippets}/post-games-gameId-players/http-request.adoc[]
+
+==== Path parameters
+
+include::{snippets}/post-games-gameId-players/path-parameters.adoc[]
+
+==== Example request
+
+include::{snippets}/post-games-gameId-players/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/post-games-gameId-players/http-response.adoc[]
+
+=== Remove player from Game
+A `DELETE` request to remove a player from a game.
+
+==== Request structure
+
+include::{snippets}/delete-games-gameId-players-playerId/http-request.adoc[]
+
+==== Path parameters
+
+include::{snippets}/delete-games-gameId-players-playerId/path-parameters.adoc[]
+
+==== Example request
+
+include::{snippets}/delete-games-gameId-players-playerId/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/delete-games-gameId-players-playerId/http-response.adoc[]

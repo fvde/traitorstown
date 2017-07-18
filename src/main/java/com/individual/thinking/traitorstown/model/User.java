@@ -1,19 +1,15 @@
-package com.individual.thinking.traitorstown.user;
+package com.individual.thinking.traitorstown.model;
 
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.Tolerate;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Builder
 @Getter
-class User {
+public class User {
 
     @Id
     @GeneratedValue
@@ -22,12 +18,13 @@ class User {
     @Column(unique=true)
     private String email;
 
-    @Getter(AccessLevel.PACKAGE)
     private String password;
 
     @Column(unique=true)
     private String token;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    private Player player;
 
     @Tolerate
     User() {}

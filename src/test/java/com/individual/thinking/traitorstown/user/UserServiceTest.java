@@ -1,7 +1,6 @@
 package com.individual.thinking.traitorstown.user;
 
-import com.individual.thinking.traitorstown.user.exceptions.IncorrectPasswordException;
-import com.individual.thinking.traitorstown.user.exceptions.UserNotFoundException;
+import com.individual.thinking.traitorstown.model.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -44,7 +43,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void shouldLoginUser() throws Exception, UserNotFoundException, IncorrectPasswordException {
+    public void shouldLoginUser() throws Exception {
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
         User newUser = userService.register("hans@wurst.de", "hcehucehuceh");
         when(userRepository.findByEmail(newUser.getEmail())).thenReturn(Optional.of(newUser));

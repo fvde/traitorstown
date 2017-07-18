@@ -1,7 +1,6 @@
 package com.individual.thinking.traitorstown.user;
 
-import com.individual.thinking.traitorstown.user.exceptions.IncorrectPasswordException;
-import com.individual.thinking.traitorstown.user.exceptions.UserNotFoundException;
+import com.individual.thinking.traitorstown.model.User;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -64,13 +63,14 @@ public class UserControllerTest {
                         requestHeaders(headerWithName("Content-Type").description("Request content type, currently only supporting application/json")),
                         responseFields(
                                 fieldWithPath("id").description("User id"),
+                                fieldWithPath("playerId").description("Player id"),
                                 fieldWithPath("email").description("User email"),
                                 fieldWithPath("token").description("Access token, to be used to access secured API calls.")
                         )));
     }
 
     @Test
-    public void login() throws Exception, UserNotFoundException, IncorrectPasswordException {
+    public void login() throws Exception {
         when(userService.login(any(), any())).thenReturn(
                 User.builder()
                 .id(123456789L)
@@ -87,6 +87,7 @@ public class UserControllerTest {
                         requestHeaders(headerWithName("Content-Type").description("Request content type, currently only supporting application/json")),
                         responseFields(
                                 fieldWithPath("id").description("User id"),
+                                fieldWithPath("playerId").description("Player id"),
                                 fieldWithPath("email").description("User email"),
                                 fieldWithPath("token").description("Access token, to be used to access secured API calls.")
                         )));

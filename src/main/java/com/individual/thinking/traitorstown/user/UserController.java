@@ -16,15 +16,12 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/user/register")
-    public User register(@RequestBody RegistrationRequestVo registrationRequestVo) throws Exception {
-        User user = userService.register(registrationRequestVo.getEmail(), registrationRequestVo.getPassword());
-        log.info("Registered user with email {}", user.getEmail());
-        return user;
+    public UserRepresentation register(@RequestBody RegistrationRequestVo registrationRequestVo) throws Exception {
+        return UserRepresentation.fromUser(userService.register(registrationRequestVo.getEmail(), registrationRequestVo.getPassword()));
     }
 
     @PostMapping("/user/login")
-    public User login(@RequestBody LoginRequestVo loginRequestVo) throws UserNotFoundException, IncorrectPasswordException {
-        User user = userService.login(loginRequestVo.getEmail(), loginRequestVo.getPassword());
-        return user;
+    public UserRepresentation login(@RequestBody LoginRequestVo loginRequestVo) throws UserNotFoundException, IncorrectPasswordException {
+        return UserRepresentation.fromUser(userService.login(loginRequestVo.getEmail(), loginRequestVo.getPassword()));
     }
 }

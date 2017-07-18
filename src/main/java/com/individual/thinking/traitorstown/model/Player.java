@@ -12,6 +12,10 @@ public class Player {
     @GeneratedValue
     private Long id;
 
+    @OneToOne
+    @PrimaryKeyJoinColumn
+    private User user;
+
     @ManyToOne
     @JoinColumn(name = "game_id")
     private Game game;

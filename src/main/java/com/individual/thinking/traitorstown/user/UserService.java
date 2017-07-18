@@ -1,5 +1,6 @@
 package com.individual.thinking.traitorstown.user;
 
+import com.individual.thinking.traitorstown.model.User;
 import com.individual.thinking.traitorstown.user.encryption.Secure;
 import com.individual.thinking.traitorstown.user.exceptions.EmailAlreadyInUseException;
 import com.individual.thinking.traitorstown.user.exceptions.IncorrectPasswordException;
@@ -11,7 +12,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-class UserService {
+public class UserService {
 
     private final UserRepository userRepository;
 
@@ -46,5 +47,13 @@ class UserService {
         }
 
         return null;
+    }
+
+    public User getUserByToken(String token) throws UserNotFoundException {
+        Optional<User> user = userRepository.findByToken(token);
+        if (!user.isPresent()){
+            throw new UserNotFoundException("User not found");
+        }
+        return user.get();
     }
 }

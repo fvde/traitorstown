@@ -26,7 +26,7 @@ public class UserService {
                 .email(email)
                 .password(Secure.getSaltedHash(password))
                 .token(Secure.getToken())
-                .player(new Player())
+                .player(Player.builder().build())
                 .build();
 
         userRepository.save(user);

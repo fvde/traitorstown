@@ -41,7 +41,7 @@ public class DataLoader implements ApplicationRunner {
 
         deckRepository.save(Arrays.asList(citizenDeck, traitorDeck));
 
-        Configuration.CITIZEN_DECK_ID = citizenDeck.getId();
-        Configuration.TRAITOR_DECK_ID = traitorDeck.getId();
+        Configuration.CITIZEN_DECK = citizenDeck;
+        Configuration.TRAITOR_DECK = traitorDeck;
     }
 }

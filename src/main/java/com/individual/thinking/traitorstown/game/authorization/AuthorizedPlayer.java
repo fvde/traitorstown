@@ -17,10 +17,10 @@ public class AuthorizedPlayer {
 
     public AuthorizedPlayer authorize(Long gameId, Long playerId) throws PlayerUnauthorizedException {
         if (gameId != null && !player.getGameId().equals(gameId)){
-            throw new PlayerUnauthorizedException("Each player may only edit games that they are in");
+            throw new PlayerUnauthorizedException("Each player may only edit or retrieve information from games that they are in");
         }
 
-        if (player == null || !player.getId().equals(playerId)){
+        if (playerId != null && (player == null || !player.getId().equals(playerId))){
             throw new PlayerUnauthorizedException("Each player may only edit or retrieve their own attributes");
         }
 

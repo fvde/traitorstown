@@ -6,6 +6,7 @@ import com.individual.thinking.traitorstown.game.exceptions.GameNotFoundExceptio
 import com.individual.thinking.traitorstown.model.Card;
 import com.individual.thinking.traitorstown.model.Game;
 import com.individual.thinking.traitorstown.model.Player;
+import com.individual.thinking.traitorstown.model.Turn;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,8 +27,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static com.individual.thinking.traitorstown.TestUtils.readFileFromResource;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -90,20 +90,20 @@ public class GameControllerTest {
 
         when(authenticationInterceptor.preHandle(any(), any(), any())).thenAnswer(invocation -> {
             MockHttpServletRequest request = (MockHttpServletRequest) invocation.getArguments()[0];
-            request.setAttribute(Configuration.AUTHENTICATION_KEY, new Player() {{
-                setId(validUserId);
-                setGameId(validGameId);
-                setCards(Arrays.asList(
+            request.setAttribute(Configuration.AUTHENTICATION_KEY, Player.builder()
+                .id(validUserId)
+                .gameId(validGameId)
+                .cards(Arrays.asList(
                         Card.builder().id(1L).name("Trade").build(),
-                        Card.builder().id(2L).name("Fight").build()));
-            }});
+                        Card.builder().id(2L).name("Fight").build()))
+                .build());
             return true;
         });
     }
 
     @Test
     public void createNewGame() throws Exception {
-        when(gameService.createNewGame()).thenReturn(new Game() {{addPlayer(new Player());}});
+        when(gameService.createNewGame()).thenReturn(new Game() {{addPlayer(Player.builder().build());}});
         this.mockMvc.perform(post("/games")
                 .header("token", validToken)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -119,8 +119,8 @@ public class GameControllerTest {
     public void getGames() throws Exception {
 
         Game game = new Game();
-        game.getPlayers().add(new Player());
-        game.getPlayers().add(new Player() {{setReady(true);}});
+        game.addPlayer(Player.builder().build());
+        game.addPlayer(Player.builder().ready(true).build());
 
         when(gameService.getGamesByStatus(any())).thenReturn(Collections.singletonList(game));
 
@@ -143,7 +143,7 @@ public class GameControllerTest {
 
     @Test
     public void getGame() throws Exception, GameNotFoundException {
-        when(gameService.getGameById(validGameId)).thenReturn(new Game() {{addPlayer(new Player());}});
+        when(gameService.getGameById(validGameId)).thenReturn(new Game() {{addPlayer(Player.builder().build());}});
 
         this.mockMvc.perform(get("/games/{gameId}", validGameId)
                 .header("token", validToken)
@@ -160,7 +160,7 @@ public class GameControllerTest {
 
     @Test
     public void addPlayer() throws Exception, GameNotFoundException {
-        when(gameService.addPlayerToGame(anyLong(), any())).thenReturn(new Game() {{addPlayer(new Player());}});
+        when(gameService.addPlayerToGame(anyLong(), any())).thenReturn(new Game() {{addPlayer(Player.builder().build());}});
 
         this.mockMvc.perform(post("/games/{gameId}/players", validGameId)
                 .header("token", validToken)
@@ -178,7 +178,7 @@ public class GameControllerTest {
 
     @Test
     public void removePlayer() throws Exception, GameNotFoundException {
-        when(gameService.removePlayerFromGame(anyLong(), any())).thenReturn(new Game() {{addPlayer(new Player());}});
+        when(gameService.removePlayerFromGame(anyLong(), any())).thenReturn(new Game() {{addPlayer(Player.builder().build());}});
 
         this.mockMvc.perform(delete("/games/{gameId}/players/{playerId}", validGameId, validUserId)
                 .header("token", validToken)
@@ -196,7 +196,7 @@ public class GameControllerTest {
 
     @Test
     public void setPlayerReady() throws Exception, GameNotFoundException {
-        when(gameService.setPlayerReady(anyLong(), any(), any())).thenReturn(new Game() {{addPlayer(new Player());}});
+        when(gameService.setPlayerReady(anyLong(), any(), any())).thenReturn(new Game() {{addPlayer(Player.builder().build());}});
 
         this.mockMvc.perform(put("/games/{gameId}/players/{playerId}", validGameId, validUserId)
                 .header("token", validToken)
@@ -215,6 +215,10 @@ public class GameControllerTest {
 
     @Test
     public void getPlayerCards() throws Exception {
+        when(gameService.getPlayerCards(anyLong())).thenReturn(Arrays.asList(
+                Card.builder().id(1L).name("Trade").build(),
+                Card.builder().id(2L).name("Fight").build()));
+
         this.mockMvc.perform(get("/games/{gameId}/players/{playerId}/cards", validGameId, validUserId)
                 .header("token", validToken)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -229,6 +233,26 @@ public class GameControllerTest {
                         responseFields(
                                 fieldWithPath("[].id").description("Id of the card"),
                                 fieldWithPath("[].name").description("Name of the card")
+                        )));
+    }
+
+    @Test
+    public void getTurn() throws Exception {
+        when(gameService.getTurnByGameIdAndCounter(anyLong(), anyInt())).thenReturn(Turn.builder().counter(1).build());
+
+        this.mockMvc.perform(get("/games/{gameId}/turns/{turnCounter}", validGameId, 1)
+                .header("token", validToken)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andDo(document("get-games-gameId-turns-turnCounter",
+                        requestHeaders(headerWithName("Content-Type").description("Request content type, currently only supporting application/json")),
+                        requestHeaders(headerWithName("token").description("API access token. Obtain through Registration or Login")),
+                        pathParameters(
+                                parameterWithName("gameId").description("The id of the requested game"),
+                                parameterWithName("turnCounter").description("The requested turn")),
+                        responseFields(
+                                fieldWithPath("counter").description("Turn counter")
                         )));
     }
 }

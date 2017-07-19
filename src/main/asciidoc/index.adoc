@@ -206,3 +206,41 @@ include::{snippets}/put-games-gameId-players-playerId/curl-request.adoc[]
 ==== Example response
 
 include::{snippets}/put-games-gameId-players-playerId/http-response.adoc[]
+
+=== Get a players current cards
+A `GET` request to retrieve a players current cards
+
+==== Request structure
+
+include::{snippets}/get-games-gameId-players-playerId-cards/http-request.adoc[]
+
+==== Path parameters
+
+include::{snippets}/get-games-gameId-players-playerId-cards/path-parameters.adoc[]
+
+==== Example request
+
+include::{snippets}/get-games-gameId-players-playerId-cards/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/get-games-gameId-players-playerId-cards/http-response.adoc[]
+
+=== Get a game's turn
+A `GET` request to retrieve a game's turn
+
+==== Request structure
+
+include::{snippets}/get-games-gameId-turns-turnCounter/http-request.adoc[]
+
+==== Path parameters
+
+include::{snippets}/get-games-gameId-turns-turnCounter/path-parameters.adoc[]
+
+==== Example request
+
+include::{snippets}/get-games-gameId-turns-turnCounter/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/get-games-gameId-turns-turnCounter/http-response.adoc[]

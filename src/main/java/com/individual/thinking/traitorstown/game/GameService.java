@@ -3,6 +3,8 @@ package com.individual.thinking.traitorstown.game;
 import com.individual.thinking.traitorstown.Configuration;
 import com.individual.thinking.traitorstown.game.exceptions.CannotJoinRunningGameException;
 import com.individual.thinking.traitorstown.game.exceptions.GameNotFoundException;
+import com.individual.thinking.traitorstown.game.repository.GameRepository;
+import com.individual.thinking.traitorstown.game.repository.PlayerRepository;
 import com.individual.thinking.traitorstown.model.Game;
 import com.individual.thinking.traitorstown.model.GameStatus;
 import com.individual.thinking.traitorstown.model.Player;

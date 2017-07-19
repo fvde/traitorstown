@@ -21,7 +21,7 @@ public class AuthorizedPlayer {
         }
 
         if (player == null || !player.getId().equals(playerId)){
-            throw new PlayerUnauthorizedException("Each player may only edit their own attributes");
+            throw new PlayerUnauthorizedException("Each player may only edit or retrieve their own attributes");
         }
 
         return this;

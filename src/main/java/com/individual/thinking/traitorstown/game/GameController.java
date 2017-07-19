@@ -4,6 +4,8 @@ import com.individual.thinking.traitorstown.game.authorization.AuthorizedPlayer;
 import com.individual.thinking.traitorstown.game.exceptions.CannotJoinRunningGameException;
 import com.individual.thinking.traitorstown.game.exceptions.GameNotFoundException;
 import com.individual.thinking.traitorstown.game.exceptions.PlayerUnauthorizedException;
+import com.individual.thinking.traitorstown.game.representation.CardRepresentation;
+import com.individual.thinking.traitorstown.game.representation.GameRepresentation;
 import com.individual.thinking.traitorstown.model.GameStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,5 +53,11 @@ public class GameController {
     public GameRepresentation setPlayerReady(@PathVariable Long gameId, @PathVariable Long playerId, @RequestBody PlayerReadyVo playerReadyVo, HttpServletRequest request) throws GameNotFoundException, PlayerUnauthorizedException {
         AuthorizedPlayer player = new AuthorizedPlayer(request).authorize(gameId, playerId);
         return GameRepresentation.fromGame(gameService.setPlayerReady(gameId, player.getPlayer(), playerReadyVo.getReady()));
+    }
+
+    @GetMapping(path = "/games/{gameId}/players/{playerId}/cards")
+    public List<CardRepresentation> getPlayerCards(@PathVariable Long gameId, @PathVariable Long playerId, HttpServletRequest request) throws GameNotFoundException, PlayerUnauthorizedException {
+        AuthorizedPlayer player = new AuthorizedPlayer(request).authorize(gameId, playerId);
+        return player.getPlayer().getCards().stream().map(CardRepresentation::fromcard).collect(Collectors.toList());
     }
 }

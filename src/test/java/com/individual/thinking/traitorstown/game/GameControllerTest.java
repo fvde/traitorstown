@@ -3,6 +3,7 @@ package com.individual.thinking.traitorstown.game;
 import com.individual.thinking.traitorstown.Configuration;
 import com.individual.thinking.traitorstown.authorization.AuthenticationInterceptor;
 import com.individual.thinking.traitorstown.game.exceptions.GameNotFoundException;
+import com.individual.thinking.traitorstown.model.Card;
 import com.individual.thinking.traitorstown.model.Game;
 import com.individual.thinking.traitorstown.model.Player;
 import org.junit.Before;
@@ -21,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import static com.individual.thinking.traitorstown.TestUtils.readFileFromResource;
@@ -88,7 +90,13 @@ public class GameControllerTest {
 
         when(authenticationInterceptor.preHandle(any(), any(), any())).thenAnswer(invocation -> {
             MockHttpServletRequest request = (MockHttpServletRequest) invocation.getArguments()[0];
-            request.setAttribute(Configuration.AUTHENTICATION_KEY, new Player() {{ setId(validUserId); setGameId(validGameId);}});
+            request.setAttribute(Configuration.AUTHENTICATION_KEY, new Player() {{
+                setId(validUserId);
+                setGameId(validGameId);
+                setCards(Arrays.asList(
+                        Card.builder().id(1L).name("Trade").build(),
+                        Card.builder().id(2L).name("Fight").build()));
+            }});
             return true;
         });
     }
@@ -203,5 +211,24 @@ public class GameControllerTest {
                                 parameterWithName("gameId").description("The id of the requested game"),
                                 parameterWithName("playerId").description("The id of the player to be removed from the game")),
                         gameSnippet));
+    }
+
+    @Test
+    public void getPlayerCards() throws Exception {
+        this.mockMvc.perform(get("/games/{gameId}/players/{playerId}/cards", validGameId, validUserId)
+                .header("token", validToken)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andDo(document("get-games-gameId-players-playerId-cards",
+                        requestHeaders(headerWithName("Content-Type").description("Request content type, currently only supporting application/json")),
+                        requestHeaders(headerWithName("token").description("API access token. Obtain through Registration or Login")),
+                        pathParameters(
+                                parameterWithName("gameId").description("The id of the requested game"),
+                                parameterWithName("playerId").description("The id of the player who's cards should be retrieved")),
+                        responseFields(
+                                fieldWithPath("[].id").description("Id of the card"),
+                                fieldWithPath("[].name").description("Name of the card")
+                        )));
     }
 }

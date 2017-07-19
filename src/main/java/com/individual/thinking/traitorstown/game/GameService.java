@@ -5,6 +5,7 @@ import com.individual.thinking.traitorstown.game.exceptions.CannotJoinRunningGam
 import com.individual.thinking.traitorstown.game.exceptions.GameNotFoundException;
 import com.individual.thinking.traitorstown.game.repository.GameRepository;
 import com.individual.thinking.traitorstown.game.repository.PlayerRepository;
+import com.individual.thinking.traitorstown.model.Card;
 import com.individual.thinking.traitorstown.model.Game;
 import com.individual.thinking.traitorstown.model.GameStatus;
 import com.individual.thinking.traitorstown.model.Player;
@@ -70,5 +71,9 @@ class GameService {
             gameRepository.save(game);
         }
         return game;
+    }
+
+    public List<Card> getPlayerCards(Player player) {
+        return player.getCards();
     }
 }

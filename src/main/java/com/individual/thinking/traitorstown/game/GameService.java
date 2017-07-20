@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +25,11 @@ class GameService {
     private final TurnRepository turnRepository;
 
     protected Game createNewGame() {
-        return gameRepository.save(Game.builder().build());
+        return gameRepository.save(Game.builder()
+                .players(new ArrayList<>())
+                .turns(new ArrayList<>())
+                .status(GameStatus.OPEN)
+                .build());
     }
 
     protected List<Game> getGamesByStatus(GameStatus status) {
@@ -62,7 +67,7 @@ class GameService {
         player.setReady(ready);
         playerRepository.save(player);
 
-        if (game.getReadyPlayers().equals(game.getPlayers().size()) && game.getPlayers().size() >= Configuration.MINIMUM_AMOUNT_OF_PLAYERS) {
+        if (game.readyToBeStarted()) {
             game = startGame(game);
         }
 
@@ -77,7 +82,7 @@ class GameService {
 
     protected List<Card> getPlayerCards(Long playerId) throws PlayerNotFoundException {
         Player player = getPlayerById(playerId);
-        return player.getCards();
+        return player.getHandCards();
     }
 
     protected Player getPlayerById(Long id) throws PlayerNotFoundException {

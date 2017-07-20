@@ -82,6 +82,15 @@ public class GameControllerTest {
                     fieldWithPath("ready").description("Indicates whether player is ready to play")
             );
 
+    private final Player player = Player.builder()
+            .id(validUserId)
+            .gameId(validGameId)
+            .ready(false)
+            .handCards(Arrays.asList(
+                    Card.builder().id(1L).name("Trade").build(),
+                    Card.builder().id(2L).name("Fight").build()))
+            .build();
+
     @Before
     public void setUp() throws Exception {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
@@ -90,20 +99,14 @@ public class GameControllerTest {
 
         when(authenticationInterceptor.preHandle(any(), any(), any())).thenAnswer(invocation -> {
             MockHttpServletRequest request = (MockHttpServletRequest) invocation.getArguments()[0];
-            request.setAttribute(Configuration.AUTHENTICATION_KEY, Player.builder()
-                .id(validUserId)
-                .gameId(validGameId)
-                .cards(Arrays.asList(
-                        Card.builder().id(1L).name("Trade").build(),
-                        Card.builder().id(2L).name("Fight").build()))
-                .build());
+            request.setAttribute(Configuration.AUTHENTICATION_KEY, player);
             return true;
         });
     }
 
     @Test
     public void createNewGame() throws Exception {
-        when(gameService.createNewGame()).thenReturn(new Game() {{addPlayer(Player.builder().build());}});
+        when(gameService.createNewGame()).thenReturn(new Game() {{addPlayer(player);}});
         this.mockMvc.perform(post("/games")
                 .header("token", validToken)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -119,7 +122,7 @@ public class GameControllerTest {
     public void getGames() throws Exception {
 
         Game game = new Game();
-        game.addPlayer(Player.builder().build());
+        game.addPlayer(Player.builder().ready(false).build());
         game.addPlayer(Player.builder().ready(true).build());
 
         when(gameService.getGamesByStatus(any())).thenReturn(Collections.singletonList(game));
@@ -143,7 +146,7 @@ public class GameControllerTest {
 
     @Test
     public void getGame() throws Exception, GameNotFoundException {
-        when(gameService.getGameById(validGameId)).thenReturn(new Game() {{addPlayer(Player.builder().build());}});
+        when(gameService.getGameById(validGameId)).thenReturn(new Game() {{addPlayer(player);}});
 
         this.mockMvc.perform(get("/games/{gameId}", validGameId)
                 .header("token", validToken)
@@ -160,7 +163,7 @@ public class GameControllerTest {
 
     @Test
     public void addPlayer() throws Exception, GameNotFoundException {
-        when(gameService.addPlayerToGame(anyLong(), any())).thenReturn(new Game() {{addPlayer(Player.builder().build());}});
+        when(gameService.addPlayerToGame(anyLong(), any())).thenReturn(new Game() {{addPlayer(player);}});
 
         this.mockMvc.perform(post("/games/{gameId}/players", validGameId)
                 .header("token", validToken)
@@ -178,7 +181,7 @@ public class GameControllerTest {
 
     @Test
     public void removePlayer() throws Exception, GameNotFoundException {
-        when(gameService.removePlayerFromGame(anyLong(), any())).thenReturn(new Game() {{addPlayer(Player.builder().build());}});
+        when(gameService.removePlayerFromGame(anyLong(), any())).thenReturn(new Game() {{addPlayer(player);}});
 
         this.mockMvc.perform(delete("/games/{gameId}/players/{playerId}", validGameId, validUserId)
                 .header("token", validToken)
@@ -196,7 +199,7 @@ public class GameControllerTest {
 
     @Test
     public void setPlayerReady() throws Exception, GameNotFoundException {
-        when(gameService.setPlayerReady(anyLong(), any(), any())).thenReturn(new Game() {{addPlayer(Player.builder().build());}});
+        when(gameService.setPlayerReady(anyLong(), any(), any())).thenReturn(new Game() {{addPlayer(player);}});
 
         this.mockMvc.perform(put("/games/{gameId}/players/{playerId}", validGameId, validUserId)
                 .header("token", validToken)

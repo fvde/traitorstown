@@ -9,7 +9,8 @@ public class PlayerRepresentation {
     private final Boolean ready;
 
     public static PlayerRepresentation fromPlayer(Player player){
-        return new PlayerRepresentation(player.getId(),
+        return new PlayerRepresentation(
+                player.getId(),
                 player.getReady());
     }
 }

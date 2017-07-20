@@ -4,6 +4,7 @@ import com.individual.thinking.traitorstown.game.repository.CardRepository;
 import com.individual.thinking.traitorstown.game.repository.DeckRepository;
 import com.individual.thinking.traitorstown.model.Card;
 import com.individual.thinking.traitorstown.model.Deck;
+import com.individual.thinking.traitorstown.model.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -11,37 +12,40 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class DataLoader implements ApplicationRunner {
 
-    private final DeckRepository deckRepository;
     private final CardRepository cardRepository;
+    private final DeckRepository deckRepository;
 
     public void run(ApplicationArguments args) {
 
-        deckRepository.deleteAll();
-        cardRepository.deleteAll();
+        if (deckRepository.findAll().iterator().hasNext()){
+            return;
+        }
 
-        Iterable<Card> mainCards = cardRepository.save(Arrays.asList(
-                Card.builder().name("Throw Party").build(),
-                Card.builder().name("Attend Party").build(),
-                Card.builder().name("Honest Trade").build(),
-                Card.builder().name("Dishonest Trade").build(),
-                Card.builder().name("Run for Mayor").build()));
+        List<Card> mainCards = Arrays.asList(
+            Card.builder().name("Throw Party").build(),
+            Card.builder().name("Attend Party").build(),
+            Card.builder().name("Honest Trade").build(),
+            Card.builder().name("Dishonest Trade").build(),
+            Card.builder().name("Run for Mayor").build());
 
-        Deck traitorDeck = Deck.builder().name("Traitor").cards(new ArrayList<>()).build();
-        mainCards.forEach(traitorDeck.getCards()::add);
-        mainCards.forEach(traitorDeck.getCards()::add);
+        cardRepository.save(mainCards);
 
-        Deck citizenDeck = Deck.builder().name("Citizen").cards(new ArrayList<>()).build();
-        mainCards.forEach(citizenDeck.getCards()::add);
-        mainCards.forEach(citizenDeck.getCards()::add);
+        buildDeckForRole(Role.CITIZEN, mainCards);
+        buildDeckForRole(Role.TRAITOR, mainCards);
+    }
 
-        deckRepository.save(Arrays.asList(citizenDeck, traitorDeck));
+    private void buildDeckForRole(Role role, List<Card> cards){
 
-        Configuration.CITIZEN_DECK = citizenDeck;
-        Configuration.TRAITOR_DECK = traitorDeck;
+        Deck deck = Deck.builder().name(role.name()).cards(new ArrayList<>()).role(role).build();
+        cards.forEach(deck.getCards()::add);
+        cards.forEach(deck.getCards()::add);
+
+        deckRepository.save(deck);
     }
 }

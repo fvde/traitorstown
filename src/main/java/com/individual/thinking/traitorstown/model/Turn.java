@@ -2,16 +2,17 @@ package com.individual.thinking.traitorstown.model;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.Tolerate;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Builder
 @Getter
+@Table(uniqueConstraints={
+        @UniqueConstraint(columnNames = {"game_id", "counter"})
+})
 public class Turn {
     @Id
     @GeneratedValue
@@ -20,6 +21,7 @@ public class Turn {
     @Column(name = "game_id")
     private Long gameId;
 
+    @NonNull
     private Integer counter;
 
     @Tolerate

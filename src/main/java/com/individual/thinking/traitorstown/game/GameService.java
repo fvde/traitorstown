@@ -5,7 +5,10 @@ import com.individual.thinking.traitorstown.game.exceptions.*;
 import com.individual.thinking.traitorstown.game.repository.GameRepository;
 import com.individual.thinking.traitorstown.game.repository.PlayerRepository;
 import com.individual.thinking.traitorstown.game.repository.TurnRepository;
-import com.individual.thinking.traitorstown.game.rules.RuleSetViolationException;
+import com.individual.thinking.traitorstown.model.exceptions.AlreadyPlayedCardThisTurnException;
+import com.individual.thinking.traitorstown.model.exceptions.NotCurrentTurnException;
+import com.individual.thinking.traitorstown.model.exceptions.PlayerDoesNotHaveCardException;
+import com.individual.thinking.traitorstown.model.exceptions.RuleSetViolationException;
 import com.individual.thinking.traitorstown.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,7 @@ class GameService {
     private final GameRepository gameRepository;
     private final PlayerRepository playerRepository;
     private final TurnRepository turnRepository;
+    private final CardService cardService;
 
     protected Game createNewGame() {
         return gameRepository.save(Game.builder()
@@ -38,7 +42,6 @@ class GameService {
 
     protected Game addPlayerToGame(Long gameId, Long playerId) throws GameNotFoundException, CannotJoinRunningGameException, PlayerNotFoundException, GameFullException {
         Game game = getGameById(gameId);
-        Player player = getPlayerById(playerId);
 
         if (!game.getStatus().equals(GameStatus.OPEN)){
            throw new CannotJoinRunningGameException("Cannot join a game that has already started");
@@ -48,15 +51,14 @@ class GameService {
             throw new GameFullException("This game is already full");
         }
 
-        game.addPlayer(player);
+        game.addPlayer(getPlayerById(playerId));
         gameRepository.save(game);
         return game;
     }
 
     protected Game removePlayerFromGame(Long gameId, Long playerId) throws GameNotFoundException, PlayerNotFoundException {
         Game game = getGameById(gameId);
-        Player player = getPlayerById(playerId);
-        game.removePlayer(player);
+        game.removePlayer(getPlayerById(playerId));
         gameRepository.save(game);
         return game;
     }
@@ -67,28 +69,32 @@ class GameService {
         player.setReady(ready);
         playerRepository.save(player);
 
-        if (game.readyToBeStarted()) {
+        if (game.isReadyToBeStarted()) {
             game = startGame(game);
         }
 
         return game;
     }
 
+    public void playCard(Long gameId, Integer turn, Long cardId, Long playerId) throws GameNotFoundException, CardNotFoundException, PlayerNotFoundException, NotCurrentTurnException, PlayerDoesNotHaveCardException, AlreadyPlayedCardThisTurnException {
+        Game game = getGameById(gameId);
+        game.playCard(getPlayerById(playerId), cardService.getCardById(cardId), turn);
+        gameRepository.save(game);
+    }
+
     private Game startGame(Game game) throws RuleSetViolationException {
         game.start();
-        gameRepository.save(game);
-        return game;
+        return gameRepository.save(game);
     }
 
     protected List<Card> getPlayerCards(Long playerId) throws PlayerNotFoundException {
-        Player player = getPlayerById(playerId);
-        return player.getHandCards();
+        return getPlayerById(playerId).getHandCards();
     }
 
     protected Player getPlayerById(Long id) throws PlayerNotFoundException {
         Player player = playerRepository.findOne(id);
         if (player == null){
-            throw new PlayerNotFoundException("Game not found");
+            throw new PlayerNotFoundException("Player not found");
         }
         return player;
     }

@@ -2,7 +2,10 @@ package com.individual.thinking.traitorstown.model;
 
 import com.individual.thinking.traitorstown.Configuration;
 import com.individual.thinking.traitorstown.game.rules.RuleSet;
-import com.individual.thinking.traitorstown.game.rules.RuleSetViolationException;
+import com.individual.thinking.traitorstown.model.exceptions.AlreadyPlayedCardThisTurnException;
+import com.individual.thinking.traitorstown.model.exceptions.NotCurrentTurnException;
+import com.individual.thinking.traitorstown.model.exceptions.PlayerDoesNotHaveCardException;
+import com.individual.thinking.traitorstown.model.exceptions.RuleSetViolationException;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -55,14 +58,38 @@ public class Game {
         players.forEach(p -> p.drawCards(Configuration.INITIAL_AMOUNT_OF_CARDS));
     }
 
+    public void playCard(Player player, Card card, Integer turnCounter) throws NotCurrentTurnException, PlayerDoesNotHaveCardException, AlreadyPlayedCardThisTurnException {
+        Turn turn = getCurrentTurn();
+
+        if (!isCurrentTurn(turnCounter)){
+            throw new NotCurrentTurnException("It is currently not turn " + turn);
+        }
+
+        player.playCard(card);
+        turn.playCard(card, player);
+
+        if (turn.getFinishedPlayers().size() == getPlayers().size()){
+            players.forEach(Player::drawCard);
+            turns.add(turn.startNext());
+        }
+    }
+
     public Integer getReadyPlayers(){
         return players.stream().filter(Player::getReady).collect(Collectors.toList()).size();
     }
 
-    public boolean readyToBeStarted(){
+    public boolean isReadyToBeStarted(){
         return getReadyPlayers().equals(players.size()) &&
                 getReadyPlayers() >= Configuration.MINIMUM_AMOUNT_OF_PLAYERS &&
                 status.equals(GameStatus.OPEN);
+    }
+
+    private Turn getCurrentTurn(){
+        return turns.get(0);
+    }
+
+    private boolean isCurrentTurn(Integer turn){
+        return !turns.isEmpty() && getCurrentTurn().getCounter().equals(turn);
     }
 
     @Tolerate

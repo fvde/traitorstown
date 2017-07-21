@@ -2,6 +2,7 @@ package com.individual.thinking.traitorstown.game.rules;
 
 import com.individual.thinking.traitorstown.model.Player;
 import com.individual.thinking.traitorstown.model.Role;
+import com.individual.thinking.traitorstown.model.exceptions.RuleSetViolationException;
 
 import java.util.*;
 

@@ -2,10 +2,11 @@ package com.individual.thinking.traitorstown.game;
 
 import com.individual.thinking.traitorstown.game.authorization.AuthorizedPlayer;
 import com.individual.thinking.traitorstown.game.exceptions.*;
-import com.individual.thinking.traitorstown.game.representation.CardRepresentation;
-import com.individual.thinking.traitorstown.game.representation.GameRepresentation;
-import com.individual.thinking.traitorstown.game.representation.TurnRepresentation;
-import com.individual.thinking.traitorstown.game.rules.RuleSetViolationException;
+import com.individual.thinking.traitorstown.game.representation.*;
+import com.individual.thinking.traitorstown.model.exceptions.AlreadyPlayedCardThisTurnException;
+import com.individual.thinking.traitorstown.model.exceptions.NotCurrentTurnException;
+import com.individual.thinking.traitorstown.model.exceptions.PlayerDoesNotHaveCardException;
+import com.individual.thinking.traitorstown.model.exceptions.RuleSetViolationException;
 import com.individual.thinking.traitorstown.model.GameStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,5 +66,11 @@ public class GameController {
     public TurnRepresentation getTurn(@PathVariable Long gameId, @PathVariable Integer turnCounter, HttpServletRequest request) throws PlayerUnauthorizedException, TurnNotFoundException {
         new AuthorizedPlayer(request).authorize(gameId, null);
         return TurnRepresentation.fromTurn(gameService.getTurnByGameIdAndCounter(gameId, turnCounter));
+    }
+
+    @PostMapping(path = "/games/{gameId}/turns/{turnCounter}/cards")
+    public void playCard(@PathVariable Long gameId, @PathVariable Integer turnCounter, @RequestBody CardVo cardVo, HttpServletRequest request) throws PlayerUnauthorizedException, TurnNotFoundException, PlayerNotFoundException, NotCurrentTurnException, CardNotFoundException, GameNotFoundException, PlayerDoesNotHaveCardException, AlreadyPlayedCardThisTurnException {
+        AuthorizedPlayer player = new AuthorizedPlayer(request).authorize(gameId, null);
+        gameService.playCard(gameId, turnCounter, cardVo.getId(), player.getPlayer().getId());
     }
 }

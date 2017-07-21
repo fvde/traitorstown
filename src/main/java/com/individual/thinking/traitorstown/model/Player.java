@@ -1,5 +1,6 @@
 package com.individual.thinking.traitorstown.model;
 
+import com.individual.thinking.traitorstown.model.exceptions.PlayerDoesNotHaveCardException;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -51,6 +52,10 @@ public class Player {
         deckCards.addAll(getDeckForRole(role).getCards());
     }
 
+    public void drawCard(){
+        drawCards(1);
+    }
+
     public void drawCards(Integer amount){
         amount = Math.min(amount, deckCards.size());
         List<Card> availableCards = new ArrayList<>(deckCards);
@@ -58,6 +63,14 @@ public class Player {
         List<Card> drawnCards = availableCards.subList(0, amount);
         handCards.addAll(drawnCards);
         drawnCards.forEach(deckCards::remove);
+    }
+
+    public void playCard(Card card) throws PlayerDoesNotHaveCardException {
+        if (!handCards.contains(card)){
+            throw new PlayerDoesNotHaveCardException("You cannot play a card you don't have!");
+        }
+        handCards.remove(card);
+        deckCards.add(card);
     }
 
     public Deck getDeckForRole(Role role){

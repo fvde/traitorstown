@@ -28,6 +28,7 @@ import java.util.Collections;
 
 import static com.individual.thinking.traitorstown.TestUtils.readFileFromResource;
 import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -257,5 +258,23 @@ public class GameControllerTest {
                         responseFields(
                                 fieldWithPath("counter").description("Turn counter")
                         )));
+    }
+
+    @Test
+    public void playCard() throws Exception, GameNotFoundException {
+        doNothing().when(gameService).playCard(anyLong(), anyInt(), anyLong(), anyLong());
+
+        this.mockMvc.perform(post("/games/{gameId}/turns/{turnCounter}/cards", validGameId, 1)
+                .header("token", validToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(readFileFromResource("card.json")))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andDo(document("post-games-gameId-turns-turnCounter-cards",
+                        requestHeaders(headerWithName("Content-Type").description("Request content type, currently only supporting application/json")),
+                        requestHeaders(headerWithName("token").description("API access token. Obtain through Registration or Login")),
+                        pathParameters(
+                                parameterWithName("gameId").description("The id of the requested game"),
+                                parameterWithName("turnCounter").description("The requested turn"))));
     }
 }

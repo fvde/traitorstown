@@ -244,3 +244,22 @@ include::{snippets}/get-games-gameId-turns-turnCounter/curl-request.adoc[]
 ==== Example response
 
 include::{snippets}/get-games-gameId-turns-turnCounter/http-response.adoc[]
+
+=== Play a card
+A `POST` request to play a card for a given turn
+
+==== Request structure
+
+include::{snippets}/post-games-gameId-turns-turnCounter-cards/http-request.adoc[]
+
+==== Path parameters
+
+include::{snippets}/post-games-gameId-turns-turnCounter-cards/path-parameters.adoc[]
+
+==== Example request
+
+include::{snippets}/post-games-gameId-turns-turnCounter-cards/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/post-games-gameId-turns-turnCounter-cards/http-response.adoc[]

@@ -1,10 +1,10 @@
-package com.individual.thinking.traitorstown.game;
+package com.individual.thinking.traitorstown.game.representation;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Getter
-class PlayerVo {
+public class CardVo {
     private Long id;
 }

@@ -131,6 +131,25 @@ include::{snippets}/get-games/curl-request.adoc[]
 
 include::{snippets}/get-games/http-response.adoc[]
 
+=== Get a players current game
+A `GET` request to get a players current game.
+
+==== Request structure
+
+include::{snippets}/get-players-playerId-games/http-request.adoc[]
+
+==== Request parameters
+
+include::{snippets}/get-players-playerId-games/request-parameters.adoc[]
+
+==== Example request
+
+include::{snippets}/get-players-playerId-games/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/get-players-playerId-games/http-response.adoc[]
+
 === Get game by id
 A `GET` request to get games by id.
 

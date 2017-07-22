@@ -120,4 +120,12 @@ class GameService {
         }
         return turn.get();
     }
+
+    public Game getGameByPlayerId(Long playerId) throws PlayerNotInGameException, PlayerNotFoundException, GameNotFoundException {
+        Player player = getPlayerById(playerId);
+        if (player.getGameId() == null){
+            throw new PlayerNotInGameException("Currently not playing a game");
+        }
+        return getGameById(player.getGameId());
+    }
 }

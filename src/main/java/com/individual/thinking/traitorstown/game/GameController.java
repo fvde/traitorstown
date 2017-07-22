@@ -29,8 +29,13 @@ public class GameController {
     }
 
     @GetMapping("/games")
-    public List<GameRepresentation> getGames(@RequestParam GameStatus status) {
+    public List<GameRepresentation> getGamesByStatus(@RequestParam GameStatus status) {
         return gameService.getGamesByStatus(status).stream().map(GameRepresentation::fromGame).collect(Collectors.toList());
+    }
+
+    @GetMapping(path = "/players/{playerId}/games")
+    public GameRepresentation getPlayersGame(@PathVariable Long playerId) throws GameNotFoundException, PlayerNotInGameException, PlayerNotFoundException {
+        return GameRepresentation.fromGame(gameService.getGameByPlayerId(playerId));
     }
 
     @GetMapping(path = "/games/{gameId}")

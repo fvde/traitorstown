@@ -3,6 +3,7 @@ package com.individual.thinking.traitorstown.game;
 import com.individual.thinking.traitorstown.Configuration;
 import com.individual.thinking.traitorstown.authorization.AuthenticationInterceptor;
 import com.individual.thinking.traitorstown.game.exceptions.GameNotFoundException;
+import com.individual.thinking.traitorstown.game.exceptions.PlayerNotInGameException;
 import com.individual.thinking.traitorstown.model.Card;
 import com.individual.thinking.traitorstown.model.Game;
 import com.individual.thinking.traitorstown.model.Player;
@@ -120,7 +121,7 @@ public class GameControllerTest {
     }
 
     @Test
-    public void getGames() throws Exception {
+    public void getGamesByStatus() throws Exception {
 
         Game game = new Game();
         game.addPlayer(Player.builder().ready(false).build());
@@ -146,13 +147,28 @@ public class GameControllerTest {
     }
 
     @Test
+    public void getPlayersGame() throws Exception, PlayerNotInGameException {
+        when(gameService.getGameByPlayerId(validUserId)).thenReturn(new Game() {{addPlayer(player);}});
+
+        this.mockMvc.perform(get("/players/{playerId}/games", validUserId)
+                .header("token", validToken)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andDo(document("get-players-playerId-games",
+                        requestHeaders(headerWithName("Content-Type").description("Request content type, currently only supporting application/json")),
+                        requestHeaders(headerWithName("token").description("API access token. Obtain through Registration or Login")),
+                        pathParameters(parameterWithName("playerId").description("The id of the player for which the game shall be queried")),
+                        gameSnippet));
+    }
+
+    @Test
     public void getGame() throws Exception, GameNotFoundException {
         when(gameService.getGameById(validGameId)).thenReturn(new Game() {{addPlayer(player);}});
 
         this.mockMvc.perform(get("/games/{gameId}", validGameId)
                 .header("token", validToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andDo(document("get-games-gameId",
@@ -169,8 +185,7 @@ public class GameControllerTest {
         this.mockMvc.perform(post("/games/{gameId}/players", validGameId)
                 .header("token", validToken)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(readFileFromResource("player.json"))
-                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .content(readFileFromResource("player.json")))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andDo(document("post-games-gameId-players",

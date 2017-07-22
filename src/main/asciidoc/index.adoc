@@ -140,7 +140,7 @@ include::{snippets}/get-players-playerId-games/http-request.adoc[]
 
 ==== Path parameters
 
-include::{snippets}/get-games-gameId/path-parameters.adoc[]
+include::{snippets}/get-players-playerId-games/path-parameters.adoc[]
 
 ==== Example request
 

@@ -29,7 +29,7 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
 
         if (StringUtils.isEmpty(token)) {
             log.error("Request {} failed. Missing token!", requestUrl);
-            throw new MissingTokenException("No token supplied. Obtain a token from logging into the API.");
+            throw new MissingTokenException("No token supplied. Obtain a token for logging into the API.");
         }
 
         User user = userService.getUserByToken(token);

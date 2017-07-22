@@ -39,7 +39,7 @@ public class GameController {
     }
 
     @PostMapping(path = "/games/{gameId}/players")
-    public GameRepresentation addPlayer(@PathVariable Long gameId, @RequestBody PlayerVo playerVo, HttpServletRequest request) throws GameNotFoundException, PlayerUnauthorizedException, CannotJoinRunningGameException, PlayerNotFoundException, GameFullException {
+    public GameRepresentation addPlayer(@PathVariable Long gameId, @RequestBody PlayerVo playerVo, HttpServletRequest request) throws GameNotFoundException, PlayerUnauthorizedException, CannotJoinRunningGameException, PlayerNotFoundException, GameFullException, AlreadyInGameException {
         AuthorizedPlayer player = new AuthorizedPlayer(request).authorize(null, playerVo.getId());
         return GameRepresentation.fromGame(gameService.addPlayerToGame(gameId, player.getPlayer().getId()));
     }

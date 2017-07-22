@@ -40,7 +40,7 @@ class GameService {
         return gameRepository.findByStatus(status);
     }
 
-    protected Game addPlayerToGame(Long gameId, Long playerId) throws GameNotFoundException, CannotJoinRunningGameException, PlayerNotFoundException, GameFullException {
+    protected Game addPlayerToGame(Long gameId, Long playerId) throws GameNotFoundException, CannotJoinRunningGameException, PlayerNotFoundException, GameFullException, AlreadyInGameException {
         Game game = getGameById(gameId);
 
         if (!game.getStatus().equals(GameStatus.OPEN)){
@@ -51,7 +51,13 @@ class GameService {
             throw new GameFullException("This game is already full");
         }
 
-        game.addPlayer(getPlayerById(playerId));
+        Player player = getPlayerById(playerId);
+
+        if (game.getPlayers().contains(player)){
+            throw new AlreadyInGameException("Already in this game");
+        }
+
+        game.addPlayer(player);
         gameRepository.save(game);
         return game;
     }

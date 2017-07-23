@@ -82,9 +82,13 @@ class GameService {
         return game;
     }
 
-    public void playCard(Long gameId, Integer turn, Long cardId, Long playerId) throws GameNotFoundException, CardNotFoundException, PlayerNotFoundException, NotCurrentTurnException, PlayerDoesNotHaveCardException, AlreadyPlayedCardThisTurnException {
+    public void playCard(Long gameId, Integer turn, Long cardId, Long playerId, Long targetPlayerId) throws GameNotFoundException, CardNotFoundException, PlayerNotFoundException, NotCurrentTurnException, PlayerDoesNotHaveCardException, AlreadyPlayedCardThisTurnException {
         Game game = getGameById(gameId);
-        game.playCard(getPlayerById(playerId), cardService.getCardById(cardId), turn);
+        game.playCard(
+                getPlayerById(playerId),
+                getPlayerById(targetPlayerId),
+                cardService.getCardById(cardId),
+                turn);
         gameRepository.save(game);
     }
 

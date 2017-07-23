@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyList;
+
 @Entity
 @Builder
 @Getter
@@ -53,13 +55,12 @@ public class Game {
 
     public void start() throws RuleSetViolationException {
         setStatus(GameStatus.PLAYING);
-        turns.add(Turn.builder().counter(1).build());
+        turns.add(Turn.builder().counter(1).cardsPlayed(emptyList()).build());
         RuleSet.getRolesForPlayers(players).forEach((role, players) ->
-                players.forEach(p -> p.setRole(role)));
-        players.forEach(p -> p.drawCards(Configuration.INITIAL_AMOUNT_OF_CARDS));
+                players.forEach(p -> p.startGameWithRole(role)));
     }
 
-    public void playCard(Player player, Card card, Integer turnCounter) throws NotCurrentTurnException, PlayerDoesNotHaveCardException, AlreadyPlayedCardThisTurnException {
+    public void playCard(Player player, Player target, Card card, Integer turnCounter) throws NotCurrentTurnException, PlayerDoesNotHaveCardException, AlreadyPlayedCardThisTurnException {
         Turn turn = getCurrentTurn().get();
 
         if (!isCurrentTurn(turnCounter)){
@@ -67,9 +68,9 @@ public class Game {
         }
 
         player.playCard(card);
-        turn.playCard(card, player);
+        turn.playCard(card, player, target);
 
-        if (turn.getFinishedPlayers().size() == getPlayers().size()){
+        if (turn.getCardsPlayed().size() == getPlayers().size()){
             players.forEach(Player::drawCard);
             turns.add(turn.startNext());
         }

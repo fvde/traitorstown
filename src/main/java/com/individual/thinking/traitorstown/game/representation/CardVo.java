@@ -7,4 +7,5 @@ import lombok.NoArgsConstructor;
 @Getter
 public class CardVo {
     private Long id;
+    private Long target;
 }

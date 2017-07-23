@@ -24,6 +24,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.Arrays;
 
 import static com.individual.thinking.traitorstown.TestUtils.readFileFromResource;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.doNothing;
@@ -96,8 +97,8 @@ public class GameControllerTest {
             .players(singletonList(player))
             .status(GameStatus.PLAYING)
             .turns(Arrays.asList(
-                    Turn.builder().counter(1).build(),
-                    Turn.builder().counter(2).build()))
+                    Turn.builder().counter(1).cardsPlayed(emptyList()).build(),
+                    Turn.builder().counter(2).cardsPlayed(emptyList()).build()))
             .build();
 
     @Before
@@ -259,7 +260,7 @@ public class GameControllerTest {
 
     @Test
     public void getTurn() throws Exception {
-        when(gameService.getTurnByGameIdAndCounter(anyLong(), anyInt())).thenReturn(Turn.builder().counter(1).build());
+        when(gameService.getTurnByGameIdAndCounter(anyLong(), anyInt())).thenReturn(Turn.builder().counter(1).cardsPlayed(emptyList()).build());
 
         this.mockMvc.perform(get("/games/{gameId}/turns/{turnCounter}", validGameId, 1)
                 .header("token", validToken)
@@ -279,7 +280,7 @@ public class GameControllerTest {
 
     @Test
     public void playCard() throws Exception, GameNotFoundException {
-        doNothing().when(gameService).playCard(anyLong(), anyInt(), anyLong(), anyLong());
+        doNothing().when(gameService).playCard(anyLong(), anyInt(), anyLong(), anyLong(), anyLong());
 
         this.mockMvc.perform(post("/games/{gameId}/turns/{turnCounter}/cards", validGameId, 1)
                 .header("token", validToken)

@@ -1,5 +1,6 @@
 package com.individual.thinking.traitorstown.model;
 
+import com.individual.thinking.traitorstown.Configuration;
 import com.individual.thinking.traitorstown.model.exceptions.PlayerDoesNotHaveCardException;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,7 +25,6 @@ public class Player {
     private Long id;
 
     @Column(name = "game_id")
-    @Setter
     private Long gameId;
 
     @Enumerated(EnumType.STRING)
@@ -46,23 +46,16 @@ public class Player {
     @NonNull
     private Boolean ready;
 
-    public void setRole(Role role){
+    public void startGameWithRole(Role role){
         this.role = role;
         deckCards.clear();
+        handCards.clear();
         deckCards.addAll(getDeckForRole(role).getCards());
+        drawCards(Configuration.INITIAL_AMOUNT_OF_CARDS);
     }
 
     public void drawCard(){
         drawCards(1);
-    }
-
-    public void drawCards(Integer amount){
-        amount = Math.min(amount, deckCards.size());
-        List<Card> availableCards = new ArrayList<>(deckCards);
-        Collections.shuffle(availableCards);
-        List<Card> drawnCards = availableCards.subList(0, amount);
-        handCards.addAll(drawnCards);
-        drawnCards.forEach(deckCards::remove);
     }
 
     public void playCard(Card card) throws PlayerDoesNotHaveCardException {
@@ -73,8 +66,17 @@ public class Player {
         deckCards.add(card);
     }
 
-    public Deck getDeckForRole(Role role){
+    private Deck getDeckForRole(Role role){
         return decks.stream().filter(deck -> deck.getRole().equals(role)).collect(singletonCollector());
+    }
+
+    private void drawCards(Integer amount){
+        amount = Math.min(amount, deckCards.size());
+        List<Card> availableCards = new ArrayList<>(deckCards);
+        Collections.shuffle(availableCards);
+        List<Card> drawnCards = availableCards.subList(0, amount);
+        handCards.addAll(drawnCards);
+        drawnCards.forEach(deckCards::remove);
     }
 
     @Tolerate

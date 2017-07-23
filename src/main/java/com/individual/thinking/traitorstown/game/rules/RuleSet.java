@@ -11,6 +11,10 @@ public class RuleSet {
         Collections.shuffle(players);
         Map<Role, List<Player>> roles = new HashMap<>();
         switch(players.size()){
+            case 1 : {
+                roles.put(Role.CITIZEN, Arrays.asList(players.get(0)));
+                break;
+            }
             case 2 : {
                 roles.put(Role.CITIZEN, Arrays.asList(players.get(0)));
                 roles.put(Role.TRAITOR, Arrays.asList(players.get(1)));

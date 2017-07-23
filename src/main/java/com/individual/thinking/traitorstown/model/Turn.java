@@ -10,6 +10,8 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
+
 @Entity
 @Builder
 @Getter
@@ -27,27 +29,30 @@ public class Turn {
     @NonNull
     private Integer counter;
 
-    @ManyToMany
-    @JoinTable(name = "turn_card", joinColumns = @JoinColumn(name = "turn_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "card_id", referencedColumnName = "id"))
-    private List<Card> cards = new ArrayList<>();
-
-    @ManyToMany
-    @JoinTable(name = "turn_player", joinColumns = @JoinColumn(name = "turn_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "player_id", referencedColumnName = "id"))
-    private List<Player> finishedPlayers = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "turn_id")
+    @NonNull
+    private List<CardPlayed> cardsPlayed = new ArrayList<>();
 
     @Tolerate
     Turn () {}
 
-    public void playCard(Card card, Player player) throws AlreadyPlayedCardThisTurnException {
-        if (finishedPlayers.contains(player)){
+    public void playCard(Card card, Player player, Player target) throws AlreadyPlayedCardThisTurnException {
+        if (cardsPlayed.stream().anyMatch(c -> c.getPlayer().equals(player.getId()))){
             throw new AlreadyPlayedCardThisTurnException("Already played a card this turn");
         }
-        cards.add(card);
-        finishedPlayers.add(player);
+        cardsPlayed.add(CardPlayed.builder()
+                .card(card)
+                .player(player)
+                .target(target)
+                .build());
     }
 
     public Turn startNext(){
         // TODO: apply all played cards
-        return Turn.builder().counter(counter + 1).build();
+        return Turn.builder()
+                .counter(counter + 1)
+                .cardsPlayed(emptyList())
+                .build();
     }
 }

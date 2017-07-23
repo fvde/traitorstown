@@ -15,6 +15,7 @@ import lombok.experimental.Tolerate;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Entity
@@ -59,7 +60,7 @@ public class Game {
     }
 
     public void playCard(Player player, Card card, Integer turnCounter) throws NotCurrentTurnException, PlayerDoesNotHaveCardException, AlreadyPlayedCardThisTurnException {
-        Turn turn = getCurrentTurn();
+        Turn turn = getCurrentTurn().get();
 
         if (!isCurrentTurn(turnCounter)){
             throw new NotCurrentTurnException("It is currently not turn " + turn);
@@ -84,22 +85,12 @@ public class Game {
                 status.equals(GameStatus.OPEN);
     }
 
-    public int getCurrentTurnCounter(){
-        Turn turn = getCurrentTurn();
-        if (turn == null){
-            return 0;
-        } else {
-            return turn.getCounter();
-        }
-    }
-
-
-    private Turn getCurrentTurn(){
-        return turns.get(0);
+    public Optional<Turn> getCurrentTurn(){
+        return turns.isEmpty() ? Optional.empty() : Optional.of(turns.get(0));
     }
 
     private boolean isCurrentTurn(Integer turn){
-        return !turns.isEmpty() && getCurrentTurn().getCounter().equals(turn);
+        return getCurrentTurn().isPresent() && getCurrentTurn().get().getCounter().equals(turn);
     }
 
     @Tolerate

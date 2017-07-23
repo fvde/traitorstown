@@ -19,6 +19,6 @@ public class GameRepresentation {
         return new GameRepresentation(game.getId(),
                 game.getPlayers().stream().map(PlayerRepresentation::fromPlayer).collect(Collectors.toList()),
                 game.getStatus(),
-                game.getCurrentTurnCounter());
+                game.getCurrentTurn().isPresent() ? game.getCurrentTurn().get().getCounter() : 0);
     }
 }

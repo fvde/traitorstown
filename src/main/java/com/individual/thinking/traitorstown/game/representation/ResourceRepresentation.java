@@ -5,12 +5,12 @@ import com.individual.thinking.traitorstown.model.Resource;
 import lombok.Data;
 
 @Data
-public class CardCostRepresentation {
-    private final Resource resource;
+public class ResourceRepresentation {
+    private final Resource type;
     private final Integer amount;
 
-    public static CardCostRepresentation fromEffect(Effect effect){
-        return new CardCostRepresentation(
+    public static ResourceRepresentation fromEffect(Effect effect){
+        return new ResourceRepresentation(
                 effect.getTargetType(),
                 effect.getAmount());
     }

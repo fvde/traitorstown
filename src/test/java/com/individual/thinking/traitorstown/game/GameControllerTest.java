@@ -71,7 +71,11 @@ public class GameControllerTest {
             fieldWithPath("players").description("Players in the game"))
             .andWithPrefix("players[].",
                 fieldWithPath("id").description("Id of the player"),
-                fieldWithPath("ready").description("Indicates whether player is ready to play")
+                fieldWithPath("ready").description("Indicates whether player is ready to play"),
+                fieldWithPath("resources").description("Players resources"))
+                .andWithPrefix("players[].resources[].",
+                        fieldWithPath("type").description("The type of resource. [GOLD, REPUTATION, CARD]"),
+                        fieldWithPath("amount").description("The amount of the specified resource")
     );
 
     private ResponseFieldsSnippet multipleGameSnippet = responseFields(
@@ -93,6 +97,8 @@ public class GameControllerTest {
             .gameId(validGameId)
             .ready(true)
             .handCards(cards)
+            .gold(20)
+            .reputation(15)
             .build();
 
     private final Game game = Game.builder()
@@ -257,7 +263,7 @@ public class GameControllerTest {
                                 fieldWithPath("[].name").description("Name of the card"),
                                 fieldWithPath("[].description").description("Description of the card"))
                                 .andWithPrefix("[].costs[].",
-                                        fieldWithPath("resource").description("The kind of resource. [GOLD, REPUTATION, CARD]"),
+                                        fieldWithPath("type").description("The kind of resource. [GOLD, REPUTATION, CARD]"),
                                         fieldWithPath("amount").description("The amount of the specified resource")
                                 )));
     }

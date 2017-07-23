@@ -12,12 +12,12 @@ public class CardRepresentation {
     private final Long id;
     private final String name;
     private final String description;
-    private final List<CardCostRepresentation> costs;
+    private final List<ResourceRepresentation> costs;
 
     public static CardRepresentation fromCard(Card card){
         return new CardRepresentation(card.getId(),
                 card.getName(),
                 card.getDescription(),
-                card.getEffects().stream().filter(Effect::isCost).map(CardCostRepresentation::fromEffect).collect(Collectors.toList()));
+                card.getEffects().stream().filter(Effect::isCost).map(ResourceRepresentation::fromEffect).collect(Collectors.toList()));
     }
 }

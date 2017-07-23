@@ -54,7 +54,7 @@ public class DataLoader implements ApplicationRunner {
             ).build(),
             Card.builder().name("Run for Mayor").description("Become mayor for one full week to win the game for your team. The mayor also has additional powers.").effects(
                     Arrays.asList(
-                            Effect.builder().targetType(Resource.REPUTATION).type(EffectType.REMOVE).amount(10).duration(1).build(),
+                            Effect.builder().targetType(Resource.GOLD).type(EffectType.REMOVE).amount(10).duration(1).build(),
                             Effect.builder().targetType(Resource.REPUTATION).type(EffectType.REMOVE).amount(10).duration(1).build())
             ).build());
 

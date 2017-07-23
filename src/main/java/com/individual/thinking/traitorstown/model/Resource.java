@@ -1,6 +1,6 @@
 package com.individual.thinking.traitorstown.model;
 
-public enum EffectTargetType {
+public enum Resource {
     GOLD,
     REPUTATION,
     CARDS

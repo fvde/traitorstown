@@ -5,10 +5,7 @@ import com.individual.thinking.traitorstown.game.exceptions.*;
 import com.individual.thinking.traitorstown.game.repository.GameRepository;
 import com.individual.thinking.traitorstown.game.repository.PlayerRepository;
 import com.individual.thinking.traitorstown.game.repository.TurnRepository;
-import com.individual.thinking.traitorstown.model.exceptions.AlreadyPlayedCardThisTurnException;
-import com.individual.thinking.traitorstown.model.exceptions.NotCurrentTurnException;
-import com.individual.thinking.traitorstown.model.exceptions.PlayerDoesNotHaveCardException;
-import com.individual.thinking.traitorstown.model.exceptions.RuleSetViolationException;
+import com.individual.thinking.traitorstown.model.exceptions.*;
 import com.individual.thinking.traitorstown.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -82,7 +79,7 @@ class GameService {
         return game;
     }
 
-    public void playCard(Long gameId, Integer turn, Long cardId, Long playerId, Long targetPlayerId) throws GameNotFoundException, CardNotFoundException, PlayerNotFoundException, NotCurrentTurnException, PlayerDoesNotHaveCardException, AlreadyPlayedCardThisTurnException {
+    public void playCard(Long gameId, Integer turn, Long cardId, Long playerId, Long targetPlayerId) throws GameNotFoundException, CardNotFoundException, PlayerNotFoundException, NotCurrentTurnException, PlayerDoesNotHaveCardException, PlayedAlreadyPlayedCardThisTurnException, PlayerMayNotPlayThisCardException {
         Game game = getGameById(gameId);
         game.playCard(
                 getPlayerById(playerId),

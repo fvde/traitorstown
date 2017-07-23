@@ -2,10 +2,7 @@ package com.individual.thinking.traitorstown.model;
 
 import com.individual.thinking.traitorstown.Configuration;
 import com.individual.thinking.traitorstown.game.rules.RuleSet;
-import com.individual.thinking.traitorstown.model.exceptions.AlreadyPlayedCardThisTurnException;
-import com.individual.thinking.traitorstown.model.exceptions.NotCurrentTurnException;
-import com.individual.thinking.traitorstown.model.exceptions.PlayerDoesNotHaveCardException;
-import com.individual.thinking.traitorstown.model.exceptions.RuleSetViolationException;
+import com.individual.thinking.traitorstown.model.exceptions.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -58,7 +55,7 @@ public class Game {
                 players.forEach(p -> p.startGameWithRole(role)));
     }
 
-    public void playCard(Player player, Player target, Card card, Integer turnCounter) throws NotCurrentTurnException, PlayerDoesNotHaveCardException, AlreadyPlayedCardThisTurnException {
+    public void playCard(Player player, Player target, Card card, Integer turnCounter) throws NotCurrentTurnException, PlayerDoesNotHaveCardException, PlayedAlreadyPlayedCardThisTurnException, PlayerMayNotPlayThisCardException {
         Turn turn = getCurrentTurn().get();
 
         if (!isCurrentTurn(turnCounter)){

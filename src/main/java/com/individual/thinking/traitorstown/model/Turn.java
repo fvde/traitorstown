@@ -1,6 +1,7 @@
 package com.individual.thinking.traitorstown.model;
 
-import com.individual.thinking.traitorstown.model.exceptions.AlreadyPlayedCardThisTurnException;
+import com.individual.thinking.traitorstown.model.exceptions.PlayedAlreadyPlayedCardThisTurnException;
+import com.individual.thinking.traitorstown.model.exceptions.PlayerMayNotPlayThisCardException;
 import com.individual.thinking.traitorstown.model.exceptions.PlayerDoesNotHaveCardException;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,10 +41,16 @@ public class Turn {
     @Tolerate
     Turn () {}
 
-    public void playCard(Card card, Player player, Player target) throws AlreadyPlayedCardThisTurnException, PlayerDoesNotHaveCardException {
+    public void playCard(Card card, Player player, Player target) throws PlayedAlreadyPlayedCardThisTurnException, PlayerDoesNotHaveCardException, PlayerMayNotPlayThisCardException {
+
         if (finishedPlayers.contains(player)){
-            throw new AlreadyPlayedCardThisTurnException("Already played a card this turn");
+            throw new PlayedAlreadyPlayedCardThisTurnException("Already played a card this turn");
         }
+
+        if (!player.mayPlayCard(card)){
+            throw new PlayerMayNotPlayThisCardException("The requirements to play this card are not met");
+        }
+
         player.playCard(card);
         activeEffects.addAll(
                 card.getEffects().stream().map( effect ->

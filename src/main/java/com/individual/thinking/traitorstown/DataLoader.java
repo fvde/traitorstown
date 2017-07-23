@@ -26,19 +26,37 @@ public class DataLoader implements ApplicationRunner {
         }
 
         List<Card> mainCards = Arrays.asList(
-            Card.builder().name("Make friends").effects(
-                    Arrays.asList(Effect.builder().targetType(EffectTargetType.CARDS).type(EffectType.ADD).amount(1).duration(1).build())
+            Card.builder().name("Use Connections").effects(
+                    Arrays.asList(Effect.builder().targetType(Resource.CARDS).type(EffectType.ADD).amount(1).duration(1).build(),
+                            Effect.builder().targetType(Resource.REPUTATION).type(EffectType.REMOVE).amount(5).duration(1).build())
             ).build(),
             Card.builder().name("Build Farm").effects(
-                    Arrays.asList(Effect.builder().targetType(EffectTargetType.GOLD).type(EffectType.ADD).amount(1).duration(7).build())
+                    Arrays.asList(Effect.builder().targetType(Resource.GOLD).type(EffectType.ADD).amount(1).duration(7).build())
             ).build(),
             Card.builder().name("Go to the Tavern").effects(
-                    Arrays.asList(Effect.builder().targetType(EffectTargetType.REPUTATION).type(EffectType.ADD).amount(5).duration(1).build())
+                    Arrays.asList(
+                            Effect.builder().targetType(Resource.REPUTATION).type(EffectType.ADD).amount(5).duration(1).build(),
+                            Effect.builder().targetType(Resource.GOLD).type(EffectType.REMOVE).amount(100).duration(1).build())
             ).build(),
-            Card.builder().name("Attend Party").build(),
-            Card.builder().name("Honest Trade").build(),
-            Card.builder().name("Dishonest Trade").build(),
-            Card.builder().name("Run for Mayor").build());
+            Card.builder().name("Throw Party").effects(
+                    Arrays.asList(
+                            Effect.builder().targetType(Resource.REPUTATION).type(EffectType.ADD).amount(10).duration(1).build(),
+                            Effect.builder().targetType(Resource.GOLD).type(EffectType.REMOVE).amount(5).duration(1).build())
+            ).build(),
+            Card.builder().name("Honest Trade").effects(
+                    Arrays.asList(
+                            Effect.builder().targetType(Resource.GOLD).type(EffectType.ADD).amount(2).duration(7).build())
+            ).build(),
+            Card.builder().name("Dishonest Trade").effects(
+                    Arrays.asList(
+                            Effect.builder().targetType(Resource.GOLD).type(EffectType.ADD).amount(3).duration(7).build(),
+                            Effect.builder().targetType(Resource.REPUTATION).type(EffectType.REMOVE).amount(1).duration(7).build())
+            ).build(),
+            Card.builder().name("Run for Mayor").effects(
+                    Arrays.asList(
+                            Effect.builder().targetType(Resource.REPUTATION).type(EffectType.REMOVE).amount(10).duration(1).build(),
+                            Effect.builder().targetType(Resource.REPUTATION).type(EffectType.REMOVE).amount(10).duration(1).build())
+            ).build());
 
         cardRepository.save(mainCards);
 

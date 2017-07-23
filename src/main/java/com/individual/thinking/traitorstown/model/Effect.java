@@ -1,5 +1,6 @@
 package com.individual.thinking.traitorstown.model;
 
+import com.individual.thinking.traitorstown.Configuration;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -22,7 +23,7 @@ public class Effect {
 
     @Enumerated(EnumType.STRING)
     @NonNull
-    private EffectTargetType targetType;
+    private Resource targetType;
 
     @NonNull
     private Integer amount;
@@ -33,7 +34,15 @@ public class Effect {
     @Tolerate
     Effect() {}
 
-    public void apply(Player origin, Player target){
-        // TODO
+    public void apply(Player player, Player target) {
+        target.setResource(targetType, type.apply(target.getResource(targetType), amount));
+    }
+
+    public boolean mayApply(Player player){
+        if (type.equals(EffectType.REMOVE)){
+            return player.getResource(targetType) - amount >= Configuration.MINIMUM_RESOURCES.get(targetType);
+        }
+
+        return true;
     }
 }

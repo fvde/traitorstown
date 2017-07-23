@@ -2,10 +2,7 @@ package com.individual.thinking.traitorstown.model;
 
 import com.individual.thinking.traitorstown.Configuration;
 import com.individual.thinking.traitorstown.model.exceptions.PlayerDoesNotHaveCardException;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Tolerate;
 
 import javax.persistence.*;
@@ -42,6 +39,12 @@ public class Player {
     @JoinTable(name = "player_hand_card", joinColumns = @JoinColumn(name = "player_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "card_id", referencedColumnName = "id"))
     private List<Card> handCards = new ArrayList<>();
 
+    @Getter(value = AccessLevel.PRIVATE)
+    private Integer gold = 0;
+
+    @Getter(value = AccessLevel.PRIVATE)
+    private Integer reputation = 0;
+
     @Setter
     @NonNull
     private Boolean ready;
@@ -50,12 +53,18 @@ public class Player {
         this.role = role;
         deckCards.clear();
         handCards.clear();
+        gold = Configuration.INITIAL_AMOUNT_OF_GOLD;
+        reputation = Configuration.INITIAL_AMOUNT_OF_REPUTATION;
         deckCards.addAll(getDeckForRole(role).getCards());
         drawCards(Configuration.INITIAL_AMOUNT_OF_CARDS);
     }
 
     public void drawCard(){
         drawCards(1);
+    }
+
+    public boolean mayPlayCard(Card card){
+        return card.mayPlayCard(this);
     }
 
     public void playCard(Card card) throws PlayerDoesNotHaveCardException {
@@ -81,4 +90,21 @@ public class Player {
 
     @Tolerate
     Player () {}
+
+    public Integer getResource(Resource resource){
+        switch (resource) {
+            case GOLD: return gold;
+            case REPUTATION: return reputation;
+            case CARDS: return handCards.size();
+            default: return null;
+        }
+    }
+
+    public void setResource(Resource resource, Integer value){
+        switch (resource) {
+            case GOLD: {gold = value; break;}
+            case REPUTATION: {reputation = value; break;}
+            case CARDS: {drawCards(Math.max(value - handCards.size(), 0)); break;}
+        }
+    }
 }

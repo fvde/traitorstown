@@ -40,6 +40,10 @@ public class Game {
     @NonNull
     private GameStatus status = GameStatus.OPEN;
 
+    @Enumerated(EnumType.STRING)
+    @Setter
+    private Role winner;
+
     public void addPlayer(Player player){
         players.add(player);
     }
@@ -55,8 +59,12 @@ public class Game {
                 players.forEach(p -> p.startGameWithRole(role)));
     }
 
-    public void playCard(Player player, Player target, Card card, Integer turnCounter) throws NotCurrentTurnException, PlayerDoesNotHaveCardException, PlayedAlreadyPlayedCardThisTurnException, PlayerMayNotPlayThisCardException {
+    public void playCard(Player player, Player target, Card card, Integer turnCounter) throws NotCurrentTurnException, PlayerDoesNotHaveCardException, PlayedAlreadyPlayedCardThisTurnException, PlayerMayNotPlayThisCardException, InactiveGameException {
         Turn turn = getCurrentTurn().get();
+
+        if (!status.equals(GameStatus.PLAYING)){
+            throw new InactiveGameException("This game has not started or is already over!");
+        }
 
         if (!isCurrentTurn(turnCounter)){
             throw new NotCurrentTurnException("It is currently not turn " + turn);
@@ -65,13 +73,23 @@ public class Game {
         turn.playCard(card, player, target);
 
         if (turn.getFinishedPlayers().size() == getPlayers().size()){
-            turns.add(turn.startNext());
-            players.forEach(Player::drawCard);
+            Turn next = turn.startNext();
+            if (next == null) {
+                status = GameStatus.FINISHED;
+                winner = getWinner().getRole();
+            } else {
+                turns.add(next);
+                players.forEach(Player::drawCard);
+            }
         }
     }
 
     public Integer getReadyPlayers(){
         return players.stream().filter(Player::getReady).collect(Collectors.toList()).size();
+    }
+
+    private Player getWinner(){
+        return getCurrentTurn().get().getActiveEffects().stream().filter(EffectActive::isLivingMayor).collect(Collectors.toList()).get(0).getTarget();
     }
 
     public boolean isReadyToBeStarted(){

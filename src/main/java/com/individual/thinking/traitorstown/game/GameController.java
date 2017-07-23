@@ -47,7 +47,7 @@ public class GameController {
     }
 
     @DeleteMapping(path = "/games/{gameId}/players/{playerId}")
-    public GameRepresentation removePlayer(@PathVariable Long gameId, @PathVariable Long playerId, HttpServletRequest request) throws GameNotFoundException, PlayerUnauthorizedException, PlayerNotFoundException {
+    public GameRepresentation removePlayer(@PathVariable Long gameId, @PathVariable Long playerId, HttpServletRequest request) throws GameNotFoundException, PlayerUnauthorizedException, PlayerNotFoundException, CannotLeaveRunningGameException {
         AuthorizedPlayer player = new AuthorizedPlayer(request).authorize(gameId, playerId);
         return GameRepresentation.fromGame(gameService.removePlayerFromGame(gameId, player.getPlayer().getId()));
     }
@@ -71,7 +71,7 @@ public class GameController {
     }
 
     @PostMapping(path = "/games/{gameId}/turns/{turnCounter}/cards")
-    public void playCard(@PathVariable Long gameId, @PathVariable Integer turnCounter, @RequestBody CardVo cardVo, HttpServletRequest request) throws PlayerUnauthorizedException, TurnNotFoundException, PlayerNotFoundException, NotCurrentTurnException, CardNotFoundException, GameNotFoundException, PlayerDoesNotHaveCardException, PlayedAlreadyPlayedCardThisTurnException, PlayerMayNotPlayThisCardException {
+    public void playCard(@PathVariable Long gameId, @PathVariable Integer turnCounter, @RequestBody CardVo cardVo, HttpServletRequest request) throws PlayerUnauthorizedException, TurnNotFoundException, PlayerNotFoundException, NotCurrentTurnException, CardNotFoundException, GameNotFoundException, PlayerDoesNotHaveCardException, PlayedAlreadyPlayedCardThisTurnException, PlayerMayNotPlayThisCardException, InactiveGameException {
         AuthorizedPlayer player = new AuthorizedPlayer(request).authorize(gameId, null);
         gameService.playCard(gameId, turnCounter, cardVo.getId(), player.getPlayer().getId(), cardVo.getTarget());
     }

@@ -1,8 +1,8 @@
 package com.individual.thinking.traitorstown.model;
 
 import com.individual.thinking.traitorstown.model.exceptions.PlayedAlreadyPlayedCardThisTurnException;
-import com.individual.thinking.traitorstown.model.exceptions.PlayerMayNotPlayThisCardException;
 import com.individual.thinking.traitorstown.model.exceptions.PlayerDoesNotHaveCardException;
+import com.individual.thinking.traitorstown.model.exceptions.PlayerMayNotPlayThisCardException;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -67,6 +67,13 @@ public class Turn {
 
     public Turn startNext(){
         activeEffects.stream().forEach(EffectActive::apply);
+        List<EffectActive> livingMayors =  activeEffects.stream().filter(EffectActive::isLivingMayor).collect(Collectors.toList());
+
+        if (!livingMayors.isEmpty()){
+            // game over, no next turn! :-)
+            return null;
+        }
+
         return Turn.builder()
                 .counter(counter + 1)
                 .activeEffects(activeEffects.stream().filter(EffectActive::isActive).collect(Collectors.toList()))

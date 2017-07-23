@@ -59,8 +59,13 @@ class GameService {
         return game;
     }
 
-    protected Game removePlayerFromGame(Long gameId, Long playerId) throws GameNotFoundException, PlayerNotFoundException {
+    protected Game removePlayerFromGame(Long gameId, Long playerId) throws GameNotFoundException, PlayerNotFoundException, CannotLeaveRunningGameException {
         Game game = getGameById(gameId);
+
+        if (!game.getStatus().equals(GameStatus.OPEN)){
+            throw new CannotLeaveRunningGameException("You can not leave a running game");
+        }
+
         game.removePlayer(getPlayerById(playerId));
         gameRepository.save(game);
         return game;
@@ -79,7 +84,7 @@ class GameService {
         return game;
     }
 
-    public void playCard(Long gameId, Integer turn, Long cardId, Long playerId, Long targetPlayerId) throws GameNotFoundException, CardNotFoundException, PlayerNotFoundException, NotCurrentTurnException, PlayerDoesNotHaveCardException, PlayedAlreadyPlayedCardThisTurnException, PlayerMayNotPlayThisCardException {
+    public void playCard(Long gameId, Integer turn, Long cardId, Long playerId, Long targetPlayerId) throws GameNotFoundException, CardNotFoundException, PlayerNotFoundException, NotCurrentTurnException, PlayerDoesNotHaveCardException, PlayedAlreadyPlayedCardThisTurnException, PlayerMayNotPlayThisCardException, InactiveGameException {
         Game game = getGameById(gameId);
         game.playCard(
                 getPlayerById(playerId),

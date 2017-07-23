@@ -45,4 +45,8 @@ public class EffectActive {
     public boolean isActive(){
         return remainingTurns > 0;
     }
+
+    public boolean isLivingMayor(){
+        return effect.getTargetType().equals(Resource.MAYOR) && remainingTurns <= 0;
+    }
 }

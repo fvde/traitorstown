@@ -96,15 +96,29 @@ public class Player {
             case GOLD: return gold;
             case REPUTATION: return reputation;
             case CARD: return handCards.size();
+            case MAYOR: return 0;
             default: return null;
         }
     }
 
     public void setResource(Resource resource, Integer value){
         switch (resource) {
-            case GOLD: {gold = value; break;}
-            case REPUTATION: {reputation = value; break;}
-            case CARD: {drawCards(Math.max(value - handCards.size(), 0)); break;}
+            case GOLD: {
+                gold = value;
+                break;
+            }
+            case REPUTATION: {
+                reputation = value;
+                break;
+            }
+            case CARD: {
+                drawCards(Math.max(value - handCards.size(), 0));
+                break;
+            }
+            case MAYOR: {
+                //TODO add mayor cards
+                break;
+            }
         }
     }
 }

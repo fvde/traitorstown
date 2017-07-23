@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static com.individual.thinking.traitorstown.TestUtils.readFileFromResource;
 import static java.util.Collections.singletonList;
@@ -83,13 +84,15 @@ public class GameControllerTest {
                     fieldWithPath("ready").description("Indicates whether player is ready to play")
             );
 
+    private final List<Card> cards = Arrays.asList(
+            Card.builder().id(1L).name("Trade").description("get gold from people!").effects(Arrays.asList(Effect.builder().type(EffectType.REMOVE).targetType(Resource.GOLD).amount(10).duration(1).build())).build(),
+            Card.builder().id(2L).name("Fight").description("Hit people!").effects(Arrays.asList(Effect.builder().type(EffectType.REMOVE).targetType(Resource.REPUTATION).amount(20).duration(1).build())).build());
+
     private final Player player = Player.builder()
             .id(validUserId)
             .gameId(validGameId)
             .ready(true)
-            .handCards(Arrays.asList(
-                    Card.builder().id(1L).name("Trade").build(),
-                    Card.builder().id(2L).name("Fight").build()))
+            .handCards(cards)
             .build();
 
     private final Game game = Game.builder()
@@ -236,9 +239,7 @@ public class GameControllerTest {
 
     @Test
     public void getPlayerCards() throws Exception {
-        when(gameService.getPlayerCards(anyLong())).thenReturn(Arrays.asList(
-                Card.builder().id(1L).name("Trade").build(),
-                Card.builder().id(2L).name("Fight").build()));
+        when(gameService.getPlayerCards(anyLong())).thenReturn(cards);
 
         this.mockMvc.perform(get("/games/{gameId}/players/{playerId}/cards", validGameId, validUserId)
                 .header("token", validToken)
@@ -253,8 +254,12 @@ public class GameControllerTest {
                                 parameterWithName("playerId").description("The id of the player who's cards should be retrieved")),
                         responseFields(
                                 fieldWithPath("[].id").description("Id of the card"),
-                                fieldWithPath("[].name").description("Name of the card")
-                        )));
+                                fieldWithPath("[].name").description("Name of the card"),
+                                fieldWithPath("[].description").description("Description of the card"))
+                                .andWithPrefix("[].costs[].",
+                                        fieldWithPath("resource").description("The kind of resource. [GOLD, REPUTATION, CARD]"),
+                                        fieldWithPath("amount").description("The amount of the specified resource")
+                                )));
     }
 
     @Test

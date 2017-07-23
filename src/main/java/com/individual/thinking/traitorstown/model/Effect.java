@@ -45,4 +45,8 @@ public class Effect {
 
         return true;
     }
+
+    public boolean isCost(){
+        return type.equals(EffectType.REMOVE);
+    }
 }

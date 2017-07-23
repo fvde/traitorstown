@@ -22,6 +22,6 @@ public class Configuration {
         MINIMUM_RESOURCES.put(Resource.REPUTATION, Integer.MIN_VALUE);
 
         // effect may cause you to discard cards, which is always allowed
-        MINIMUM_RESOURCES.put(Resource.CARDS, Integer.MIN_VALUE);
+        MINIMUM_RESOURCES.put(Resource.CARD, Integer.MIN_VALUE);
     }
 }

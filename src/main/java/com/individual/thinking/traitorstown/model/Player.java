@@ -95,7 +95,7 @@ public class Player {
         switch (resource) {
             case GOLD: return gold;
             case REPUTATION: return reputation;
-            case CARDS: return handCards.size();
+            case CARD: return handCards.size();
             default: return null;
         }
     }
@@ -104,7 +104,7 @@ public class Player {
         switch (resource) {
             case GOLD: {gold = value; break;}
             case REPUTATION: {reputation = value; break;}
-            case CARDS: {drawCards(Math.max(value - handCards.size(), 0)); break;}
+            case CARD: {drawCards(Math.max(value - handCards.size(), 0)); break;}
         }
     }
 }

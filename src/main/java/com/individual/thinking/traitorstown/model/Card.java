@@ -21,6 +21,9 @@ public class Card {
     @NonNull
     private String name;
 
+    @NonNull
+    private String description;
+
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "card_effect", joinColumns = @JoinColumn(name = "card_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "effect_id", referencedColumnName = "id"))
     private List<Effect> effects = new ArrayList<>();

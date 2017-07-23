@@ -84,7 +84,17 @@ public class Game {
                 status.equals(GameStatus.OPEN);
     }
 
-    public Turn getCurrentTurn(){
+    public int getCurrentTurnCounter(){
+        Turn turn = getCurrentTurn();
+        if (turn == null){
+            return 0;
+        } else {
+            return turn.getCounter();
+        }
+    }
+
+
+    private Turn getCurrentTurn(){
         return turns.get(0);
     }
 

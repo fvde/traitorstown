@@ -84,7 +84,7 @@ public class Game {
                 status.equals(GameStatus.OPEN);
     }
 
-    private Turn getCurrentTurn(){
+    public Turn getCurrentTurn(){
         return turns.get(0);
     }
 

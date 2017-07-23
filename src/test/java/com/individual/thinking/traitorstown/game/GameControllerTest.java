@@ -4,10 +4,7 @@ import com.individual.thinking.traitorstown.Configuration;
 import com.individual.thinking.traitorstown.authorization.AuthenticationInterceptor;
 import com.individual.thinking.traitorstown.game.exceptions.GameNotFoundException;
 import com.individual.thinking.traitorstown.game.exceptions.PlayerNotInGameException;
-import com.individual.thinking.traitorstown.model.Card;
-import com.individual.thinking.traitorstown.model.Game;
-import com.individual.thinking.traitorstown.model.Player;
-import com.individual.thinking.traitorstown.model.Turn;
+import com.individual.thinking.traitorstown.model.*;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,9 +22,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 import static com.individual.thinking.traitorstown.TestUtils.readFileFromResource;
+import static java.util.Collections.singletonList;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -69,6 +66,7 @@ public class GameControllerTest {
     private ResponseFieldsSnippet gameSnippet = responseFields(
             fieldWithPath("id").description("Game id"),
             fieldWithPath("status").description("Game status"),
+            fieldWithPath("turn").description("Current turn"),
             fieldWithPath("players").description("Players in the game"))
             .andWithPrefix("players[].",
                 fieldWithPath("id").description("Id of the player"),
@@ -78,6 +76,7 @@ public class GameControllerTest {
     private ResponseFieldsSnippet multipleGameSnippet = responseFields(
             fieldWithPath("[].id").description("Game id"),
             fieldWithPath("[].status").description("Game status"),
+            fieldWithPath("[].turn").description("Current turn"),
             fieldWithPath("[].players").description("Players in the game"))
             .andWithPrefix("[].players[].",
                     fieldWithPath("id").description("Id of the player"),
@@ -87,10 +86,18 @@ public class GameControllerTest {
     private final Player player = Player.builder()
             .id(validUserId)
             .gameId(validGameId)
-            .ready(false)
+            .ready(true)
             .handCards(Arrays.asList(
                     Card.builder().id(1L).name("Trade").build(),
                     Card.builder().id(2L).name("Fight").build()))
+            .build();
+
+    private final Game game = Game.builder()
+            .players(singletonList(player))
+            .status(GameStatus.PLAYING)
+            .turns(Arrays.asList(
+                    Turn.builder().counter(1).build(),
+                    Turn.builder().counter(2).build()))
             .build();
 
     @Before
@@ -108,7 +115,7 @@ public class GameControllerTest {
 
     @Test
     public void createNewGame() throws Exception {
-        when(gameService.createNewGame()).thenReturn(new Game() {{addPlayer(player);}});
+        when(gameService.createNewGame()).thenReturn(game);
         this.mockMvc.perform(post("/games")
                 .header("token", validToken)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -122,12 +129,7 @@ public class GameControllerTest {
 
     @Test
     public void getGamesByStatus() throws Exception {
-
-        Game game = new Game();
-        game.addPlayer(Player.builder().ready(false).build());
-        game.addPlayer(Player.builder().ready(true).build());
-
-        when(gameService.getGamesByStatus(any())).thenReturn(Collections.singletonList(game));
+        when(gameService.getGamesByStatus(any())).thenReturn(singletonList(game));
 
         this.mockMvc.perform(get("/games")
                 .header("token", validToken)
@@ -148,7 +150,7 @@ public class GameControllerTest {
 
     @Test
     public void getPlayersGame() throws Exception, PlayerNotInGameException {
-        when(gameService.getGameByPlayerId(validUserId)).thenReturn(new Game() {{addPlayer(player);}});
+        when(gameService.getGameByPlayerId(validUserId)).thenReturn(game);
 
         this.mockMvc.perform(get("/players/{playerId}/games", validUserId)
                 .header("token", validToken)
@@ -164,7 +166,7 @@ public class GameControllerTest {
 
     @Test
     public void getGame() throws Exception, GameNotFoundException {
-        when(gameService.getGameById(validGameId)).thenReturn(new Game() {{addPlayer(player);}});
+        when(gameService.getGameById(validGameId)).thenReturn(game);
 
         this.mockMvc.perform(get("/games/{gameId}", validGameId)
                 .header("token", validToken)
@@ -180,7 +182,7 @@ public class GameControllerTest {
 
     @Test
     public void addPlayer() throws Exception, GameNotFoundException {
-        when(gameService.addPlayerToGame(anyLong(), any())).thenReturn(new Game() {{addPlayer(player);}});
+        when(gameService.addPlayerToGame(anyLong(), any())).thenReturn(game);
 
         this.mockMvc.perform(post("/games/{gameId}/players", validGameId)
                 .header("token", validToken)
@@ -197,7 +199,7 @@ public class GameControllerTest {
 
     @Test
     public void removePlayer() throws Exception, GameNotFoundException {
-        when(gameService.removePlayerFromGame(anyLong(), any())).thenReturn(new Game() {{addPlayer(player);}});
+        when(gameService.removePlayerFromGame(anyLong(), any())).thenReturn(game);
 
         this.mockMvc.perform(delete("/games/{gameId}/players/{playerId}", validGameId, validUserId)
                 .header("token", validToken)
@@ -215,7 +217,7 @@ public class GameControllerTest {
 
     @Test
     public void setPlayerReady() throws Exception, GameNotFoundException {
-        when(gameService.setPlayerReady(anyLong(), any(), any())).thenReturn(new Game() {{addPlayer(player);}});
+        when(gameService.setPlayerReady(anyLong(), any(), any())).thenReturn(game);
 
         this.mockMvc.perform(put("/games/{gameId}/players/{playerId}", validGameId, validUserId)
                 .header("token", validToken)

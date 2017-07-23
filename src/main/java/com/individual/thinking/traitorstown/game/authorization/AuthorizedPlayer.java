@@ -16,7 +16,7 @@ public class AuthorizedPlayer {
     }
 
     public AuthorizedPlayer authorize(Long gameId, Long playerId) throws PlayerUnauthorizedException {
-        if (gameId != null && !player.getGameId().equals(gameId)){
+        if (gameId != null && (player.getGameId() == null || !player.getGameId().equals(gameId))){
             throw new PlayerUnauthorizedException("Each player may only edit or retrieve information from games that they are in");
         }
 

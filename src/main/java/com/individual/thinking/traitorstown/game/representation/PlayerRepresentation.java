@@ -18,7 +18,7 @@ public class PlayerRepresentation {
                 player.getId(),
                 player.getReady(),
                 Arrays.asList(
-                        new ResourceRepresentation(Resource.GOLD, player.getResource(Resource.GOLD)),
-                        new ResourceRepresentation(Resource.REPUTATION, player.getResource(Resource.REPUTATION))));
+                        new ResourceRepresentation(Resource.GOLD.ordinal(), player.getResource(Resource.GOLD)),
+                        new ResourceRepresentation(Resource.REPUTATION.ordinal(), player.getResource(Resource.REPUTATION))));
     }
 }

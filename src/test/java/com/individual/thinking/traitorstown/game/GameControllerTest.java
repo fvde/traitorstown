@@ -66,7 +66,7 @@ public class GameControllerTest {
 
     private ResponseFieldsSnippet gameSnippet = responseFields(
             fieldWithPath("id").description("Game id"),
-            fieldWithPath("status").description("Game status"),
+            fieldWithPath("status").description("Game status [OPEN = 0, PLAYING = 1, FINISHED = 2]"),
             fieldWithPath("turn").description("Current turn"),
             fieldWithPath("players").description("Players in the game"))
             .andWithPrefix("players[].",
@@ -74,13 +74,13 @@ public class GameControllerTest {
                 fieldWithPath("ready").description("Indicates whether player is ready to play"),
                 fieldWithPath("resources").description("Players resources"))
                 .andWithPrefix("players[].resources[].",
-                        fieldWithPath("type").description("The type of resource. [GOLD, REPUTATION, CARD]"),
+                        fieldWithPath("type").description("The type of resource. [GOLD = 0, REPUTATION = 1, CARD = 2]"),
                         fieldWithPath("amount").description("The amount of the specified resource")
     );
 
     private ResponseFieldsSnippet multipleGameSnippet = responseFields(
             fieldWithPath("[].id").description("Game id"),
-            fieldWithPath("[].status").description("Game status"),
+            fieldWithPath("[].status").description("Game status [OPEN = 0, PLAYING = 1, FINISHED = 2]"),
             fieldWithPath("[].turn").description("Current turn"),
             fieldWithPath("[].players").description("Players in the game"))
             .andWithPrefix("[].players[].",

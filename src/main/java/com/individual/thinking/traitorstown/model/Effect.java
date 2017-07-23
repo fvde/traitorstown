@@ -5,9 +5,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Tolerate;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Builder
@@ -18,22 +16,24 @@ public class Effect {
     @GeneratedValue
     private Long id;
 
-    @NonNull
-    private String name;
-
+    @Enumerated(EnumType.STRING)
     @NonNull
     private EffectType type;
 
+    @Enumerated(EnumType.STRING)
     @NonNull
     private EffectTargetType targetType;
 
     @NonNull
     private Integer amount;
 
+    @NonNull
+    private Integer duration;
+
     @Tolerate
     Effect() {}
 
-    public void apply(Turn turn, Player origin, Player target){
+    public void apply(Player origin, Player target){
         // TODO
     }
 }

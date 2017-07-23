@@ -24,7 +24,6 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.Arrays;
 
 import static com.individual.thinking.traitorstown.TestUtils.readFileFromResource;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.doNothing;
@@ -97,8 +96,8 @@ public class GameControllerTest {
             .players(singletonList(player))
             .status(GameStatus.PLAYING)
             .turns(Arrays.asList(
-                    Turn.builder().counter(1).cardsPlayed(emptyList()).build(),
-                    Turn.builder().counter(2).cardsPlayed(emptyList()).build()))
+                    Turn.builder().counter(1).build(),
+                    Turn.builder().counter(2).build()))
             .build();
 
     @Before
@@ -260,7 +259,7 @@ public class GameControllerTest {
 
     @Test
     public void getTurn() throws Exception {
-        when(gameService.getTurnByGameIdAndCounter(anyLong(), anyInt())).thenReturn(Turn.builder().counter(1).cardsPlayed(emptyList()).build());
+        when(gameService.getTurnByGameIdAndCounter(anyLong(), anyInt())).thenReturn(Turn.builder().counter(1).build());
 
         this.mockMvc.perform(get("/games/{gameId}/turns/{turnCounter}", validGameId, 1)
                 .header("token", validToken)

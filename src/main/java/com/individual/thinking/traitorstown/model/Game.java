@@ -18,8 +18,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static java.util.Collections.emptyList;
-
 @Entity
 @Builder
 @Getter
@@ -55,7 +53,7 @@ public class Game {
 
     public void start() throws RuleSetViolationException {
         setStatus(GameStatus.PLAYING);
-        turns.add(Turn.builder().counter(1).cardsPlayed(emptyList()).build());
+        turns.add(Turn.builder().counter(1).build());
         RuleSet.getRolesForPlayers(players).forEach((role, players) ->
                 players.forEach(p -> p.startGameWithRole(role)));
     }
@@ -67,12 +65,11 @@ public class Game {
             throw new NotCurrentTurnException("It is currently not turn " + turn);
         }
 
-        player.playCard(card);
         turn.playCard(card, player, target);
 
-        if (turn.getCardsPlayed().size() == getPlayers().size()){
-            players.forEach(Player::drawCard);
+        if (turn.getFinishedPlayers().size() == getPlayers().size()){
             turns.add(turn.startNext());
+            players.forEach(Player::drawCard);
         }
     }
 

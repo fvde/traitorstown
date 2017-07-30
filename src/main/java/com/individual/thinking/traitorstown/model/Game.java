@@ -8,17 +8,19 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Tolerate;
+import org.deeplearning4j.rl4j.space.Encodable;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.individual.thinking.traitorstown.Configuration.ARRAY_OBSERVATION_SPACE_SIZE;
+import static java.util.Collections.singletonList;
 
 @Entity
 @Builder
 @Getter
-public class Game {
+public class Game implements Encodable {
 
     @Id
     @GeneratedValue
@@ -41,7 +43,6 @@ public class Game {
     private GameStatus status = GameStatus.OPEN;
 
     @Enumerated(EnumType.STRING)
-    @Setter
     private Role winner;
 
     public void addPlayer(Player player){
@@ -54,7 +55,8 @@ public class Game {
 
     public void start() throws RuleSetViolationException {
         setStatus(GameStatus.PLAYING);
-        turns.add(Turn.builder().counter(1).build());
+        Turn firstTurn = Turn.builder().counter(1).build();
+        turns.add(firstTurn);
         RuleSet.getRolesForPlayers(players).forEach((role, players) ->
                 players.forEach(p -> p.startGameWithRole(role)));
     }
@@ -76,7 +78,7 @@ public class Game {
             Turn next = turn.startNext();
             if (next == null) {
                 status = GameStatus.FINISHED;
-                winner = getWinner().getRole();
+                winner = getWinningPlayer().getRole();
             } else {
                 turns.add(next);
                 players.forEach(Player::drawCard);
@@ -88,7 +90,7 @@ public class Game {
         return players.stream().filter(Player::getReady).collect(Collectors.toList()).size();
     }
 
-    private Player getWinner(){
+    private Player getWinningPlayer(){
         return getCurrentTurn().get().getActiveEffects().stream().filter(EffectActive::isLivingMayor).collect(Collectors.toList()).get(0).getTarget();
     }
 
@@ -108,4 +110,46 @@ public class Game {
 
     @Tolerate
     public Game() {}
+
+    /**
+     * ---------------------------------------------
+     * This section contains methods required for AI TODO: externalize
+     * ---------------------------------------------
+     */
+
+    public static Game buildAITrainingGame() {
+        return Game.builder()
+                .turns(new ArrayList<>())
+                .players(singletonList(Player.builder().ready(true).build()))
+                .status(GameStatus.PLAYING)
+                .turns(Collections.emptyList())
+                .build();
+    }
+
+    public void playCardAsPlayerFromCardSlotTargetingPlayer(int playerIndex, int cardIndex, int targetPlayer){
+        try {
+            playCard(players.get(playerIndex), players.get(targetPlayer), players.get(playerIndex).getHandCards().get(cardIndex), getCurrentTurn().get().getCounter());
+        } catch (NotCurrentTurnException e) {
+            e.printStackTrace();
+        } catch (PlayerDoesNotHaveCardException e) {
+            e.printStackTrace();
+        } catch (PlayedAlreadyPlayedCardThisTurnException e) {
+            e.printStackTrace();
+        } catch (PlayerMayNotPlayThisCardException e) {
+            e.printStackTrace();
+        } catch (InactiveGameException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public double[] toArray() {
+        double[] asArray = new double[]{
+                players.size(),
+                turns.size(),
+                status.ordinal(),
+                winner != null ? winner.ordinal() : -1};
+        assert (asArray.length == ARRAY_OBSERVATION_SPACE_SIZE);
+        return asArray;
+    }
 }

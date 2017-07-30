@@ -24,4 +24,6 @@ public class Configuration {
         // effect may cause you to discard cards, which is always allowed
         MINIMUM_RESOURCES.put(Resource.CARD, Integer.MIN_VALUE);
     }
+
+    public static final Integer ARRAY_OBSERVATION_SPACE_SIZE = 4;
 }

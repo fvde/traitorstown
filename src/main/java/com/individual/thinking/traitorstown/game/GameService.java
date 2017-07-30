@@ -37,7 +37,7 @@ class GameService {
         return gameRepository.findByStatus(status);
     }
 
-    protected Game addPlayerToGame(Long gameId, Long playerId) throws GameNotFoundException, CannotJoinRunningGameException, PlayerNotFoundException, GameFullException, AlreadyInGameException {
+    protected Game addPlayerToGame(Long gameId, Long playerId) throws GameNotFoundException, CannotJoinRunningGameException, PlayerNotFoundException, GameFullException, AlreadyInGameException, RuleSetViolationException {
         Game game = getGameById(gameId);
 
         if (!game.getStatus().equals(GameStatus.OPEN)){
@@ -55,6 +55,12 @@ class GameService {
         }
 
         game.addPlayer(player);
+        player.setReady(true);
+
+        if (game.isReadyToBeStarted()) {
+            game = startGame(game);
+        }
+
         gameRepository.save(game);
         return game;
     }

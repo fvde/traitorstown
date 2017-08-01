@@ -4,6 +4,8 @@ import com.individual.thinking.traitorstown.Configuration;
 import com.individual.thinking.traitorstown.model.exceptions.PlayerDoesNotHaveCardException;
 import lombok.*;
 import lombok.experimental.Tolerate;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -35,7 +37,8 @@ public class Player {
     @JoinTable(name = "player_deck_card", joinColumns = @JoinColumn(name = "player_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "card_id", referencedColumnName = "id"))
     private List<Card> deckCards = new ArrayList<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
     @JoinTable(name = "player_hand_card", joinColumns = @JoinColumn(name = "player_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "card_id", referencedColumnName = "id"))
     private List<Card> handCards = new ArrayList<>();
 

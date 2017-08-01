@@ -71,7 +71,7 @@ public class GameController {
     }
 
     @PostMapping(path = "/games/{gameId}/turns/{turnCounter}/cards")
-    public void playCard(@PathVariable Long gameId, @PathVariable Integer turnCounter, @RequestBody CardVo cardVo, HttpServletRequest request) throws PlayerUnauthorizedException, TurnNotFoundException, PlayerNotFoundException, NotCurrentTurnException, CardNotFoundException, GameNotFoundException, PlayerDoesNotHaveCardException, PlayedAlreadyPlayedCardThisTurnException, PlayerMayNotPlayThisCardException, InactiveGameException {
+    public void playCard(@PathVariable Long gameId, @PathVariable Integer turnCounter, @RequestBody CardVo cardVo, HttpServletRequest request) throws PlayerUnauthorizedException, TurnNotFoundException, PlayerNotFoundException, NotCurrentTurnException, CardNotFoundException, GameNotFoundException, PlayerDoesNotHaveCardException, PlayedAlreadyPlayedCardThisTurnException, PlayerMayNotPlayThisCardException, InactiveGameException, TargetPlayerNotInGameException {
         AuthorizedPlayer player = new AuthorizedPlayer(request).authorize(gameId, null);
         gameService.playCard(gameId, turnCounter, cardVo.getId(), player.getPlayer().getId(), cardVo.getTarget());
     }

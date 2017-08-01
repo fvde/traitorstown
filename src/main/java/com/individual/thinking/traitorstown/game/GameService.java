@@ -25,7 +25,7 @@ public class GameService {
     private final TurnRepository turnRepository;
     private final CardService cardService;
 
-    protected Game createNewGame() {
+    public Game createNewGame() {
         return gameRepository.save(Game.builder()
                 .players(new ArrayList<>())
                 .turns(new ArrayList<>())
@@ -33,11 +33,11 @@ public class GameService {
                 .build());
     }
 
-    protected List<Game> getGamesByStatus(GameStatus status) {
+    public List<Game> getGamesByStatus(GameStatus status) {
         return gameRepository.findByStatus(status);
     }
 
-    protected Game addPlayerToGame(Long gameId, Long playerId) throws GameNotFoundException, CannotJoinRunningGameException, PlayerNotFoundException, GameFullException, AlreadyInGameException, RuleSetViolationException {
+    public Game addPlayerToGame(Long gameId, Long playerId) throws GameNotFoundException, CannotJoinRunningGameException, PlayerNotFoundException, GameFullException, AlreadyInGameException, RuleSetViolationException {
         Game game = getGameById(gameId);
 
         if (!game.getStatus().equals(GameStatus.OPEN)){
@@ -65,7 +65,7 @@ public class GameService {
         return game;
     }
 
-    protected Game removePlayerFromGame(Long gameId, Long playerId) throws GameNotFoundException, PlayerNotFoundException, CannotLeaveRunningGameException {
+    public Game removePlayerFromGame(Long gameId, Long playerId) throws GameNotFoundException, PlayerNotFoundException, CannotLeaveRunningGameException {
         Game game = getGameById(gameId);
 
         if (!game.getStatus().equals(GameStatus.OPEN)){
@@ -77,7 +77,7 @@ public class GameService {
         return game;
     }
 
-    protected Game setPlayerReady(Long gameId, Long playerId, Boolean ready) throws GameNotFoundException, PlayerNotFoundException, RuleSetViolationException {
+    public Game setPlayerReady(Long gameId, Long playerId, Boolean ready) throws GameNotFoundException, PlayerNotFoundException, RuleSetViolationException {
         Game game = getGameById(gameId);
         Player player = getPlayerById(playerId);
         player.setReady(ready);
@@ -90,13 +90,17 @@ public class GameService {
         return game;
     }
 
-    public void playCard(Long gameId, Integer turn, Long cardId, Long playerId, Long targetPlayerId) throws GameNotFoundException, CardNotFoundException, PlayerNotFoundException, NotCurrentTurnException, PlayerDoesNotHaveCardException, PlayedAlreadyPlayedCardThisTurnException, PlayerMayNotPlayThisCardException, InactiveGameException {
+    public void playCard(Long gameId, Integer turn, Long cardId, Long playerId, Long targetPlayerId) throws GameNotFoundException, CardNotFoundException, PlayerNotFoundException, NotCurrentTurnException, PlayerDoesNotHaveCardException, PlayedAlreadyPlayedCardThisTurnException, PlayerMayNotPlayThisCardException, InactiveGameException, TargetPlayerNotInGameException {
         Game game = getGameById(gameId);
+
+        if (!game.isCurrentTurn(turn)){
+            throw new NotCurrentTurnException("It is currently not turn " + turn);
+        }
+
         game.playCard(
                 getPlayerById(playerId),
                 getPlayerById(targetPlayerId),
-                cardService.getCardById(cardId),
-                turn);
+                cardService.getCardById(cardId));
         gameRepository.save(game);
     }
 
@@ -109,7 +113,7 @@ public class GameService {
         return getPlayerById(playerId).getHandCards();
     }
 
-    protected Player getPlayerById(Long id) throws PlayerNotFoundException {
+    public Player getPlayerById(Long id) throws PlayerNotFoundException {
         Player player = playerRepository.findOne(id);
         if (player == null){
             throw new PlayerNotFoundException("Player not found");
@@ -117,7 +121,7 @@ public class GameService {
         return player;
     }
 
-    protected Game getGameById(Long id) throws GameNotFoundException {
+    public Game getGameById(Long id) throws GameNotFoundException {
         Game game = gameRepository.findOne(id);
         if (game == null){
             throw new GameNotFoundException("Game not found");

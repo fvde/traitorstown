@@ -9,13 +9,16 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Tolerate;
 import org.deeplearning4j.rl4j.space.Encodable;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.individual.thinking.traitorstown.Configuration.ARRAY_OBSERVATION_SPACE_SIZE;
-import static java.util.Collections.singletonList;
 
 @Entity
 @Builder
@@ -26,12 +29,14 @@ public class Game implements Encodable {
     @GeneratedValue
     private Long id;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
     @JoinColumn(name = "game_id")
     @NonNull
     private List<Player> players = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
     @JoinColumn(name = "game_id")
     @OrderBy("counter DESC")
     @NonNull
@@ -61,15 +66,15 @@ public class Game implements Encodable {
                 players.forEach(p -> p.startGameWithRole(role)));
     }
 
-    public void playCard(Player player, Player target, Card card, Integer turnCounter) throws NotCurrentTurnException, PlayerDoesNotHaveCardException, PlayedAlreadyPlayedCardThisTurnException, PlayerMayNotPlayThisCardException, InactiveGameException {
+    public void playCard(Player player, Player target, Card card) throws NotCurrentTurnException, PlayerDoesNotHaveCardException, PlayedAlreadyPlayedCardThisTurnException, PlayerMayNotPlayThisCardException, InactiveGameException, TargetPlayerNotInGameException {
         Turn turn = getCurrentTurn().get();
 
         if (!status.equals(GameStatus.PLAYING)){
             throw new InactiveGameException("This game has not started or is already over!");
         }
 
-        if (!isCurrentTurn(turnCounter)){
-            throw new NotCurrentTurnException("It is currently not turn " + turn);
+        if (!players.contains(target)){
+            throw new TargetPlayerNotInGameException("The player you are targeting is not in your game!");
         }
 
         turn.playCard(card, player, target);
@@ -104,7 +109,7 @@ public class Game implements Encodable {
         return turns.isEmpty() ? Optional.empty() : Optional.of(turns.get(0));
     }
 
-    private boolean isCurrentTurn(Integer turn){
+    public boolean isCurrentTurn(Integer turn){
         return getCurrentTurn().isPresent() && getCurrentTurn().get().getCounter().equals(turn);
     }
 
@@ -116,31 +121,6 @@ public class Game implements Encodable {
      * This section contains methods required for AI TODO: externalize
      * ---------------------------------------------
      */
-
-    public static Game buildAITrainingGame() {
-        return Game.builder()
-                .turns(new ArrayList<>())
-                .players(singletonList(Player.builder().ready(true).build()))
-                .status(GameStatus.PLAYING)
-                .turns(Collections.emptyList())
-                .build();
-    }
-
-    public void playCardAsPlayerFromCardSlotTargetingPlayer(int playerIndex, int cardIndex, int targetPlayer){
-        try {
-            playCard(players.get(playerIndex), players.get(targetPlayer), players.get(playerIndex).getHandCards().get(cardIndex), getCurrentTurn().get().getCounter());
-        } catch (NotCurrentTurnException e) {
-            e.printStackTrace();
-        } catch (PlayerDoesNotHaveCardException e) {
-            e.printStackTrace();
-        } catch (PlayedAlreadyPlayedCardThisTurnException e) {
-            e.printStackTrace();
-        } catch (PlayerMayNotPlayThisCardException e) {
-            e.printStackTrace();
-        } catch (InactiveGameException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public double[] toArray() {

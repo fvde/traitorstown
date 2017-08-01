@@ -20,7 +20,9 @@ import org.deeplearning4j.rl4j.util.DataManager;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -81,8 +83,7 @@ public class ReinforcementLearningService implements LearningService{
 
     private final UserService userService;
     private final GameService gameService;
-    private Player aiPlayer;
-    private List<Player> possibleOpponents;
+    private List<Player> players = new ArrayList<>();
 
     public void startLearning(){
         try {
@@ -94,10 +95,8 @@ public class ReinforcementLearningService implements LearningService{
     }
 
     private void prepareSession() throws Exception {
-        aiPlayer = userService.register("ai", "ai").getPlayer();
-        int registeredOpponents = 0;
-        while (registeredOpponents < Configuration.MAXIMUM_AMOUNT_OF_PLAYERS){
-            possibleOpponents.add(userService.register("opponent" + registeredOpponents,"opponent" + registeredOpponents).getPlayer());
+        while (players.size() < Configuration.MINIMUM_AMOUNT_OF_PLAYERS){
+            players.add(userService.register("player" + players.size(),"player" + players.size()).getPlayer());
         }
     }
 
@@ -107,7 +106,11 @@ public class ReinforcementLearningService implements LearningService{
         DataManager manager = new DataManager(true);
 
         //define the mdp from toy (toy length)
-        TraitorsTownMDP mdp = new TraitorsTownMDP(10, 8, false);
+        TraitorsTownMDP mdp = new TraitorsTownMDP(
+                gameService,
+                players.stream().map(p -> p.getId()).collect(Collectors.toList()),
+                12,
+                false);
 
         //define the training method
         Learning<Game, Integer, DiscreteSpace, IDQN> dql = new QLearningDiscreteDense<>(mdp, TRAITORS_NET, TRAITORS_QL, manager);

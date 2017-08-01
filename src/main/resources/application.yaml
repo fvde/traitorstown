@@ -12,11 +12,21 @@ logging:
   level:
     org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
 
+---
+# learning
+spring:
+  profiles: learning
+  datasource:
+    url: jdbc:h2:mem:AZ;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username:
+    password:
+    driver-class-name: org.h2.Driver
+
 
 ---
 # dev
 spring:
-  profiles: default
+  profiles: development
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/traitorstown
     username: root
@@ -31,3 +41,5 @@ spring:
     url:
     username:
     password:
+    driver-class-name: com.mysql.jdbc.Driver
+

@@ -18,7 +18,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-class GameService {
+public class GameService {
 
     private final GameRepository gameRepository;
     private final PlayerRepository playerRepository;

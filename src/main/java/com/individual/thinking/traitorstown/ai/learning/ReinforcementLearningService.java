@@ -1,6 +1,11 @@
 package com.individual.thinking.traitorstown.ai.learning;
 
+import com.individual.thinking.traitorstown.Configuration;
+import com.individual.thinking.traitorstown.game.GameService;
 import com.individual.thinking.traitorstown.model.Game;
+import com.individual.thinking.traitorstown.model.Player;
+import com.individual.thinking.traitorstown.user.UserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.deeplearning4j.rl4j.learning.Learning;
 import org.deeplearning4j.rl4j.learning.async.a3c.discrete.A3CDiscrete;
@@ -12,11 +17,18 @@ import org.deeplearning4j.rl4j.network.dqn.IDQN;
 import org.deeplearning4j.rl4j.policy.Policy;
 import org.deeplearning4j.rl4j.space.DiscreteSpace;
 import org.deeplearning4j.rl4j.util.DataManager;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Slf4j
-public class ReinforcementLearningRunner {
+@Service
+@RequiredArgsConstructor
+@Profile("learning")
+public class ReinforcementLearningService implements LearningService{
 
-    public static QLearning.QLConfiguration TRAITORS_QL =
+    private QLearning.QLConfiguration TRAITORS_QL =
             new QLearning.QLConfiguration(
                     123,   //Random seed
                     100000,//Max step By epoch
@@ -34,7 +46,7 @@ public class ReinforcementLearningRunner {
             );
 
 
-    public static AsyncNStepQLearningDiscrete.AsyncNStepQLConfiguration TRAITORS_ASYNC_QL =
+    private AsyncNStepQLearningDiscrete.AsyncNStepQLConfiguration TRAITORS_ASYNC_QL =
             new AsyncNStepQLearningDiscrete.AsyncNStepQLConfiguration(
                     123,        //Random seed
                     100000,     //Max step By epoch
@@ -50,7 +62,7 @@ public class ReinforcementLearningRunner {
                     2000        //num step for eps greedy anneal
             );
 
-    private static A3CDiscrete.A3CConfiguration TRAITORS_A3C =
+    private A3CDiscrete.A3CConfiguration TRAITORS_A3C =
             new A3CDiscrete.A3CConfiguration(
                     123,            //Random seed
                     200,            //Max step By epoch
@@ -63,15 +75,34 @@ public class ReinforcementLearningRunner {
                     10.0           //td-error clipping
             );
 
-    public static DQNFactoryStdDense.Configuration TRAITORS_NET =
+    private DQNFactoryStdDense.Configuration TRAITORS_NET =
             DQNFactoryStdDense.Configuration.builder()
                     .l2(0.01).learningRate(1e-2).numLayer(3).numHiddenNodes(16).build();
 
-    public static void main(String[] args ){
+    private final UserService userService;
+    private final GameService gameService;
+    private Player aiPlayer;
+    private List<Player> possibleOpponents;
+
+    public void startLearning(){
+        try {
+            prepareSession();
+        } catch (Exception e) {
+            log.error("Failed to prepare learning session with exception {}", e);
+        }
         trainAI();
     }
 
-    private static void trainAI() {
+    private void prepareSession() throws Exception {
+        aiPlayer = userService.register("ai", "ai").getPlayer();
+        int registeredOpponents = 0;
+        while (registeredOpponents < Configuration.MAXIMUM_AMOUNT_OF_PLAYERS){
+            possibleOpponents.add(userService.register("opponent" + registeredOpponents,"opponent" + registeredOpponents).getPlayer());
+        }
+    }
+
+    private void trainAI() {
+
         //record the training data in rl4j-data in a new folder
         DataManager manager = new DataManager(true);
 

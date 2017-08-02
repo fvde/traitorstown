@@ -132,4 +132,16 @@ public class Game implements Encodable {
         assert (asArray.length == ARRAY_OBSERVATION_SPACE_SIZE);
         return asArray;
     }
+
+    @Override
+    public String toString() {
+        return "Game{" +
+                "id=" + id +
+                ", players=" + players +
+                ", turn=" + getCurrentTurn().get().getCounter() +
+                ", activeEffects=" + getCurrentTurn().get().getActiveEffects() +
+                ", status=" + status +
+                ", winner=" + winner +
+                '}';
+    }
 }

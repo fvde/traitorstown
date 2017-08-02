@@ -45,7 +45,7 @@ public class CardService {
                                 Effect.builder().targetType(Resource.REPUTATION).type(EffectType.REMOVE).amount(5).duration(1).build())
                 ).build(),
                 Card.builder().name("Build Farm").description("Provides a low amount of gold for the next 2 weeks.").effects(
-                        Arrays.asList(Effect.builder().targetType(Resource.GOLD).type(EffectType.ADD).amount(1).duration(14).build())
+                        Arrays.asList(Effect.builder().targetType(Resource.GOLD).type(EffectType.ADD).amount(3).duration(14).build())
                 ).build(),
                 Card.builder().name("Go to the Tavern").description("Increase your reputation").effects(
                         Arrays.asList(
@@ -59,17 +59,18 @@ public class CardService {
                 ).build(),
                 Card.builder().name("Honest Trade").description("Receive a small amount of gold during the next week").effects(
                         Arrays.asList(
-                                Effect.builder().targetType(Resource.GOLD).type(EffectType.ADD).amount(2).duration(7).build())
+                                Effect.builder().targetType(Resource.GOLD).type(EffectType.ADD).amount(3).duration(7).build())
                 ).build(),
                 Card.builder().name("Dishonest Trade").description("Receive a decent amount of gold during the next week, but suffer a loss of reputation").effects(
                         Arrays.asList(
-                                Effect.builder().targetType(Resource.GOLD).type(EffectType.ADD).amount(3).duration(7).build(),
+                                Effect.builder().targetType(Resource.GOLD).type(EffectType.ADD).amount(5).duration(7).build(),
                                 Effect.builder().targetType(Resource.REPUTATION).type(EffectType.REMOVE).amount(1).duration(7).build())
                 ).build(),
                 Card.builder().name("Run for Mayor").description("Become mayor for one full week to win the game for your team. The mayor also has additional powers.").effects(
                         Arrays.asList(
-                                Effect.builder().targetType(Resource.MAYOR).type(EffectType.ADD).amount(1).duration(2).build(),
-                                Effect.builder().targetType(Resource.REPUTATION).type(EffectType.REMOVE).amount(10).duration(1).build())
+                                Effect.builder().targetType(Resource.MAYOR).type(EffectType.ADD).amount(1).duration(7).build(),
+                                Effect.builder().targetType(Resource.REPUTATION).type(EffectType.REMOVE).amount(10).duration(1).build(),
+                                Effect.builder().targetType(Resource.GOLD).type(EffectType.REMOVE).amount(5).duration(1).build())
                 ).build());
 
         cardRepository.save(mainCards);

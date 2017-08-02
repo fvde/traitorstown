@@ -124,4 +124,14 @@ public class Player {
             }
         }
     }
+
+    @Override
+    public String toString() {
+        return "Player{" +
+                "role=" + role +
+                ", handCards=" + handCards +
+                ", gold=" + gold +
+                ", reputation=" + reputation +
+                '}';
+    }
 }

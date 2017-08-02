@@ -49,4 +49,15 @@ public class EffectActive {
     public boolean isLivingMayor(){
         return effect.getTargetType().equals(Resource.MAYOR) && remainingTurns <= 0;
     }
+
+    @Override
+    public String toString() {
+        return "EffectActive{" +
+                "id=" + id +
+                ", effect=" + effect +
+                ", remainingTurns=" + remainingTurns +
+                ", player=" + player.getId() +
+                ", target=" + target.getId() +
+                '}';
+    }
 }

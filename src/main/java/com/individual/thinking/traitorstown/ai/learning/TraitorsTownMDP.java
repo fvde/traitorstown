@@ -82,9 +82,13 @@ public class TraitorsTownMDP implements MDP<Game, Integer, DiscreteSpace> {
     public StepReply<Game> step(Integer action) {
         printTest(action);
         Game game = null;
-        double reward = 0.0;
         try {
             game = gameService.getGameById(gameId);
+        } catch (GameNotFoundException e) {
+            e.printStackTrace();
+        }
+        double reward = 0.0;
+        try {
             Player aiPlayer = gameService.getPlayerById(aiPlayerId);
             gameService.playCard(
                     gameId,
@@ -98,15 +102,16 @@ public class TraitorsTownMDP implements MDP<Game, Integer, DiscreteSpace> {
 
             // reward victory
             reward += game.getStatus().equals(GameStatus.FINISHED) && game.getWinner().equals(gameService.getPlayerById(aiPlayerId).getRole()) ?
-                    100.0 :
+                    1.0 :
                     0.0;
 
             // reward playing correct cards
-            reward += game.getCurrentTurn().get().getCounter();
+            // reward += game.getCurrentTurn().get().getCounter();
         } catch (Exception e) {
-            log.error("Failed to execute step with exception {}", e.getMessage());
+            // log.error("Failed to execute step with exception {}", e.getMessage());
             reward = -1.0;
         }
+        log.info(game.toString());
 
         return new StepReply<>(game, reward, isDone(), null);
     }

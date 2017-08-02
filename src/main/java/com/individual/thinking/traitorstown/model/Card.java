@@ -34,4 +34,11 @@ public class Card {
     public boolean mayPlayCard(Player player){
         return effects.stream().allMatch(effect -> effect.mayApply(player));
     }
+
+    @Override
+    public String toString() {
+        return "Card{" +
+                "name='" + name + '\'' +
+                '}';
+    }
 }

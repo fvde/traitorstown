@@ -49,4 +49,13 @@ public class Effect {
     public boolean isCost(){
         return type.equals(EffectType.REMOVE);
     }
+
+    @Override
+    public String toString() {
+        return "Effect{" +
+                "type=" + type +
+                ", targetType=" + targetType +
+                ", amount=" + amount +
+                '}';
+    }
 }

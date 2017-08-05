@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Tolerate;
-import org.deeplearning4j.rl4j.space.Encodable;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -18,12 +17,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.individual.thinking.traitorstown.Configuration.ARRAY_OBSERVATION_SPACE_SIZE;
-
 @Entity
 @Builder
 @Getter
-public class Game implements Encodable {
+public class Game {
 
     @Id
     @GeneratedValue
@@ -32,6 +29,7 @@ public class Game implements Encodable {
     @OneToMany(fetch = FetchType.EAGER)
     @Fetch(value = FetchMode.SUBSELECT)
     @JoinColumn(name = "game_id")
+    @OrderBy("id DESC")
     @NonNull
     private List<Player> players = new ArrayList<>();
 
@@ -78,25 +76,38 @@ public class Game implements Encodable {
         }
 
         turn.playCard(card, player, target);
+    }
 
-        if (turn.getFinishedPlayers().size() == getPlayers().size()){
-            Turn next = turn.startNext();
-            if (next == null) {
-                status = GameStatus.FINISHED;
-                winner = getWinningPlayer().getRole();
-            } else {
-                turns.add(next);
-                players.forEach(Player::drawCard);
-            }
+    public void startNextTurn(){
+        Turn next = getCurrentTurn().get().end();
+        if (next == null) {
+            status = GameStatus.FINISHED;
+            winner = getWinningPlayer().getRole();
+        } else {
+            turns.add(next);
+            players.forEach(Player::drawCard);
         }
     }
 
+    //TODO add timeout
+    public boolean isTurnOver(){
+        return getCurrentTurn().get().getFinishedPlayers().size() == getPlayers().size() - getAIPlayers().size();
+    }
+
     public Integer getReadyPlayers(){
-        return players.stream().filter(Player::getReady).collect(Collectors.toList()).size();
+        return players.stream().filter(Player::isReady).collect(Collectors.toList()).size();
+    }
+
+    public List<Player> getAIPlayers(){
+        return players.stream().filter(Player::isAi).collect(Collectors.toList());
     }
 
     private Player getWinningPlayer(){
         return getCurrentTurn().get().getActiveEffects().stream().filter(EffectActive::isLivingMayor).collect(Collectors.toList()).get(0).getTarget();
+    }
+
+    public Player getPlayer(Long id){
+        return players.stream().filter(p -> p.getId().equals(id)).findFirst().get();
     }
 
     public boolean isReadyToBeStarted(){
@@ -109,29 +120,17 @@ public class Game implements Encodable {
         return turns.isEmpty() ? Optional.empty() : Optional.of(turns.get(0));
     }
 
+    public int getTurn(){
+        Optional<Turn> turn = getCurrentTurn();
+        return turn.isPresent() ? turn.get().getCounter() : 0;
+    }
+
     public boolean isCurrentTurn(Integer turn){
         return getCurrentTurn().isPresent() && getCurrentTurn().get().getCounter().equals(turn);
     }
 
     @Tolerate
     public Game() {}
-
-    /**
-     * ---------------------------------------------
-     * This section contains methods required for AI TODO: externalize
-     * ---------------------------------------------
-     */
-
-    @Override
-    public double[] toArray() {
-        double[] asArray = new double[]{
-                players.size(),
-                turns.size(),
-                status.ordinal(),
-                winner != null ? winner.ordinal() : -1};
-        assert (asArray.length == ARRAY_OBSERVATION_SPACE_SIZE);
-        return asArray;
-    }
 
     @Override
     public String toString() {

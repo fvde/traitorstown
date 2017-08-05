@@ -19,6 +19,10 @@ public class UserService {
     private final CardService cardService;
 
     public User register(String email, String password) throws Exception {
+        return register(email, password, false);
+    }
+
+    public User register(String email, String password, boolean ai) throws Exception {
 
         if (userRepository.findByEmail(email).isPresent()){
             throw new EmailAlreadyInUseException("Email already in use!");
@@ -28,7 +32,7 @@ public class UserService {
                 .email(email)
                 .password(Secure.getSaltedHash(password))
                 .token(Secure.getToken())
-                .player(Player.builder().decks(cardService.getStandardDecks()).ready(false).build())
+                .player(Player.builder().decks(cardService.getStandardDecks()).ready(false).ai(ai).build())
                 .build();
 
         userRepository.save(user);

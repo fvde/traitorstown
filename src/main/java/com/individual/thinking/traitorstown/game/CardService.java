@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.individual.thinking.traitorstown.Configuration.TOTAL_NUMBER_OF_CARDS;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -68,12 +70,16 @@ public class CardService {
                 ).build(),
                 Card.builder().name("Run for Mayor").description("Become mayor for one full week to win the game for your team. The mayor also has additional powers.").effects(
                         Arrays.asList(
-                                Effect.builder().targetType(Resource.MAYOR).type(EffectType.ADD).amount(1).duration(7).build(),
+                                Effect.builder().targetType(Resource.MAYOR).type(EffectType.ADD).amount(1).duration(1).build(),
                                 Effect.builder().targetType(Resource.REPUTATION).type(EffectType.REMOVE).amount(10).duration(1).build(),
                                 Effect.builder().targetType(Resource.GOLD).type(EffectType.REMOVE).amount(5).duration(1).build())
                 ).build());
 
         cardRepository.save(mainCards);
+
+        if (TOTAL_NUMBER_OF_CARDS != mainCards.size()){
+            throw new IllegalArgumentException("Incorrect number of total cards");
+        }
 
         buildDeckForRole(Role.CITIZEN, mainCards);
         buildDeckForRole(Role.TRAITOR, mainCards);

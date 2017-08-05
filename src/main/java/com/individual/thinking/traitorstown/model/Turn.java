@@ -68,7 +68,7 @@ public class Turn {
         finishedPlayers.add(player);
     }
 
-    public Turn startNext(){
+    public Turn end(){
         activeEffects.stream().forEach(EffectActive::apply);
         List<EffectActive> livingMayors =  activeEffects.stream().filter(EffectActive::isLivingMayor).collect(Collectors.toList());
 

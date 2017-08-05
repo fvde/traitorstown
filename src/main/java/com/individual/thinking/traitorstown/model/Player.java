@@ -50,7 +50,12 @@ public class Player {
 
     @Setter
     @NonNull
-    private Boolean ready;
+    private boolean ready;
+
+    @Setter
+    @NonNull
+    @Builder.Default
+    private boolean ai = false;
 
     public void startGameWithRole(Role role){
         this.role = role;
@@ -83,7 +88,15 @@ public class Player {
     }
 
     private void drawCards(Integer amount){
+        // may not draw more cards than in deck
         amount = Math.min(amount, deckCards.size());
+
+        // may not draw more cards than allowed to have at the same time
+        int overDraw = handCards.size() + amount - Configuration.MAXIMUM_AMOUNT_OF_CARDS;
+        if (overDraw > 0){
+            amount = Math.max(amount - overDraw, 0);
+        }
+
         List<Card> availableCards = new ArrayList<>(deckCards);
         Collections.shuffle(availableCards);
         List<Card> drawnCards = availableCards.subList(0, amount);
@@ -129,6 +142,7 @@ public class Player {
     public String toString() {
         return "Player{" +
                 "role=" + role +
+                ", ai=" + ai +
                 ", handCards=" + handCards +
                 ", gold=" + gold +
                 ", reputation=" + reputation +

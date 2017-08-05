@@ -1,6 +1,8 @@
 package com.individual.thinking.traitorstown.game;
 
 import com.individual.thinking.traitorstown.Configuration;
+import com.individual.thinking.traitorstown.ai.ArtificialIntelligenceService;
+import com.individual.thinking.traitorstown.ai.learning.model.Action;
 import com.individual.thinking.traitorstown.game.exceptions.*;
 import com.individual.thinking.traitorstown.game.repository.GameRepository;
 import com.individual.thinking.traitorstown.game.repository.PlayerRepository;
@@ -8,22 +10,27 @@ import com.individual.thinking.traitorstown.game.repository.TurnRepository;
 import com.individual.thinking.traitorstown.model.exceptions.*;
 import com.individual.thinking.traitorstown.model.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class GameService {
 
     private final GameRepository gameRepository;
     private final PlayerRepository playerRepository;
     private final TurnRepository turnRepository;
     private final CardService cardService;
+    private final ArtificialIntelligenceService artificialIntelligenceService;
 
     public Game createNewGame() {
         return gameRepository.save(Game.builder()
@@ -102,6 +109,28 @@ public class GameService {
                 getPlayerById(targetPlayerId),
                 cardService.getCardById(cardId));
         gameRepository.save(game);
+
+        if (game.isTurnOver()){
+            startNextTurn(game);
+        }
+    }
+
+    private void startNextTurn(Game game){
+        game.startNextTurn();
+        game.getAIPlayers().forEach(player -> {
+                    Action recommendedAction = artificialIntelligenceService.getRecommendedAction(game, player.getId());
+                    try {
+                        playCard(
+                                game.getId(),
+                                game.getTurn(),
+                                player.getHandCards().get(recommendedAction.getCardSlot()).getId(),
+                                player.getId(),
+                                game.getPlayers().get(recommendedAction.getPlayerSlot()).getId());
+                    } catch (Exception e) {
+                        log.error("AI failed to make valid move, skipping turn: {}", e.getMessage());
+                    }
+                }
+        );
     }
 
     private Game startGame(Game game) throws RuleSetViolationException {
@@ -109,8 +138,15 @@ public class GameService {
         return gameRepository.save(game);
     }
 
-    protected List<Card> getPlayerCards(Long playerId) throws PlayerNotFoundException {
-        return getPlayerById(playerId).getHandCards();
+    public List<Card> getPlayerCards(Long playerId) throws PlayerNotFoundException {
+        return getPlayerCards(getPlayerById(playerId));
+    }
+
+    private List<Card> getPlayerCards(Player player){
+        return player.getHandCards()
+                .stream()
+                .sorted(Comparator.comparing(Card::getId))
+                .collect(Collectors.toList());
     }
 
     public Player getPlayerById(Long id) throws PlayerNotFoundException {

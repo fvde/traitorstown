@@ -16,7 +16,7 @@ public class PlayerRepresentation {
     public static PlayerRepresentation fromPlayer(Player player){
         return new PlayerRepresentation(
                 player.getId(),
-                player.getReady(),
+                player.isReady(),
                 Arrays.asList(
                         new ResourceRepresentation(Resource.GOLD.ordinal(), player.getResource(Resource.GOLD)),
                         new ResourceRepresentation(Resource.REPUTATION.ordinal(), player.getResource(Resource.REPUTATION))));

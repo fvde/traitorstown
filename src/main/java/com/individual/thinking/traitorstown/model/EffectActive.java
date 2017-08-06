@@ -3,6 +3,7 @@ package com.individual.thinking.traitorstown.model;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.experimental.Tolerate;
 
 import javax.persistence.*;
@@ -10,6 +11,7 @@ import javax.persistence.*;
 @Entity
 @Builder
 @Getter
+@ToString
 public class EffectActive {
 
     @Id
@@ -46,10 +48,6 @@ public class EffectActive {
         return remainingTurns > 0;
     }
 
-    public boolean isLivingMayor(){
-        return effect.getTargetType().equals(Resource.MAYOR) && remainingTurns <= 0;
-    }
-
     @Override
     public String toString() {
         return "EffectActive{" +
@@ -59,5 +57,17 @@ public class EffectActive {
                 ", player=" + player.getId() +
                 ", target=" + target.getId() +
                 '}';
+    }
+
+    public boolean isCandidacy() {
+        return effect.getTargetResource().equals(Resource.CANDIDACY);
+    }
+
+    public boolean isVote() {
+        return effect.getTargetResource().equals(Resource.VOTE);
+    }
+
+    public boolean isMayor() {
+        return effect.getTargetResource().equals(Resource.MAYOR);
     }
 }

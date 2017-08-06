@@ -3,24 +3,29 @@ package com.individual.thinking.traitorstown.game;
 import com.individual.thinking.traitorstown.game.exceptions.CardNotFoundException;
 import com.individual.thinking.traitorstown.game.repository.CardRepository;
 import com.individual.thinking.traitorstown.game.repository.DeckRepository;
+import com.individual.thinking.traitorstown.game.repository.EffectRepository;
 import com.individual.thinking.traitorstown.model.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static com.individual.thinking.traitorstown.Configuration.TOTAL_NUMBER_OF_CARDS;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class CardService {
+
+    public static Map<CardType, Card> Cards = new HashMap<>();
+    public static Map<EffectType, Effect> Effects = new HashMap<>();
 
     private final DeckRepository deckRepository;
     private final CardRepository cardRepository;
+    private final EffectRepository effectRepository;
 
     public List<Deck> getStandardDecks(){
         List<Deck> decks = new ArrayList<>();
@@ -37,52 +42,104 @@ public class CardService {
     }
 
     public void initializeCards() {
-        if (deckRepository.findAll().iterator().hasNext()){
-            return;
-        }
-
         List<Card> mainCards = Arrays.asList(
-                Card.builder().name("Use Connections").description("Draw an additional card.").effects(
-                        Arrays.asList(Effect.builder().targetType(Resource.CARD).type(EffectType.ADD).amount(1).duration(1).build(),
-                                Effect.builder().targetType(Resource.REPUTATION).type(EffectType.REMOVE).amount(5).duration(1).build())
-                ).build(),
-                Card.builder().name("Build Farm").description("Provides a low amount of gold for the next 2 weeks.").effects(
-                        Arrays.asList(Effect.builder().targetType(Resource.GOLD).type(EffectType.ADD).amount(3).duration(14).build())
-                ).build(),
-                Card.builder().name("Go to the Tavern").description("Increase your reputation").effects(
+                createCardOfType(CardType.CONNECTIONS,
+                        Card.builder().cardType(CardType.CONNECTIONS).name("Use Connections").description("Draw an additional card.").effects(
                         Arrays.asList(
-                                Effect.builder().targetType(Resource.REPUTATION).type(EffectType.ADD).amount(5).duration(1).build(),
-                                Effect.builder().targetType(Resource.GOLD).type(EffectType.REMOVE).amount(1).duration(1).build())
-                ).build(),
-                Card.builder().name("Throw Party").description("Increase your popularity by a considerable amount").effects(
+                                Effect.builder().targetResource(Resource.CARD).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.SINGLE).amount(1).duration(1).build(),
+                                Effect.builder().targetResource(Resource.REPUTATION).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SINGLE).amount(5).duration(1).build())
+                ).build()),
+                createCardOfType(CardType.FARM,
+                        Card.builder().cardType(CardType.FARM).name("Build Farm").description("Provides a low amount of gold for the next 2 weeks.").effects(
                         Arrays.asList(
-                                Effect.builder().targetType(Resource.REPUTATION).type(EffectType.ADD).amount(15).duration(1).build(),
-                                Effect.builder().targetType(Resource.GOLD).type(EffectType.REMOVE).amount(5).duration(1).build())
-                ).build(),
-                Card.builder().name("Honest Trade").description("Receive a small amount of gold during the next week").effects(
+                                Effect.builder().targetResource(Resource.GOLD).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.SINGLE).amount(3).duration(14).build())
+                ).build()),
+                createCardOfType(CardType.TAVERN,
+                Card.builder().cardType(CardType.TAVERN).name("Go to the Tavern").description("Increase your reputation").effects(
                         Arrays.asList(
-                                Effect.builder().targetType(Resource.GOLD).type(EffectType.ADD).amount(3).duration(7).build())
-                ).build(),
-                Card.builder().name("Dishonest Trade").description("Receive a decent amount of gold during the next week, but suffer a loss of reputation").effects(
+                                Effect.builder().targetResource(Resource.REPUTATION).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.SINGLE).amount(5).duration(1).build(),
+                                Effect.builder().targetResource(Resource.GOLD).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SINGLE).amount(1).duration(1).build())
+                ).build()),
+                createCardOfType(CardType.PARTY,
+                Card.builder().cardType(CardType.PARTY).name("Throw Party").description("Increase your popularity by a considerable amount").effects(
                         Arrays.asList(
-                                Effect.builder().targetType(Resource.GOLD).type(EffectType.ADD).amount(5).duration(7).build(),
-                                Effect.builder().targetType(Resource.REPUTATION).type(EffectType.REMOVE).amount(1).duration(7).build())
-                ).build(),
-                Card.builder().name("Run for Mayor").description("Become mayor for one full week to win the game for your team. The mayor also has additional powers.").effects(
+                                Effect.builder().targetResource(Resource.REPUTATION).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.SINGLE).amount(15).duration(1).build(),
+                                Effect.builder().targetResource(Resource.GOLD).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SINGLE).amount(5).duration(1).build())
+                ).build()),
+                createCardOfType(CardType.HONEST_TRADE,
+                Card.builder().cardType(CardType.HONEST_TRADE).name("Honest Trade").description("Receive a small amount of gold during the next week").effects(
                         Arrays.asList(
-                                Effect.builder().targetType(Resource.MAYOR).type(EffectType.ADD).amount(1).duration(1).build(),
-                                Effect.builder().targetType(Resource.REPUTATION).type(EffectType.REMOVE).amount(10).duration(1).build(),
-                                Effect.builder().targetType(Resource.GOLD).type(EffectType.REMOVE).amount(20).duration(1).build())
-                ).build());
+                                Effect.builder().targetResource(Resource.GOLD).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.SINGLE).amount(3).duration(7).build())
+                ).build()),
+                createCardOfType(CardType.DISHONEST_TRADE,
+                Card.builder().cardType(CardType.DISHONEST_TRADE).name("Dishonest Trade").description("Receive a decent amount of gold during the next week, but suffer a loss of reputation").effects(
+                        Arrays.asList(
+                                Effect.builder().targetResource(Resource.GOLD).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.SINGLE).amount(5).duration(7).build(),
+                                Effect.builder().targetResource(Resource.REPUTATION).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SINGLE).amount(1).duration(7).build())
+                ).build()),
+                createCardOfType(CardType.RUN_FOR_MAYOR,
+                Card.builder().version(1).cardType(CardType.RUN_FOR_MAYOR).name("Run for Mayor").description("Become mayor on election day. Stay alive for one week to win the game.").effects(
+                        Arrays.asList(
+                                Effect.builder().targetResource(Resource.CANDIDACY).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.SINGLE).amount(1).duration(Integer.MAX_VALUE).build(),
+                                Effect.builder().targetResource(Resource.REPUTATION).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SINGLE).amount(10).duration(1).build(),
+                                Effect.builder().targetResource(Resource.GOLD).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SINGLE).amount(10).duration(1).build())
+                ).build()));
 
-        cardRepository.save(mainCards);
+        // SPECIAL CARDS
+        createCardOfType(CardType.VOTE,
+                Card.builder().cardType(CardType.VOTE).name("Vote").description("Vote for a player to become mayor.").isSpecial(true).effects(
+                        Arrays.asList(
+                                Effect.builder().targetResource(Resource.VOTE).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.SINGLE).amount(1).duration(2).build())
+        ).build());
 
-        if (TOTAL_NUMBER_OF_CARDS != mainCards.size()){
+        // SPECIAL EFFECTS
+        createEffect(EffectType.MAYOR,
+                Effect.builder().targetResource(Resource.MAYOR).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.SINGLE).amount(1).duration(7).build());
+
+        if (TOTAL_NUMBER_OF_CARDS != cardRepository.count()){
             throw new IllegalArgumentException("Incorrect number of total cards");
         }
 
-        buildDeckForRole(Role.CITIZEN, mainCards);
-        buildDeckForRole(Role.TRAITOR, mainCards);
+        if (deckRepository.count() == 0){
+            // TODO version decks
+            buildDeckForRole(Role.CITIZEN, mainCards);
+            buildDeckForRole(Role.TRAITOR, mainCards);
+        }
+    }
+
+    private Card createCardOfType(CardType type, Card card){
+        Optional<Card> existingCard = cardRepository.findByCardType(type);
+
+        if (existingCard.isPresent()){
+            Card currentCard = existingCard.get();
+            if (currentCard.getVersion() != card.getVersion()){
+                // TODO enable version
+                log.info("NOT IMPLEMENTED: Found new version of card {}, updating to {}", currentCard, card);
+                // currentCard.updateCard(card);
+                // cardRepository.save(currentCard);
+            } else {
+                log.info("Found card {}, loading...", currentCard);
+            }
+            Cards.put(type, currentCard);
+            return currentCard;
+        } else {
+            log.info("No version found for card {}, creating new...", card);
+            cardRepository.save(card);
+            Cards.put(type, card);
+            return card;
+        }
+    }
+
+    private Effect createEffect(EffectType type, Effect effect){
+        Optional<Effect> existingEffect = effectRepository.findByEffectType(type);
+
+        if (existingEffect.isPresent()){
+            effectRepository.delete(existingEffect.get());
+        }
+
+        effectRepository.save(effect);
+        Effects.put(type, effect);
+        return effect;
     }
 
     private void buildDeckForRole(Role role, List<Card> cards){

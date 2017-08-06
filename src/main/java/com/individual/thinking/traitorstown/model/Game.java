@@ -1,25 +1,22 @@
 package com.individual.thinking.traitorstown.model;
 
 import com.individual.thinking.traitorstown.Configuration;
+import com.individual.thinking.traitorstown.game.CardService;
 import com.individual.thinking.traitorstown.game.rules.RuleSet;
 import com.individual.thinking.traitorstown.model.exceptions.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Tolerate;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
 @Builder
 @Getter
+@ToString
 public class Game {
 
     @Id
@@ -79,14 +76,35 @@ public class Game {
     }
 
     public void startNextTurn(){
+        players.forEach(Player::endTurn);
         Turn next = getCurrentTurn().get().end();
-        if (next == null) {
+
+        if (Day.isElectionDay(next.getCounter()) && players.stream().filter(Player::isCandidate).count() > 0){
+            players.stream().forEach(player -> player.addCard(CardService.Cards.get(CardType.VOTE)));
+        }
+
+        if (Day.isDayAfterElections(next.getCounter())){
+            electMayor();
+        }
+
+        if (getMayor().isPresent() && Day.isElectionDay(next.getCounter())) {
             status = GameStatus.FINISHED;
-            winner = getWinningPlayer().getRole();
+            winner = getMayor().get().getRole();
         } else {
             turns.add(next);
             players.forEach(Player::drawCard);
         }
+    }
+
+    private void electMayor(){
+        Player electedPlayer = Collections.max(players, Comparator.comparingLong(Player::getVotes));
+
+        if (electedPlayer.getVotes() > 0){
+            // TODO add mayor cards
+            electedPlayer.addEffect(CardService.Effects.get(EffectType.MAYOR));
+        }
+        // clean up candidacies
+        players.stream().forEach(Player::clearCandidacy);
     }
 
     //TODO add timeout
@@ -102,12 +120,12 @@ public class Game {
         return players.stream().filter(Player::isAi).collect(Collectors.toList());
     }
 
-    private Player getWinningPlayer(){
-        return getCurrentTurn().get().getActiveEffects().stream().filter(EffectActive::isLivingMayor).collect(Collectors.toList()).get(0).getTarget();
-    }
-
     public Player getPlayer(Long id){
         return players.stream().filter(p -> p.getId().equals(id)).findFirst().get();
+    }
+
+    public Optional<Player> getMayor(){
+        return players.stream().filter(Player::isMayor).findFirst();
     }
 
     public boolean isReadyToBeStarted(){
@@ -131,16 +149,4 @@ public class Game {
 
     @Tolerate
     public Game() {}
-
-    @Override
-    public String toString() {
-        return "Game{" +
-                "id=" + id +
-                ", players=" + players +
-                ", turn=" + getCurrentTurn().get().getCounter() +
-                ", activeEffects=" + getCurrentTurn().get().getActiveEffects() +
-                ", status=" + status +
-                ", winner=" + winner +
-                '}';
-    }
 }

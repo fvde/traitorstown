@@ -1,8 +1,6 @@
 package com.individual.thinking.traitorstown.model;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NonNull;
+import lombok.*;
 import lombok.experimental.Tolerate;
 
 import javax.persistence.*;
@@ -12,11 +10,16 @@ import java.util.List;
 @Entity
 @Builder
 @Getter
+@ToString
 public class Card {
 
     @Id
     @GeneratedValue
     private Long id;
+
+    @NonNull
+    @Enumerated(EnumType.STRING)
+    private CardType cardType;
 
     @NonNull
     private String name;
@@ -28,6 +31,14 @@ public class Card {
     @JoinTable(name = "card_effect", joinColumns = @JoinColumn(name = "card_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "effect_id", referencedColumnName = "id"))
     private List<Effect> effects = new ArrayList<>();
 
+    @Setter
+    @NonNull
+    @Builder.Default
+    private boolean isSpecial = false;
+
+    @NonNull
+    private int version;
+
     @Tolerate
     Card() {}
 
@@ -35,10 +46,11 @@ public class Card {
         return effects.stream().allMatch(effect -> effect.mayApply(player));
     }
 
-    @Override
-    public String toString() {
-        return "Card{" +
-                "name='" + name + '\'' +
-                '}';
+    public void updateCard(Card newCard){
+        name = newCard.name;
+        description = newCard.description;
+        effects = newCard.effects;
+        isSpecial = newCard.isSpecial;
+        version = newCard.version;
     }
 }

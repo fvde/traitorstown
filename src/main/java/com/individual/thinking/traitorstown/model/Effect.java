@@ -4,6 +4,7 @@ import com.individual.thinking.traitorstown.Configuration;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.experimental.Tolerate;
 
 import javax.persistence.*;
@@ -11,6 +12,7 @@ import javax.persistence.*;
 @Entity
 @Builder
 @Getter
+@ToString
 public class Effect {
 
     @Id
@@ -19,11 +21,20 @@ public class Effect {
 
     @Enumerated(EnumType.STRING)
     @NonNull
-    private EffectType type;
+    @Builder.Default
+    private EffectType effectType = EffectType.OTHER;
 
     @Enumerated(EnumType.STRING)
     @NonNull
-    private Resource targetType;
+    private EffectOperator operator;
+
+    @Enumerated(EnumType.STRING)
+    @NonNull
+    private EffectTargetType effectTargetType;
+
+    @Enumerated(EnumType.STRING)
+    @NonNull
+    private Resource targetResource;
 
     @NonNull
     private Integer amount;
@@ -35,27 +46,22 @@ public class Effect {
     Effect() {}
 
     public void apply(Player player, Player target) {
-        target.setResource(targetType, type.apply(target.getResource(targetType), amount));
+        if (operator == EffectOperator.REMOVE){
+            player.setResource(targetResource, operator.apply(target.getResource(targetResource), amount));
+        } else {
+            target.setResource(targetResource, operator.apply(target.getResource(targetResource), amount));
+        }
     }
 
     public boolean mayApply(Player player){
-        if (type.equals(EffectType.REMOVE)){
-            return player.getResource(targetType) - amount >= Configuration.MINIMUM_RESOURCES.get(targetType);
+        if (operator.equals(EffectOperator.REMOVE)){
+            return player.getResource(targetResource) - amount >= Configuration.MINIMUM_RESOURCES.get(targetResource);
         }
 
         return true;
     }
 
     public boolean isCost(){
-        return type.equals(EffectType.REMOVE);
-    }
-
-    @Override
-    public String toString() {
-        return "Effect{" +
-                "type=" + type +
-                ", targetType=" + targetType +
-                ", amount=" + amount +
-                '}';
+        return operator.equals(EffectOperator.REMOVE);
     }
 }

@@ -11,6 +11,8 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static com.individual.thinking.traitorstown.util.CollectorsExtension.singletonCollector;
 
@@ -42,6 +44,12 @@ public class Player {
     @JoinTable(name = "player_hand_card", joinColumns = @JoinColumn(name = "player_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "card_id", referencedColumnName = "id"))
     private List<Card> handCards = new ArrayList<>();
 
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
+    @JoinColumn(name = "player_id")
+    private List<EffectActive> activeEffects = new ArrayList<>();
+
     @Getter(value = AccessLevel.PRIVATE)
     private Integer gold = 0;
 
@@ -59,6 +67,7 @@ public class Player {
 
     public void startGameWithRole(Role role){
         this.role = role;
+        activeEffects.clear();
         deckCards.clear();
         handCards.clear();
         gold = Configuration.INITIAL_AMOUNT_OF_GOLD;
@@ -75,12 +84,31 @@ public class Player {
         return card.mayPlayCard(this);
     }
 
-    public void playCard(Card card) throws PlayerDoesNotHaveCardException {
+    public void playCard(Card card, Player target) throws PlayerDoesNotHaveCardException {
         if (!handCards.contains(card)){
             throw new PlayerDoesNotHaveCardException("You cannot play a card you don't have!");
         }
+
+        card.getEffects().forEach(effect -> addEffect(effect, target));
+
+        if (!card.isSpecial()){
+            deckCards.add(card);
+        }
+
         handCards.remove(card);
-        deckCards.add(card);
+    }
+
+    public void addEffect(Effect effect){
+        addEffect(effect, this);
+    }
+
+    private void addEffect(Effect effect, Player target){
+        activeEffects.add(EffectActive.builder()
+                .effect(effect)
+                .player(this)
+                .target(target)
+                .remainingTurns(effect.getDuration())
+                .build());
     }
 
     private Deck getDeckForRole(Role role){
@@ -104,6 +132,31 @@ public class Player {
         drawnCards.forEach(deckCards::remove);
     }
 
+    public void addCard(Card card){
+        handCards.add(card);
+    }
+
+    public void endTurn() {
+        activeEffects.stream().forEach(EffectActive::apply);
+        activeEffects = activeEffects.stream().filter(EffectActive::isActive).collect(Collectors.toList());
+    }
+
+    public Long getVotes(){
+        return activeEffects.stream().filter(EffectActive::isVote).count();
+    }
+
+    public boolean isMayor(){
+        return is(EffectActive::isMayor);
+    }
+
+    public boolean isCandidate(){
+        return is(EffectActive::isCandidacy);
+    }
+
+    private boolean is(Predicate<? super EffectActive> predicate){
+        return activeEffects.stream().filter(predicate).findFirst().isPresent();
+    }
+
     @Tolerate
     Player () {}
 
@@ -112,8 +165,7 @@ public class Player {
             case GOLD: return gold;
             case REPUTATION: return reputation;
             case CARD: return handCards.size();
-            case MAYOR: return 0;
-            default: return null;
+            default: return 0;
         }
     }
 
@@ -131,21 +183,13 @@ public class Player {
                 drawCards(Math.max(value - handCards.size(), 0));
                 break;
             }
-            case MAYOR: {
-                //TODO add mayor cards
+            default: {
                 break;
             }
         }
     }
 
-    @Override
-    public String toString() {
-        return "Player{" +
-                "role=" + role +
-                ", ai=" + ai +
-                ", handCards=" + handCards +
-                ", gold=" + gold +
-                ", reputation=" + reputation +
-                '}';
+    public void clearCandidacy() {
+        activeEffects.removeAll(activeEffects.stream().filter(EffectActive::isCandidacy).collect(Collectors.toList()));
     }
 }

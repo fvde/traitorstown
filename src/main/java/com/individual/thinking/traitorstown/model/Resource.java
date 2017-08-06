@@ -4,5 +4,7 @@ public enum Resource {
     GOLD,
     REPUTATION,
     CARD,
-    MAYOR
+    MAYOR,
+    VOTE,
+    CANDIDACY
 }

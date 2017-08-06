@@ -10,7 +10,7 @@ public class ResourceRepresentation {
 
     public static ResourceRepresentation fromEffect(Effect effect){
         return new ResourceRepresentation(
-                effect.getTargetType().ordinal(),
+                effect.getTargetResource().ordinal(),
                 effect.getAmount());
     }
 }

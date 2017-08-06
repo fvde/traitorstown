@@ -72,7 +72,7 @@ public class CardService {
                         Arrays.asList(
                                 Effect.builder().targetType(Resource.MAYOR).type(EffectType.ADD).amount(1).duration(1).build(),
                                 Effect.builder().targetType(Resource.REPUTATION).type(EffectType.REMOVE).amount(10).duration(1).build(),
-                                Effect.builder().targetType(Resource.GOLD).type(EffectType.REMOVE).amount(5).duration(1).build())
+                                Effect.builder().targetType(Resource.GOLD).type(EffectType.REMOVE).amount(20).duration(1).build())
                 ).build());
 
         cardRepository.save(mainCards);

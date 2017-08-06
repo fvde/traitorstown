@@ -88,7 +88,7 @@ public class TraitorsTownMDP implements MDP<GameState, Integer, DiscreteSpace> {
         int currentTurn = turn;
         double reward = 0.0;
 
-        log.info("Turn " + turn + ": " + getReadable(action) + " with state " + gameState.toString() + "("+ timesInSameTurn +")");
+        log.info("Game: " + gameId + " Turn: " + turn + ": " + getReadable(action) + " with state " + gameState.toString() + "("+ timesInSameTurn +")");
 
         try {
             gameService.playCard(

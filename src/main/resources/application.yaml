@@ -6,7 +6,10 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5Dialect
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
+      url: jdbc:h2:mem:AZ;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      username:
+      password:
+      driver-class-name: org.h2.Driver
 
 logging:
   level:
@@ -21,7 +24,6 @@ spring:
     username:
     password:
     driver-class-name: org.h2.Driver
-
 
 ---
 # dev

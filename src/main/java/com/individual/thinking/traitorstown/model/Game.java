@@ -43,7 +43,8 @@ public class Game {
     private GameStatus status = GameStatus.OPEN;
 
     @Enumerated(EnumType.STRING)
-    private Role winner;
+    @Builder.Default
+    private Role winner = Role.NONE;
 
     public void addPlayer(Player player){
         players.add(player);

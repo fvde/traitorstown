@@ -68,6 +68,7 @@ public class GameControllerTest {
             fieldWithPath("id").description("Game id"),
             fieldWithPath("status").description("Game status [OPEN = 0, PLAYING = 1, FINISHED = 2]"),
             fieldWithPath("turn").description("Current turn"),
+            fieldWithPath("winner").description("The winning role [NONE = 0, CITIZEN = 1, TRAITOR = 2]"),
             fieldWithPath("players").description("Players in the game"))
             .andWithPrefix("players[].",
                 fieldWithPath("id").description("Id of the player"),
@@ -82,6 +83,7 @@ public class GameControllerTest {
             fieldWithPath("[].id").description("Game id"),
             fieldWithPath("[].status").description("Game status [OPEN = 0, PLAYING = 1, FINISHED = 2]"),
             fieldWithPath("[].turn").description("Current turn"),
+            fieldWithPath("[].winner").description("The winning role [NONE = 0, CITIZEN = 1, TRAITOR = 2]"),
             fieldWithPath("[].players").description("Players in the game"))
             .andWithPrefix("[].players[].",
                     fieldWithPath("id").description("Id of the player"),
@@ -89,8 +91,8 @@ public class GameControllerTest {
             );
 
     private final List<Card> cards = Arrays.asList(
-            Card.builder().id(1L).cardType(CardType.HONEST_TRADE).name("Trade").description("get gold from people!").effects(Arrays.asList(Effect.builder().operator(EffectOperator.REMOVE).targetResource(Resource.GOLD).amount(10).duration(1).build())).build(),
-            Card.builder().id(2L).cardType(CardType.RUN_FOR_MAYOR).name("Run for mayor").description("Apply to become mayor!").effects(Arrays.asList(Effect.builder().operator(EffectOperator.REMOVE).targetResource(Resource.REPUTATION).amount(20).duration(1).build())).build());
+            Card.builder().id(1L).cardType(CardType.HONEST_TRADE).name("Trade").description("get gold from people!").effects(Arrays.asList(Effect.builder().effectTargetType(EffectTargetType.SINGLE).operator(EffectOperator.REMOVE).targetResource(Resource.GOLD).amount(10).duration(1).build())).build(),
+            Card.builder().id(2L).cardType(CardType.RUN_FOR_MAYOR).name("Run for mayor").description("Apply to become mayor!").effects(Arrays.asList(Effect.builder().effectTargetType(EffectTargetType.SINGLE).operator(EffectOperator.REMOVE).targetResource(Resource.REPUTATION).amount(20).duration(1).build())).build());
 
     private final Player player = Player.builder()
             .id(validUserId)

@@ -113,7 +113,7 @@ public class CardService {
         if (existingCard.isPresent()){
             Card currentCard = existingCard.get();
             if (currentCard.getVersion() != card.getVersion()){
-                // TODO enable version
+                // TODO enable versioning of cards and effects
                 log.info("NOT IMPLEMENTED: Found new version of card {}, updating to {}", currentCard, card);
                 // currentCard.updateCard(card);
                 // cardRepository.save(currentCard);

@@ -45,7 +45,7 @@ public class Player {
     private List<Card> handCards = new ArrayList<>();
 
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @Fetch(value = FetchMode.SUBSELECT)
     @JoinColumn(name = "player_id")
     private List<EffectActive> activeEffects = new ArrayList<>();

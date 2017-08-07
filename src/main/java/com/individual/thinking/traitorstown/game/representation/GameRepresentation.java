@@ -12,11 +12,13 @@ public class GameRepresentation {
     private final List<PlayerRepresentation> players;
     private final int status;
     private final Integer turn;
+    private final int winner;
 
     public static GameRepresentation fromGame(Game game){
         return new GameRepresentation(game.getId(),
                 game.getPlayers().stream().map(PlayerRepresentation::fromPlayer).collect(Collectors.toList()),
                 game.getStatus().ordinal(),
-                game.getCurrentTurn().isPresent() ? game.getCurrentTurn().get().getCounter() : 0);
+                game.getCurrentTurn().isPresent() ? game.getCurrentTurn().get().getCounter() : 0,
+                game.getWinner().ordinal());
     }
 }

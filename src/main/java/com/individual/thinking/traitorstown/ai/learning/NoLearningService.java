@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-@Profile({"development", "production"})
+@Profile({"default", "development", "production"})
 public class NoLearningService implements LearningService{
     @Override
     public void startLearning() {

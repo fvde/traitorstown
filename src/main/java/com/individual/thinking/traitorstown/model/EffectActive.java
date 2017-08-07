@@ -18,7 +18,7 @@ public class EffectActive {
     @GeneratedValue
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "effect_id")
     @NonNull
     private Effect effect;

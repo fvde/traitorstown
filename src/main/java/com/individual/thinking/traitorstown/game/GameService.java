@@ -165,6 +165,7 @@ public class GameService {
         return game;
     }
 
+    @Deprecated
     public Turn getTurnByGameIdAndCounter(Long gameId, Integer counter) throws TurnNotFoundException {
         Optional<Turn> turn = turnRepository.findByGameIdAndCounter(gameId, counter);
         if (!turn.isPresent()){

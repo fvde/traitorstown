@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static com.individual.thinking.traitorstown.TestUtils.readFileFromResource;
@@ -99,6 +100,7 @@ public class GameControllerTest {
             .gameId(validGameId)
             .ready(true)
             .handCards(cards)
+            .activeEffects(Collections.emptyList())
             .gold(20)
             .reputation(15)
             .build();

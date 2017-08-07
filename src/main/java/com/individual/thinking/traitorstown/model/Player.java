@@ -91,7 +91,7 @@ public class Player {
 
         card.getEffects().forEach(effect -> addEffect(effect, target));
 
-        if (!card.isSpecial()){
+        if (!card.getSingleTurnOnly()){
             deckCards.add(card);
         }
 
@@ -139,6 +139,7 @@ public class Player {
     public void endTurn() {
         activeEffects.stream().forEach(EffectActive::apply);
         activeEffects = activeEffects.stream().filter(EffectActive::isActive).collect(Collectors.toList());
+        handCards = handCards.stream().filter(card -> !card.getSingleTurnOnly()).collect(Collectors.toList());
     }
 
     public Long getVotes(){

@@ -15,10 +15,6 @@ public enum Day {
         this.day = day;
     }
 
-    public static Day fromTurn(int turn){
-        return Day.values()[turn % SUNDAY.day];
-    }
-
     public static boolean isElectionDay(int turn){
         return 0 == (turn % SUNDAY.day);
     }

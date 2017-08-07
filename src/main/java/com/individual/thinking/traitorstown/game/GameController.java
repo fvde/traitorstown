@@ -21,41 +21,45 @@ public class GameController {
     private final GameService gameService;
 
     @PostMapping("/games")
-    public GameRepresentation createNewGame() throws Exception {
-        return GameRepresentation.fromGame(gameService.createNewGame());
+    public GameRepresentation createNewGame(HttpServletRequest request) throws Exception {
+        AuthorizedPlayer player = new AuthorizedPlayer(request).authorize(null, null);
+        return GameRepresentation.fromGame(gameService.createNewGame(), player.getPlayer());
     }
 
     @GetMapping("/games")
-    public List<GameRepresentation> getGamesByStatus(@RequestParam GameStatus status) {
-        return gameService.getGamesByStatus(status).stream().map(GameRepresentation::fromGame).collect(Collectors.toList());
+    public List<GameRepresentation> getGamesByStatus(@RequestParam GameStatus status, HttpServletRequest request) throws PlayerUnauthorizedException {
+        AuthorizedPlayer player = new AuthorizedPlayer(request).authorize(null, null);
+        return gameService.getGamesByStatus(status).stream().map(game -> GameRepresentation.fromGame(game, player.getPlayer())).collect(Collectors.toList());
     }
 
     @GetMapping(path = "/players/{playerId}/games")
-    public GameRepresentation getPlayersGame(@PathVariable Long playerId) throws GameNotFoundException, PlayerNotInGameException, PlayerNotFoundException {
-        return GameRepresentation.fromGame(gameService.getGameByPlayerId(playerId));
+    public GameRepresentation getPlayersGame(@PathVariable Long playerId, HttpServletRequest request) throws GameNotFoundException, PlayerNotInGameException, PlayerNotFoundException, PlayerUnauthorizedException {
+        AuthorizedPlayer player = new AuthorizedPlayer(request).authorize(null, null);
+        return GameRepresentation.fromGame(gameService.getGameByPlayerId(playerId), player.getPlayer());
     }
 
     @GetMapping(path = "/games/{gameId}")
-    public GameRepresentation getGame(@PathVariable Long gameId) throws GameNotFoundException {
-        return GameRepresentation.fromGame(gameService.getGameById(gameId));
+    public GameRepresentation getGame(@PathVariable Long gameId, HttpServletRequest request) throws GameNotFoundException, PlayerUnauthorizedException {
+        AuthorizedPlayer player = new AuthorizedPlayer(request).authorize(null, null);
+        return GameRepresentation.fromGame(gameService.getGameById(gameId), player.getPlayer());
     }
 
     @PostMapping(path = "/games/{gameId}/players")
     public GameRepresentation addPlayer(@PathVariable Long gameId, @RequestBody PlayerVo playerVo, HttpServletRequest request) throws GameNotFoundException, PlayerUnauthorizedException, CannotJoinRunningGameException, PlayerNotFoundException, GameFullException, AlreadyInGameException, RuleSetViolationException {
         AuthorizedPlayer player = new AuthorizedPlayer(request).authorize(null, playerVo.getId());
-        return GameRepresentation.fromGame(gameService.addPlayerToGame(gameId, player.getPlayer().getId()));
+        return GameRepresentation.fromGame(gameService.addPlayerToGame(gameId, player.getPlayer().getId()), player.getPlayer());
     }
 
     @DeleteMapping(path = "/games/{gameId}/players/{playerId}")
     public GameRepresentation removePlayer(@PathVariable Long gameId, @PathVariable Long playerId, HttpServletRequest request) throws GameNotFoundException, PlayerUnauthorizedException, PlayerNotFoundException, CannotLeaveRunningGameException {
         AuthorizedPlayer player = new AuthorizedPlayer(request).authorize(gameId, playerId);
-        return GameRepresentation.fromGame(gameService.removePlayerFromGame(gameId, player.getPlayer().getId()));
+        return GameRepresentation.fromGame(gameService.removePlayerFromGame(gameId, player.getPlayer().getId()), player.getPlayer());
     }
 
     @PutMapping(path = "/games/{gameId}/players/{playerId}")
     public GameRepresentation setPlayerReady(@PathVariable Long gameId, @PathVariable Long playerId, @RequestBody PlayerReadyVo playerReadyVo, HttpServletRequest request) throws GameNotFoundException, PlayerUnauthorizedException, PlayerNotFoundException, RuleSetViolationException {
         AuthorizedPlayer player = new AuthorizedPlayer(request).authorize(gameId, playerId);
-        return GameRepresentation.fromGame(gameService.setPlayerReady(gameId, player.getPlayer().getId(), playerReadyVo.getReady()));
+        return GameRepresentation.fromGame(gameService.setPlayerReady(gameId, player.getPlayer().getId(), playerReadyVo.getReady()), player.getPlayer());
     }
 
     @GetMapping(path = "/games/{gameId}/players/{playerId}/cards")
@@ -65,6 +69,7 @@ public class GameController {
     }
 
     @GetMapping(path = "/games/{gameId}/turns/{turnCounter}")
+    @Deprecated
     public TurnRepresentation getTurn(@PathVariable Long gameId, @PathVariable Integer turnCounter, HttpServletRequest request) throws PlayerUnauthorizedException, TurnNotFoundException {
         new AuthorizedPlayer(request).authorize(gameId, null);
         return TurnRepresentation.fromTurn(gameService.getTurnByGameIdAndCounter(gameId, turnCounter));

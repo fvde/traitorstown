@@ -70,4 +70,18 @@ public class EffectActive {
     public boolean isMayor() {
         return effect.getTargetResource().equals(Resource.MAYOR);
     }
+
+    public boolean isVisibleFor(Player player){
+        if (player == null){
+            return false;
+        }
+
+        switch (effect.getVisibility()) {
+            case ALL: { return true; }
+            case FACTION: return target.getRole().equals(player.getRole());
+            case PLAYER: return target.getId().equals(player.getId());
+        }
+
+        return false;
+    }
 }

@@ -42,6 +42,10 @@ public class Effect {
     @NonNull
     private Integer duration;
 
+    @NonNull
+    @Builder.Default
+    private EffectVisibility visibility = EffectVisibility.PLAYER;
+
     @Tolerate
     Effect() {}
 
@@ -63,5 +67,9 @@ public class Effect {
 
     public boolean isCost(){
         return operator.equals(EffectOperator.REMOVE);
+    }
+
+    public String getName() {
+        return operator + " " + amount + " " + targetResource;
     }
 }

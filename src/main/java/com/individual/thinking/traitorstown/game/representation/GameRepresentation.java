@@ -1,6 +1,7 @@
 package com.individual.thinking.traitorstown.game.representation;
 
 import com.individual.thinking.traitorstown.model.Game;
+import com.individual.thinking.traitorstown.model.Player;
 import lombok.Data;
 
 import java.util.List;
@@ -14,9 +15,9 @@ public class GameRepresentation {
     private final Integer turn;
     private final int winner;
 
-    public static GameRepresentation fromGame(Game game){
+    public static GameRepresentation fromGame(Game game, Player asPlayer){
         return new GameRepresentation(game.getId(),
-                game.getPlayers().stream().map(PlayerRepresentation::fromPlayer).collect(Collectors.toList()),
+                game.getPlayers().stream().map(player -> PlayerRepresentation.fromPlayer(player, asPlayer)).collect(Collectors.toList()),
                 game.getStatus().ordinal(),
                 game.getCurrentTurn().isPresent() ? game.getCurrentTurn().get().getCounter() : 0,
                 game.getWinner().ordinal());

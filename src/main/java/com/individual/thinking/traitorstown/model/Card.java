@@ -27,17 +27,17 @@ public class Card {
     @NonNull
     private String description;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(name = "card_effect", joinColumns = @JoinColumn(name = "card_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "effect_id", referencedColumnName = "id"))
     private List<Effect> effects = new ArrayList<>();
 
-    @Setter
     @NonNull
     @Builder.Default
-    private boolean isSpecial = false;
+    private Boolean singleTurnOnly = false;
 
     @NonNull
-    private int version;
+    @Builder.Default
+    private Integer version = 0;
 
     @Tolerate
     Card() {}
@@ -50,7 +50,7 @@ public class Card {
         name = newCard.name;
         description = newCard.description;
         effects = newCard.effects;
-        isSpecial = newCard.isSpecial;
+        singleTurnOnly = newCard.singleTurnOnly;
         version = newCard.version;
     }
 }

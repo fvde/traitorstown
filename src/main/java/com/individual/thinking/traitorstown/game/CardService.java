@@ -93,8 +93,14 @@ public class CardService {
         ).build());
 
         // SPECIAL EFFECTS
+        createEffect(EffectType.CITIZEN,
+                Effect.builder().effectType(EffectType.CITIZEN).targetResource(Resource.CITIZEN).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.SINGLE).amount(1).duration(Integer.MAX_VALUE).visibility(EffectVisibility.PLAYER).build());
+
+        createEffect(EffectType.TRAITOR,
+                Effect.builder().effectType(EffectType.TRAITOR).targetResource(Resource.TRAITOR).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.SINGLE).amount(1).duration(Integer.MAX_VALUE).visibility(EffectVisibility.FACTION).build());
+
         createEffect(EffectType.MAYOR,
-                Effect.builder().targetResource(Resource.MAYOR).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.SINGLE).amount(1).duration(7).visibility(EffectVisibility.ALL).build());
+                Effect.builder().effectType(EffectType.MAYOR).targetResource(Resource.MAYOR).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.SINGLE).amount(1).duration(7).visibility(EffectVisibility.ALL).build());
 
         if (TOTAL_NUMBER_OF_CARDS != cardRepository.count()){
             throw new IllegalArgumentException("Incorrect number of total cards");

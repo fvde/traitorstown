@@ -6,5 +6,7 @@ public enum Resource {
     CARD,
     MAYOR,
     VOTE,
-    CANDIDACY
+    CANDIDACY,
+    CITIZEN,
+    TRAITOR
 }

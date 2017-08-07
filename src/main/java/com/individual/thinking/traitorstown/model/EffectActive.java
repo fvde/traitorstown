@@ -71,6 +71,14 @@ public class EffectActive {
         return effect.getTargetResource().equals(Resource.MAYOR);
     }
 
+    public boolean isTraitor() {
+        return effect.getTargetResource().equals(Resource.TRAITOR);
+    }
+
+    public boolean isCitizen() {
+        return effect.getTargetResource().equals(Resource.CITIZEN);
+    }
+
     public boolean isVisibleFor(Player player){
         if (player == null){
             return false;

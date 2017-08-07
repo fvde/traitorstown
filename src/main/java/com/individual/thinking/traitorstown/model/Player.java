@@ -1,6 +1,7 @@
 package com.individual.thinking.traitorstown.model;
 
 import com.individual.thinking.traitorstown.Configuration;
+import com.individual.thinking.traitorstown.game.CardService;
 import com.individual.thinking.traitorstown.model.exceptions.PlayerDoesNotHaveCardException;
 import lombok.*;
 import lombok.experimental.Tolerate;
@@ -27,9 +28,6 @@ public class Player {
 
     @Column(name = "game_id")
     private Long gameId;
-
-    @Enumerated(EnumType.STRING)
-    private Role role = Role.NONE;
 
     @ManyToMany
     @JoinTable(name = "player_deck", joinColumns = @JoinColumn(name = "player_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "deck_id", referencedColumnName = "id"))
@@ -66,10 +64,12 @@ public class Player {
     private boolean ai = false;
 
     public void startGameWithRole(Role role){
-        this.role = role;
+
         activeEffects.clear();
         deckCards.clear();
         handCards.clear();
+
+        addEffect(CardService.Effects.get(EffectType.fromRole(role)));
         gold = Configuration.INITIAL_AMOUNT_OF_GOLD;
         reputation = Configuration.INITIAL_AMOUNT_OF_REPUTATION;
         deckCards.addAll(getDeckForRole(role).getCards());
@@ -152,6 +152,12 @@ public class Player {
 
     public boolean isCandidate(){
         return is(EffectActive::isCandidacy);
+    }
+
+    public Role getRole(){
+        if (is(EffectActive::isCitizen)){ return Role.CITIZEN; }
+        else if (is(EffectActive::isTraitor)){ return Role.TRAITOR; }
+        else { return Role.NONE; }
     }
 
     private boolean is(Predicate<? super EffectActive> predicate){

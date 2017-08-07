@@ -140,12 +140,13 @@ public class CardService {
         Optional<Effect> existingEffect = effectRepository.findByEffectType(type);
 
         if (existingEffect.isPresent()){
-            effectRepository.delete(existingEffect.get());
+            Effects.put(type, existingEffect.get());
+            return existingEffect.get();
+        } else {
+            effectRepository.save(effect);
+            Effects.put(type, effect);
+            return effect;
         }
-
-        effectRepository.save(effect);
-        Effects.put(type, effect);
-        return effect;
     }
 
     private void buildDeckForRole(Role role, List<Card> cards){

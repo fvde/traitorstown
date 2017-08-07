@@ -89,7 +89,7 @@ public class Player {
             throw new PlayerDoesNotHaveCardException("You cannot play a card you don't have!");
         }
 
-        card.getEffects().forEach(effect -> addEffect(effect, target));
+        card.getEffects().forEach(effect -> target.addEffect(effect));
 
         if (!card.getSingleTurnOnly()){
             deckCards.add(card);

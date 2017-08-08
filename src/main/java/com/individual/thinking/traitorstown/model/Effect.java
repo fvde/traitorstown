@@ -44,7 +44,7 @@ public class Effect {
 
     @NonNull
     @Builder.Default
-    private EffectVisibility visibility = EffectVisibility.PLAYER;
+    private Visibility visibility = Visibility.PLAYER;
 
     @Tolerate
     Effect() {}

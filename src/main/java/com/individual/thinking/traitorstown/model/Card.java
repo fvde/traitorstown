@@ -1,6 +1,9 @@
 package com.individual.thinking.traitorstown.model;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.ToString;
 import lombok.experimental.Tolerate;
 
 import javax.persistence.*;
@@ -30,6 +33,11 @@ public class Card {
     @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(name = "card_effect", joinColumns = @JoinColumn(name = "card_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "effect_id", referencedColumnName = "id"))
     private List<Effect> effects = new ArrayList<>();
+
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(name = "card_message", joinColumns = @JoinColumn(name = "card_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "message_id", referencedColumnName = "id"))
+    @Builder.Default
+    private List<Message> messages = new ArrayList<>();
 
     @NonNull
     @Builder.Default

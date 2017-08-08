@@ -78,29 +78,30 @@ public class CardService {
                                 Effect.builder().targetResource(Resource.REPUTATION).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SINGLE).amount(1).duration(7).build())
                 ).build()),
                 createCardOfType(CardType.RUN_FOR_MAYOR,
-                Card.builder().version(1).cardType(CardType.RUN_FOR_MAYOR).name("Run for Mayor").description("Become mayor on election day. Stay alive for one week to win the game.").effects(
-                        Arrays.asList(
-                                Effect.builder().targetResource(Resource.CANDIDACY).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.SINGLE).amount(1).duration(Integer.MAX_VALUE).visibility(EffectVisibility.ALL).build(),
+                Card.builder().version(1).cardType(CardType.RUN_FOR_MAYOR).name("Run for Mayor").description("Become mayor on election day. Stay alive for one week to win the game.")
+                        .messages(Collections.singletonList(Message.builder().structure(MessageStructure.PREFIX_TARGET).content(" just applied for the mayor position!").build()))
+                        .effects(Arrays.asList(
+                                Effect.builder().targetResource(Resource.CANDIDACY).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.SINGLE).amount(1).duration(Integer.MAX_VALUE).visibility(Visibility.ALL).build(),
                                 Effect.builder().targetResource(Resource.REPUTATION).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SINGLE).amount(10).duration(1).build(),
                                 Effect.builder().targetResource(Resource.GOLD).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SINGLE).amount(10).duration(1).build())
                 ).build()));
 
         // SPECIAL CARDS
         createCardOfType(CardType.VOTE,
-                Card.builder().cardType(CardType.VOTE).name("Vote").description("Vote for a player to become mayor.").singleTurnOnly(true).effects(
-                        Arrays.asList(
-                                Effect.builder().targetResource(Resource.VOTE).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.SINGLE).amount(1).duration(2).visibility(EffectVisibility.ALL).build())
+                Card.builder().cardType(CardType.VOTE).name("Vote").description("Vote for a player to become mayor.").singleTurnOnly(true)
+                        .effects(Arrays.asList(
+                                Effect.builder().targetResource(Resource.VOTE).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.SINGLE).amount(1).duration(2).visibility(Visibility.ALL).build())
         ).build());
 
         // SPECIAL EFFECTS
         createEffect(EffectType.CITIZEN,
-                Effect.builder().effectType(EffectType.CITIZEN).targetResource(Resource.CITIZEN).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.SINGLE).amount(1).duration(Integer.MAX_VALUE).visibility(EffectVisibility.PLAYER).build());
+                Effect.builder().effectType(EffectType.CITIZEN).targetResource(Resource.CITIZEN).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.SINGLE).amount(1).duration(Integer.MAX_VALUE).visibility(Visibility.PLAYER).build());
 
         createEffect(EffectType.TRAITOR,
-                Effect.builder().effectType(EffectType.TRAITOR).targetResource(Resource.TRAITOR).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.SINGLE).amount(1).duration(Integer.MAX_VALUE).visibility(EffectVisibility.FACTION).build());
+                Effect.builder().effectType(EffectType.TRAITOR).targetResource(Resource.TRAITOR).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.SINGLE).amount(1).duration(Integer.MAX_VALUE).visibility(Visibility.FACTION).build());
 
         createEffect(EffectType.MAYOR,
-                Effect.builder().effectType(EffectType.MAYOR).targetResource(Resource.MAYOR).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.SINGLE).amount(1).duration(7).visibility(EffectVisibility.ALL).build());
+                Effect.builder().effectType(EffectType.MAYOR).targetResource(Resource.MAYOR).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.SINGLE).amount(1).duration(7).visibility(Visibility.ALL).build());
 
         if (TOTAL_NUMBER_OF_CARDS != cardRepository.count()){
             throw new IllegalArgumentException("Incorrect number of total cards");

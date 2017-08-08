@@ -8,8 +8,9 @@ import com.individual.thinking.traitorstown.game.repository.GameRepository;
 import com.individual.thinking.traitorstown.game.repository.PlayerRepository;
 import com.individual.thinking.traitorstown.game.repository.TurnRepository;
 import com.individual.thinking.traitorstown.message.MessageService;
-import com.individual.thinking.traitorstown.model.exceptions.*;
 import com.individual.thinking.traitorstown.model.*;
+import com.individual.thinking.traitorstown.model.exceptions.*;
+import com.individual.thinking.traitorstown.util.SwitchConsumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -71,7 +72,7 @@ public class GameService {
         }
 
         gameRepository.save(game);
-        messageService.sendMessage(gameId, "Player " + playerId + " joined");
+        messageService.sendMessage(game, "Player " + playerId + " joined");
 
         return game;
     }
@@ -85,7 +86,7 @@ public class GameService {
 
         game.removePlayer(getPlayerById(playerId));
         gameRepository.save(game);
-        messageService.sendMessage(gameId, "Player " + playerId + " left");
+        messageService.sendMessage(game, "Player " + playerId + " left");
         return game;
     }
 
@@ -109,11 +110,19 @@ public class GameService {
             throw new NotCurrentTurnException("It is currently not turn " + turn);
         }
 
-        game.playCard(
-                getPlayerById(playerId),
-                getPlayerById(targetPlayerId),
-                cardService.getCardById(cardId));
+        Card card = cardService.getCardById(cardId);
+        Player origin = getPlayerById(playerId);
+        Player target = getPlayerById(targetPlayerId);
+
+        game.playCard(origin, target, card);
         gameRepository.save(game);
+
+        card.getMessages().stream().forEach(SwitchConsumer.<Message>
+                inCase(m -> m.isForAll(), m -> messageService.sendMessage(game, m.buildContent(origin, target)))
+                .elseIf(m -> m.isForOrigin(), m -> messageService.sendMessage(game, m.buildContent(origin, target), origin))
+                .elseIf(m -> m.isForTarget(), m -> messageService.sendMessage(game, m.buildContent(origin, target), target))
+                .elseDefault(m -> log.error("Message {} had no recipient!", m))
+        );
 
         if (game.isTurnOver()){
             startNextTurn(game);
@@ -121,7 +130,7 @@ public class GameService {
     }
 
     private void startNextTurn(Game game){
-        messageService.sendMessage(game.getId(), "A new day dawns..");
+        messageService.sendMessage(game, "A new day dawns..");
         game.startNextTurn();
         game.getAIPlayers().forEach(player -> {
                     Action recommendedAction = artificialIntelligenceService.getRecommendedAction(game, player.getId());
@@ -140,7 +149,7 @@ public class GameService {
     }
 
     private Game startGame(Game game) throws RuleSetViolationException {
-        messageService.sendMessage(game.getId(), "And so the " + game.getPlayers().size() + " of you arrive in the city. Who can you trust? Who to believe? And who is a traitor?");
+        messageService.sendMessage(game, "And so the " + game.getPlayers().size() + " of you arrive in the city. Who can you trust? Who to believe? And who is a traitor?");
         game.start();
         return gameRepository.save(game);
     }

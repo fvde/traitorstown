@@ -2,8 +2,8 @@ package com.individual.thinking.traitorstown.message;
 
 import com.individual.thinking.traitorstown.game.authorization.AuthorizedPlayer;
 import com.individual.thinking.traitorstown.game.exceptions.PlayerUnauthorizedException;
-import com.individual.thinking.traitorstown.model.Message;
 import com.individual.thinking.traitorstown.model.Player;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +15,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
+@Slf4j
 public class MessageController {
 
     ConcurrentHashMap<Long, ConcurrentHashMap<Player, SseEmitter>> gameEmitters = new ConcurrentHashMap<>();
@@ -33,14 +34,21 @@ public class MessageController {
 
     @EventListener
     public void onMessage(Message message){
+        log.info("Publishing message {}", message);
+        if (!gameEmitters.containsKey(message.getGameId())){
+            log.info("Publishing message {}, but nobody seems to be listening :(", message);
+            return;
+        }
         gameEmitters.get(message.getGameId()).forEach((player, emitter) -> {
-            try {
-                emitter.send(SseEmitter.event()
-                        .id(UUID.randomUUID().toString())
-                        .name("Message")
-                        .data(message));
-            } catch (Exception e) {
-                emitter.completeWithError(e);
+            if (message.getRecipients().contains(player)){
+                try {
+                    emitter.send(SseEmitter.event()
+                            .id(UUID.randomUUID().toString())
+                            .name("Message")
+                            .data(message.getContent()));
+                } catch (Exception e) {
+                    emitter.completeWithError(e);
+                }
             }
         });
     }

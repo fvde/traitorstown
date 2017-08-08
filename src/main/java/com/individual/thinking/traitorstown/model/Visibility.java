@@ -1,6 +1,6 @@
 package com.individual.thinking.traitorstown.model;
 
-public enum EffectVisibility {
+public enum Visibility {
     PLAYER,
     FACTION,
     ALL

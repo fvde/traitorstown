@@ -11,6 +11,9 @@ spring:
       password:
       driver-class-name: org.h2.Driver
 
+  mvc:
+    async.request-timeout: 60000
+
 logging:
   level:
     org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG

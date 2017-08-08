@@ -7,6 +7,8 @@ This is the backend to the game Traitor's Town. For more information, check out 
 
 * Spring Boot
 
+* Server Sent Events (SSE) for player messaging
+
 * Lombok
 
 The project uses Lombok to reduce the java boilerplate.

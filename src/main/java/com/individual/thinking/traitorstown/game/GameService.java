@@ -7,6 +7,7 @@ import com.individual.thinking.traitorstown.game.exceptions.*;
 import com.individual.thinking.traitorstown.game.repository.GameRepository;
 import com.individual.thinking.traitorstown.game.repository.PlayerRepository;
 import com.individual.thinking.traitorstown.game.repository.TurnRepository;
+import com.individual.thinking.traitorstown.message.MessageService;
 import com.individual.thinking.traitorstown.model.exceptions.*;
 import com.individual.thinking.traitorstown.model.*;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class GameService {
     private final TurnRepository turnRepository;
     private final CardService cardService;
     private final ArtificialIntelligenceService artificialIntelligenceService;
+    private final MessageService messageService;
 
     public Game createNewGame() {
         return gameRepository.save(Game.builder()
@@ -69,6 +71,8 @@ public class GameService {
         }
 
         gameRepository.save(game);
+        messageService.sendMessage(gameId, "Player " + playerId + " joined");
+
         return game;
     }
 
@@ -81,6 +85,7 @@ public class GameService {
 
         game.removePlayer(getPlayerById(playerId));
         gameRepository.save(game);
+        messageService.sendMessage(gameId, "Player " + playerId + " left");
         return game;
     }
 
@@ -116,6 +121,7 @@ public class GameService {
     }
 
     private void startNextTurn(Game game){
+        messageService.sendMessage(game.getId(), "A new day dawns..");
         game.startNextTurn();
         game.getAIPlayers().forEach(player -> {
                     Action recommendedAction = artificialIntelligenceService.getRecommendedAction(game, player.getId());
@@ -134,6 +140,7 @@ public class GameService {
     }
 
     private Game startGame(Game game) throws RuleSetViolationException {
+        messageService.sendMessage(game.getId(), "And so the " + game.getPlayers().size() + " of you arrive in the city. Who can you trust? Who to believe? And who is a traitor?");
         game.start();
         return gameRepository.save(game);
     }

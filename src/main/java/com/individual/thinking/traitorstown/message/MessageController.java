@@ -4,8 +4,7 @@ import com.individual.thinking.traitorstown.game.authorization.AuthorizedPlayer;
 import com.individual.thinking.traitorstown.game.exceptions.PlayerUnauthorizedException;
 import com.individual.thinking.traitorstown.model.Message;
 import com.individual.thinking.traitorstown.model.Player;
-import com.individual.thinking.traitorstown.model.Visibility;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.context.event.EventListener;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,19 +31,17 @@ public class MessageController {
                 buildEmitter(gameId, authorizedPlayer.getPlayer()));
     }
 
-    @Scheduled(fixedRate = 1000L)
-    public void onMessage(){
-        gameEmitters.forEach((game, playerEmitters) -> {
-            playerEmitters.forEach((player, emitter) -> {
-                try {
-                    emitter.send(SseEmitter.event()
-                            .id(UUID.randomUUID().toString())
-                            .name("Message")
-                            .data(new Message("Hello to game " + game, Visibility.ALL)));
-                } catch (Exception e) {
-                    emitter.completeWithError(e);
-                }
-            });
+    @EventListener
+    public void onMessage(Message message){
+        gameEmitters.get(message.getGameId()).forEach((player, emitter) -> {
+            try {
+                emitter.send(SseEmitter.event()
+                        .id(UUID.randomUUID().toString())
+                        .name("Message")
+                        .data(message));
+            } catch (Exception e) {
+                emitter.completeWithError(e);
+            }
         });
     }
 

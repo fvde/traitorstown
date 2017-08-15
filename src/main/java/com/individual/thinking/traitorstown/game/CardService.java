@@ -34,7 +34,7 @@ public class CardService {
     }
 
     protected Card getCardById(Long id) throws CardNotFoundException {
-        Card card = cardRepository.findOne(id);
+        Card card = cardRepository.findById(id).get();
         if (card == null){
             throw new CardNotFoundException("Card not found");
         }

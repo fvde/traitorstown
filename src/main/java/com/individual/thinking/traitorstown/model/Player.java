@@ -23,7 +23,7 @@ import static com.individual.thinking.traitorstown.util.CollectorsExtension.sing
 public class Player {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "game_id")

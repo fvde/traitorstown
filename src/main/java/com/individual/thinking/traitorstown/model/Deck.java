@@ -14,7 +14,7 @@ import java.util.*;
 public class Deck {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NonNull

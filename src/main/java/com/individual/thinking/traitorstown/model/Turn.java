@@ -19,8 +19,9 @@ import java.util.List;
         @UniqueConstraint(columnNames = {"game_id", "counter"})
 })
 public class Turn {
+
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "game_id")

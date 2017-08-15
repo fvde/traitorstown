@@ -166,15 +166,12 @@ public class GameService {
     }
 
     public Player getPlayerById(Long id) throws PlayerNotFoundException {
-        Player player = playerRepository.findOne(id);
-        if (player == null){
-            throw new PlayerNotFoundException("Player not found");
-        }
-        return player;
+        return playerRepository.findById(id)
+                .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
     }
 
     public Game getGameById(Long id) throws GameNotFoundException {
-        Game game = gameRepository.findOne(id);
+        Game game = gameRepository.findById(id).get();
         if (game == null){
             throw new GameNotFoundException("Game not found");
         }

@@ -1,38 +1,48 @@
-= API Guide
-Traitor's Town API;
+= Traitor's Town API
 :doctype: book
-:icons: font
-:source-highlighter: highlightjs
-:toc: left
-:toclevels: 4
+:compat-mode:
+:page-layout!:
+:toc: right
+:toclevels: 2
+:sectanchors:
 :sectlinks:
+:sectnums:
+:linkattrs:
+:source-highlighter: highlightjs
 
 [[overview]]
 = Overview
 
-[[overview-http-verbs]]
-== HTTP verbs
+Welcome to the API documentation of Traitor's Town.
 
-The API of Traitor's Town tries to adhere as closely as possible to standard HTTP and REST conventions in its use of HTTP verbs.
+[[overview-general]]
+== General
+
+Traitor's Town API uses Spring Boot 5, Reactive Endpoints as well Deep Neural Network Reinforcement Learning based on Deepmind4J for AI behaviour.
+
+[[overview-http-verbs]]
+=== HTTP verbs
+
+Overview of http verbs used in Traitor's Town API.
 
 |===
 | Verb | Usage
 
 | `GET`
-| Used to retrieve a resource
+| Used to retrieve a resource (idempotent)
 
 | `POST`
 | Used to create a new resource
 
 | `PUT`
-| Used to update an existent resource idempotently.
+| Used to update an existing resource (idempotent)
 
 | `DELETE`
-| Used to delete a resource
+| Used to delete an existing resource
 |===
 
 [[overview-http-status-codes]]
-== HTTP status codes
+=== HTTP status codes
 
 The API of Traitor's Town tries to adhere as closely as possible to standard HTTP and REST conventions in its
 use of HTTP status codes.
@@ -62,223 +72,8 @@ use of HTTP status codes.
 [[resources]]
 = Resources
 
-[[register]]
-== Register
-A `POST` request to create a new user.
+include::users.adoc[]
 
-=== Request structure
+include::games.adoc[]
 
-include::{snippets}/register/http-request.adoc[]
 
-=== Example request
-
-include::{snippets}/register/curl-request.adoc[]
-
-=== Example response
-
-include::{snippets}/register/http-response.adoc[]
-
-[[login]]
-== Login
-A `POST` request to create a new user.
-
-=== Request structure
-
-include::{snippets}/login/http-request.adoc[]
-
-=== Example request
-
-include::{snippets}/login/curl-request.adoc[]
-
-=== Example response
-
-include::{snippets}/login/http-response.adoc[]
-
-[[game]]
-== Game
-
-=== Create new game
-A `POST` request to create a new game.
-
-==== Request structure
-
-include::{snippets}/post-games/http-request.adoc[]
-
-==== Example request
-
-include::{snippets}/post-games/curl-request.adoc[]
-
-==== Example response
-
-include::{snippets}/post-games/http-response.adoc[]
-
-=== Get games by status
-A `GET` request to get games by status.
-
-==== Request structure
-
-include::{snippets}/get-games/http-request.adoc[]
-
-==== Request parameters
-
-include::{snippets}/get-games/request-parameters.adoc[]
-
-==== Example request
-
-include::{snippets}/get-games/curl-request.adoc[]
-
-==== Example response
-
-include::{snippets}/get-games/http-response.adoc[]
-
-=== Get a players current game
-A `GET` request to get a players current game.
-
-==== Request structure
-
-include::{snippets}/get-players-playerId-games/http-request.adoc[]
-
-==== Path parameters
-
-include::{snippets}/get-players-playerId-games/path-parameters.adoc[]
-
-==== Example request
-
-include::{snippets}/get-players-playerId-games/curl-request.adoc[]
-
-==== Example response
-
-include::{snippets}/get-players-playerId-games/http-response.adoc[]
-
-=== Get game by id
-A `GET` request to get games by id.
-
-==== Request structure
-
-include::{snippets}/get-games-gameId/http-request.adoc[]
-
-==== Path parameters
-
-include::{snippets}/get-games-gameId/path-parameters.adoc[]
-
-==== Example request
-
-include::{snippets}/get-games-gameId/curl-request.adoc[]
-
-==== Example response
-
-include::{snippets}/get-games-gameId/http-response.adoc[]
-
-=== Add player to game
-A `POST` request to add a player to a game.
-
-==== Request structure
-
-include::{snippets}/post-games-gameId-players/http-request.adoc[]
-
-==== Path parameters
-
-include::{snippets}/post-games-gameId-players/path-parameters.adoc[]
-
-==== Example request
-
-include::{snippets}/post-games-gameId-players/curl-request.adoc[]
-
-==== Example response
-
-include::{snippets}/post-games-gameId-players/http-response.adoc[]
-
-=== Remove player from game
-A `DELETE` request to remove a player from a game.
-
-==== Request structure
-
-include::{snippets}/delete-games-gameId-players-playerId/http-request.adoc[]
-
-==== Path parameters
-
-include::{snippets}/delete-games-gameId-players-playerId/path-parameters.adoc[]
-
-==== Example request
-
-include::{snippets}/delete-games-gameId-players-playerId/curl-request.adoc[]
-
-==== Example response
-
-include::{snippets}/delete-games-gameId-players-playerId/http-response.adoc[]
-
-=== Set a player's status
-A `PUT` request to either set a player to be ready to play or not
-
-==== Request structure
-
-include::{snippets}/put-games-gameId-players-playerId/http-request.adoc[]
-
-==== Path parameters
-
-include::{snippets}/put-games-gameId-players-playerId/path-parameters.adoc[]
-
-==== Example request
-
-include::{snippets}/put-games-gameId-players-playerId/curl-request.adoc[]
-
-==== Example response
-
-include::{snippets}/put-games-gameId-players-playerId/http-response.adoc[]
-
-=== Get a players current cards
-A `GET` request to retrieve a players current cards
-
-==== Request structure
-
-include::{snippets}/get-games-gameId-players-playerId-cards/http-request.adoc[]
-
-==== Path parameters
-
-include::{snippets}/get-games-gameId-players-playerId-cards/path-parameters.adoc[]
-
-==== Example request
-
-include::{snippets}/get-games-gameId-players-playerId-cards/curl-request.adoc[]
-
-==== Example response
-
-include::{snippets}/get-games-gameId-players-playerId-cards/http-response.adoc[]
-
-=== Get a game's turn
-A `GET` request to retrieve a game's turn
-
-==== Request structure
-
-include::{snippets}/get-games-gameId-turns-turnCounter/http-request.adoc[]
-
-==== Path parameters
-
-include::{snippets}/get-games-gameId-turns-turnCounter/path-parameters.adoc[]
-
-==== Example request
-
-include::{snippets}/get-games-gameId-turns-turnCounter/curl-request.adoc[]
-
-==== Example response
-
-include::{snippets}/get-games-gameId-turns-turnCounter/http-response.adoc[]
-
-=== Play a card
-A `POST` request to play a card for a given turn
-
-==== Request structure
-
-include::{snippets}/post-games-gameId-turns-turnCounter-cards/http-request.adoc[]
-
-==== Path parameters
-
-include::{snippets}/post-games-gameId-turns-turnCounter-cards/path-parameters.adoc[]
-
-==== Example request
-
-include::{snippets}/post-games-gameId-turns-turnCounter-cards/curl-request.adoc[]
-
-==== Example response
-
-include::{snippets}/post-games-gameId-turns-turnCounter-cards/http-response.adoc[]

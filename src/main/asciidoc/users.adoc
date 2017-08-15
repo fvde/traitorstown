@@ -1,0 +1,5 @@
+[[resources-games]]
+== Users
+
+include::{snippets}/user-controller-test/register/section.adoc[]
+include::{snippets}/user-controller-test/login/section.adoc[]

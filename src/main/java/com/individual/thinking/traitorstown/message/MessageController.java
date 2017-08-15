@@ -5,6 +5,7 @@ import com.individual.thinking.traitorstown.game.exceptions.PlayerUnauthorizedEx
 import com.individual.thinking.traitorstown.model.Player;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,7 +21,7 @@ public class MessageController {
 
     ConcurrentHashMap<Long, ConcurrentHashMap<Player, SseEmitter>> gameEmitters = new ConcurrentHashMap<>();
 
-    @GetMapping("/messages/{gameId}")
+    @GetMapping(value = "/messages/{gameId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     SseEmitter getMessages(@PathVariable Long gameId, HttpServletRequest request) throws PlayerUnauthorizedException {
         AuthorizedPlayer authorizedPlayer = new AuthorizedPlayer(request).authorize(gameId, null);
         if (!gameEmitters.containsKey(gameId)){
@@ -45,7 +46,8 @@ public class MessageController {
                     emitter.send(SseEmitter.event()
                             .id(UUID.randomUUID().toString())
                             .name("Message")
-                            .data(message.getContent()));
+                            .data(message.getContent()),
+                            MediaType.TEXT_EVENT_STREAM);
                 } catch (Exception e) {
                     emitter.completeWithError(e);
                 }

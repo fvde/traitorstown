@@ -1,0 +1,13 @@
+[[resources-games]]
+== Games
+
+include::{snippets}/game-controller-test/create-new-game/section.adoc[]
+include::{snippets}/game-controller-test/add-player/section.adoc[]
+include::{snippets}/game-controller-test/remove-player/section.adoc[]
+include::{snippets}/game-controller-test/get-game/section.adoc[]
+include::{snippets}/game-controller-test/get-games-by-status/section.adoc[]
+include::{snippets}/game-controller-test/set-player-ready/section.adoc[]
+include::{snippets}/game-controller-test/get-player-cards/section.adoc[]
+include::{snippets}/game-controller-test/get-players-game/section.adoc[]
+include::{snippets}/game-controller-test/get-turn/section.adoc[]
+include::{snippets}/game-controller-test/play-card/section.adoc[]

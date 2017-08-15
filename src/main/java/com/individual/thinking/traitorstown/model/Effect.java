@@ -16,7 +16,7 @@ import javax.persistence.*;
 public class Effect {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Enumerated(EnumType.STRING)

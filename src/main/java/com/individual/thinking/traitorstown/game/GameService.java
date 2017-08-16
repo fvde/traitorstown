@@ -72,7 +72,7 @@ public class GameService {
         }
 
         gameRepository.save(game);
-        messageService.sendMessage(game, "Player " + playerId + " joined");
+        messageService.publishMessage(game, "Player " + playerId + " joined");
 
         return game;
     }
@@ -86,7 +86,7 @@ public class GameService {
 
         game.removePlayer(getPlayerById(playerId));
         gameRepository.save(game);
-        messageService.sendMessage(game, "Player " + playerId + " left");
+        messageService.publishMessage(game, "Player " + playerId + " left");
         return game;
     }
 
@@ -118,9 +118,9 @@ public class GameService {
         gameRepository.save(game);
 
         card.getMessages().stream().forEach(SwitchConsumer.<Message>
-                inCase(m -> m.isForAll(), m -> messageService.sendMessage(game, m.buildContent(origin, target)))
-                .elseIf(m -> m.isForOrigin(), m -> messageService.sendMessage(game, m.buildContent(origin, target), origin))
-                .elseIf(m -> m.isForTarget(), m -> messageService.sendMessage(game, m.buildContent(origin, target), target))
+                inCase(m -> m.isForAll(), m -> messageService.publishMessage(game, m.buildContent(origin, target)))
+                .elseIf(m -> m.isForOrigin(), m -> messageService.publishMessage(game, m.buildContent(origin, target), origin))
+                .elseIf(m -> m.isForTarget(), m -> messageService.publishMessage(game, m.buildContent(origin, target), target))
                 .elseDefault(m -> log.error("Message {} had no recipient!", m))
         );
 
@@ -130,7 +130,7 @@ public class GameService {
     }
 
     private void startNextTurn(Game game){
-        messageService.sendMessage(game, "A new day dawns..");
+        messageService.publishMessage(game, "A new day dawns..");
         game.startNextTurn();
         game.getAIPlayers().forEach(player -> {
                     Action recommendedAction = artificialIntelligenceService.getRecommendedAction(game, player.getId());
@@ -149,7 +149,7 @@ public class GameService {
     }
 
     private Game startGame(Game game) throws RuleSetViolationException {
-        messageService.sendMessage(game, "And so the " + game.getPlayers().size() + " of you arrive in the city. Who can you trust? Who to believe? And who is a traitor?");
+        messageService.publishMessage(game, "And so the " + game.getPlayers().size() + " of you arrive in the city. Who can you trust? Who to believe? And who is a traitor?");
         game.start();
         return gameRepository.save(game);
     }

@@ -10,5 +10,6 @@ import java.util.List;
 public class Message {
     private final Long gameId;
     private final List<Long> recipients;
+    private final Long from;
     private final String content;
 }

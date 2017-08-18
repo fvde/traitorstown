@@ -1,12 +1,27 @@
 package com.individual.thinking.traitorstown.game.rules;
 
+import com.individual.thinking.traitorstown.TraitorsTownConfiguration;
 import com.individual.thinking.traitorstown.model.Player;
 import com.individual.thinking.traitorstown.model.Role;
 import com.individual.thinking.traitorstown.model.exceptions.RuleSetViolationException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
-public class RuleSet {
+@Component
+public class Rules {
+
+    public static final Integer INITIAL_AMOUNT_OF_CARDS = 3;
+    public static final Integer INITIAL_AMOUNT_OF_GOLD = 10;
+    public static final Integer INITIAL_AMOUNT_OF_REPUTATION = 10;
+    public static Integer MAXIMUM_NUMBER_OF_CARDS = 8;
+
+    @Autowired
+    public Rules(TraitorsTownConfiguration configuration){
+        MAXIMUM_NUMBER_OF_CARDS = configuration.getMaximumNumberOfCards();
+    }
+
     public static Map<Role, List<Player>> getRolesForPlayers(List<Player> players) throws RuleSetViolationException {
         Collections.shuffle(players);
         Map<Role, List<Player>> roles = new HashMap<>();

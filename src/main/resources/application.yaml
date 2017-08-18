@@ -18,6 +18,13 @@ logging:
   level:
     org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
 
+com.individual.thinking.traitorstown:
+  learning-enabled: false
+  messaging-enabled: true
+  minimum-number-of-players: 4
+  maximum-number-of-players: 8
+  maximum-number-of-cards: 8
+
 ---
 # learning
 spring:
@@ -28,6 +35,16 @@ spring:
     password:
     driver-class-name: org.h2.Driver
 
+com.individual.thinking.traitorstown:
+  minimum-number-of-players: 1
+  maximum-number-of-players: 8
+  learning-enabled: true
+  messaging-enabled: false
+
+logging:
+  level:
+    com.individual.thinking.traitorstown.game: ERROR
+
 ---
 # dev
 spring:
@@ -37,6 +54,10 @@ spring:
     username: root
     password: root
     driver-class-name: com.mysql.jdbc.Driver
+
+com.individual.thinking.traitorstown:
+  minimum-number-of-players: 1
+  maximum-number-of-players: 1
 
 ---
 #production environment

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class RewardService {
 
-    final double WIN_WEIGHT = 10000.0;
+    final double WIN_WEIGHT = 100000.0;
     final double NEW_TURN_REWARD = 1.0;
     final double NUMBER_OF_TURNS_PENALITY = 10.0;
 

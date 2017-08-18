@@ -27,7 +27,7 @@ public class GameState implements Encodable {
         return new GameState(
                 game.getPlayers().size(),
                 player.getRole().ordinal(),
-                game.getWinner() != null ? game.getWinner().ordinal() : -1,
+                game.getWinner().ordinal(),
                 player.getHandCards().stream().map(card -> card.getId()).collect(Collectors.toList()));
     }
 

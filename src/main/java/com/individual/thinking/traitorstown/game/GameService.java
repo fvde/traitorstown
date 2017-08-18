@@ -1,6 +1,6 @@
 package com.individual.thinking.traitorstown.game;
 
-import com.individual.thinking.traitorstown.Configuration;
+import com.individual.thinking.traitorstown.TraitorsTownConfiguration;
 import com.individual.thinking.traitorstown.ai.ArtificialIntelligenceService;
 import com.individual.thinking.traitorstown.ai.learning.model.Action;
 import com.individual.thinking.traitorstown.game.exceptions.*;
@@ -34,10 +34,12 @@ public class GameService {
     private final CardService cardService;
     private final ArtificialIntelligenceService artificialIntelligenceService;
     private final MessageService messageService;
+    private final TraitorsTownConfiguration configuration;
 
     public Game createNewGame() {
         return gameRepository.save(Game.builder()
                 .players(new ArrayList<>())
+                .desiredNumberOfHumanPlayers(configuration.getMinimumNumberOfPlayers())
                 .turns(new ArrayList<>())
                 .status(GameStatus.OPEN)
                 .build());
@@ -54,7 +56,7 @@ public class GameService {
            throw new CannotJoinRunningGameException("Cannot join a game that has already started");
         }
 
-        if (game.getPlayers().size() >= Configuration.MAXIMUM_AMOUNT_OF_PLAYERS){
+        if (game.getPlayers().size() >= configuration.getMaximumNumberOfPlayers()){
             throw new GameFullException("This game is already full");
         }
 
@@ -114,6 +116,7 @@ public class GameService {
         Player origin = getPlayerById(playerId);
         Player target = getPlayerById(targetPlayerId);
 
+        log.info("Player {} playing card {} targeting player {}", origin.getId(), card.getName(), target.getId());
         game.playCard(origin, target, card);
         gameRepository.save(game);
 
@@ -150,6 +153,7 @@ public class GameService {
 
     private Game startGame(Game game) throws RuleSetViolationException {
         messageService.sendMessageToGame(game, "And so the " + game.getPlayers().size() + " of you arrive in the city. Who can you trust? Who to believe? And who is a traitor?");
+        // TODO add AI players
         game.start();
         return gameRepository.save(game);
     }

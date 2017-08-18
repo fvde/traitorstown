@@ -1,7 +1,9 @@
 package com.individual.thinking.traitorstown.message;
 
+import com.individual.thinking.traitorstown.TraitorsTownConfiguration;
 import com.individual.thinking.traitorstown.model.Game;
 import com.individual.thinking.traitorstown.model.Player;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.EmitterProcessor;
@@ -17,8 +19,11 @@ import java.util.stream.Collectors;
 public class MessageService {
 
     private final EmitterProcessor<ServerSentEvent<Message>> emitter;
+    private final TraitorsTownConfiguration configuration;
 
-    MessageService() {
+    @Autowired
+    MessageService(TraitorsTownConfiguration configuration) {
+        this.configuration = configuration;
         emitter = EmitterProcessor.create();
     }
 
@@ -61,6 +66,7 @@ public class MessageService {
     }
 
     public void publishMessage(Long game, String content, List<Long> recipients, Optional<Player> fromPlayer){
+        if (!configuration.getMessagingEnabled()) return;
         emitter.onNext(ServerSentEvent.<Message>builder()
                         .id(UUID.randomUUID().toString())
                         .event("message")

@@ -3,6 +3,7 @@ package com.individual.thinking.traitorstown;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.individual.thinking.traitorstown.authorization.AuthenticationInterceptor;
+import com.individual.thinking.traitorstown.game.authorization.AuthorizedPlayer;
 import com.individual.thinking.traitorstown.model.Player;
 import org.junit.Before;
 import org.junit.Rule;
@@ -87,7 +88,7 @@ public abstract class MockMvcBase {
 
     protected RequestPostProcessor authorizedPlayer(Player player) {
         return request -> {
-            request.setAttribute(Configuration.AUTHENTICATION_KEY, player);
+            request.setAttribute(AuthorizedPlayer.AUTHENTICATION_KEY, player);
             return documentAuthorization(request, "User access token required.");
         };
     }

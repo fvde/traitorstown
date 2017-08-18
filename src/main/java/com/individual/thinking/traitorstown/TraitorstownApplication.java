@@ -1,5 +1,6 @@
 package com.individual.thinking.traitorstown;
 
+import com.individual.thinking.traitorstown.ai.learning.model.DiscreteActionSpace;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -21,6 +22,13 @@ public class TraitorstownApplication extends SpringBootServletInitializer {
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
 		return application.sources(TraitorstownApplication.class);
 	}
+
+	@Bean
+    public DiscreteActionSpace actionSpace(TraitorsTownConfiguration configuration){
+	    return new DiscreteActionSpace(
+	            configuration.getMaximumNumberOfCards(),
+                configuration.getMaximumNumberOfPlayers());
+    }
 
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {

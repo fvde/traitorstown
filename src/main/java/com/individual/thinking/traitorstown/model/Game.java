@@ -1,8 +1,7 @@
 package com.individual.thinking.traitorstown.model;
 
-import com.individual.thinking.traitorstown.Configuration;
 import com.individual.thinking.traitorstown.game.CardService;
-import com.individual.thinking.traitorstown.game.rules.RuleSet;
+import com.individual.thinking.traitorstown.game.rules.Rules;
 import com.individual.thinking.traitorstown.model.exceptions.*;
 import lombok.*;
 import lombok.experimental.Tolerate;
@@ -46,6 +45,9 @@ public class Game {
     @Builder.Default
     private Role winner = Role.NONE;
 
+    @Builder.Default
+    private Integer desiredNumberOfHumanPlayers = 1;
+
     public void addPlayer(Player player){
         players.add(player);
     }
@@ -58,7 +60,7 @@ public class Game {
         setStatus(GameStatus.PLAYING);
         Turn firstTurn = Turn.builder().counter(1).build();
         turns.add(firstTurn);
-        RuleSet.getRolesForPlayers(players).forEach((role, players) ->
+        Rules.getRolesForPlayers(players).forEach((role, players) ->
                 players.forEach(p -> p.startGameWithRole(role)));
     }
 
@@ -113,8 +115,11 @@ public class Game {
         return getCurrentTurn().get().getFinishedPlayers().size() == getPlayers().size() - getAIPlayers().size();
     }
 
-    public Integer getReadyPlayers(){
-        return players.stream().filter(Player::isReady).collect(Collectors.toList()).size();
+    private List<Player> getReadyPlayers(){
+        return players.stream()
+                .filter(Player::isReady)
+                .filter(p -> !p.isAi())
+                .collect(Collectors.toList());
     }
 
     public List<Player> getAIPlayers(){
@@ -130,8 +135,7 @@ public class Game {
     }
 
     public boolean isReadyToBeStarted(){
-        return getReadyPlayers().equals(players.size()) &&
-                getReadyPlayers() >= Configuration.MINIMUM_AMOUNT_OF_PLAYERS &&
+        return getReadyPlayers().size() >= desiredNumberOfHumanPlayers &&
                 status.equals(GameStatus.OPEN);
     }
 

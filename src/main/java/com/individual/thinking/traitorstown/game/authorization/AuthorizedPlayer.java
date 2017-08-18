@@ -1,6 +1,5 @@
 package com.individual.thinking.traitorstown.game.authorization;
 
-import com.individual.thinking.traitorstown.Configuration;
 import com.individual.thinking.traitorstown.game.exceptions.PlayerUnauthorizedException;
 import com.individual.thinking.traitorstown.model.Player;
 import lombok.Getter;
@@ -9,10 +8,13 @@ import javax.servlet.ServletRequest;
 
 @Getter
 public class AuthorizedPlayer {
+
+    public static final String AUTHENTICATION_KEY = "player";
+
     private final Player player;
 
     public AuthorizedPlayer(ServletRequest request) {
-        player = (Player) request.getAttribute(Configuration.AUTHENTICATION_KEY);
+        player = (Player) request.getAttribute(AUTHENTICATION_KEY);
     }
 
     public AuthorizedPlayer authorize(Long gameId, Long playerId) throws PlayerUnauthorizedException {

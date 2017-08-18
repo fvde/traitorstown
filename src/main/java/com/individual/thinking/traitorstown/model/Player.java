@@ -1,7 +1,7 @@
 package com.individual.thinking.traitorstown.model;
 
-import com.individual.thinking.traitorstown.Configuration;
 import com.individual.thinking.traitorstown.game.CardService;
+import com.individual.thinking.traitorstown.game.rules.Rules;
 import com.individual.thinking.traitorstown.model.exceptions.PlayerDoesNotHaveCardException;
 import lombok.*;
 import lombok.experimental.Tolerate;
@@ -70,10 +70,10 @@ public class Player {
         handCards.clear();
 
         addEffect(CardService.Effects.get(EffectType.fromRole(role)));
-        gold = Configuration.INITIAL_AMOUNT_OF_GOLD;
-        reputation = Configuration.INITIAL_AMOUNT_OF_REPUTATION;
+        gold = Rules.INITIAL_AMOUNT_OF_GOLD;
+        reputation = Rules.INITIAL_AMOUNT_OF_REPUTATION;
         deckCards.addAll(getDeckForRole(role).getCards());
-        drawCards(Configuration.INITIAL_AMOUNT_OF_CARDS);
+        drawCards(Rules.INITIAL_AMOUNT_OF_CARDS);
     }
 
     public void drawCard(){
@@ -120,7 +120,7 @@ public class Player {
         amount = Math.min(amount, deckCards.size());
 
         // may not draw more cards than allowed to have at the same time
-        int overDraw = handCards.size() + amount - Configuration.MAXIMUM_AMOUNT_OF_CARDS;
+        int overDraw = handCards.size() + amount - Rules.MAXIMUM_NUMBER_OF_CARDS;
         if (overDraw > 0){
             amount = Math.max(amount - overDraw, 0);
         }

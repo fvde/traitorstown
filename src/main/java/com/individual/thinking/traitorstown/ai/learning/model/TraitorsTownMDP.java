@@ -1,6 +1,7 @@
 package com.individual.thinking.traitorstown.ai.learning.model;
 
 import com.individual.thinking.traitorstown.Configuration;
+import com.individual.thinking.traitorstown.TraitorsTownConfiguration;
 import com.individual.thinking.traitorstown.ai.learning.RewardService;
 import com.individual.thinking.traitorstown.game.GameService;
 import com.individual.thinking.traitorstown.game.exceptions.PlayerNotFoundException;
@@ -34,16 +35,18 @@ public class TraitorsTownMDP implements MDP<GameState, Integer, DiscreteSpace> {
 
     @Getter
     private final DiscreteActionSpace actionSpace;
+    private final TraitorsTownConfiguration configuration;
 
     @Getter
     private final ObservationSpace<GameState> observationSpace;
 
-    public TraitorsTownMDP(GameService gameService, RewardService rewardService, List<Long> players){
+    public TraitorsTownMDP(GameService gameService, RewardService rewardService, List<Long> players, DiscreteActionSpace actionSpace, TraitorsTownConfiguration configuration){
         this.gameService = gameService;
         this.rewardService = rewardService;
         this.aiPlayerId = players.get(0);
         this.players = players;
-        this.actionSpace = Configuration.ACTION_SPACE;
+        this.actionSpace = actionSpace;
+        this.configuration = configuration;
         this.observationSpace = Configuration.OBSERVATION_SPACE;
         this.random = new Random();
 
@@ -54,15 +57,15 @@ public class TraitorsTownMDP implements MDP<GameState, Integer, DiscreteSpace> {
     public GameState reset() {
         Game game = gameService.createNewGame();
         try {
-            game = gameService.addPlayerToGame(game.getId(), aiPlayerId);
-            game = gameService.setPlayerReady(game.getId(), aiPlayerId, false);
-            int desiredAmountOfOpponents = Math.max(1, random.nextInt(Configuration.MAXIMUM_AMOUNT_OF_PLAYERS));
+            int desiredAmountOfOpponents = random.nextInt(configuration.getMaximumNumberOfPlayers());
             int opponentIndex = 1;
             while (desiredAmountOfOpponents > 0){
                 game = gameService.addPlayerToGame(game.getId(), players.get(opponentIndex++));
                 desiredAmountOfOpponents--;
             }
-            game = gameService.setPlayerReady(game.getId(), aiPlayerId, true);
+
+            // join game so enough 'human' players are ready
+            game = gameService.addPlayerToGame(game.getId(), aiPlayerId);
         } catch (Exception e) {
             log.error("Failed to reset game with exception {}", e);
         }
@@ -129,16 +132,16 @@ public class TraitorsTownMDP implements MDP<GameState, Integer, DiscreteSpace> {
 
     @Override
     public boolean isDone() {
-        return gameState.getWinner() != -1 || timesInSameTurn > 50;
+        return gameState.getWinner() > 0 || timesInSameTurn > 50;
     }
 
     @Override
     public TraitorsTownMDP newInstance() {
-        return new TraitorsTownMDP(gameService, rewardService, players);
+        return new TraitorsTownMDP(gameService, rewardService, players, actionSpace, configuration);
     }
 
     private Long getCardIdFromAction(Action action) {
-        List<Card> playerCards = null;
+        List<Card> playerCards;
         try {
             playerCards = gameService.getPlayerCards(aiPlayerId);
         } catch (PlayerNotFoundException e) {

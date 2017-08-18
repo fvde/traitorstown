@@ -1,7 +1,8 @@
 package com.individual.thinking.traitorstown.ai.learning;
 
-import com.individual.thinking.traitorstown.Configuration;
+import com.individual.thinking.traitorstown.TraitorsTownConfiguration;
 import com.individual.thinking.traitorstown.ai.learning.model.Action;
+import com.individual.thinking.traitorstown.ai.learning.model.DiscreteActionSpace;
 import com.individual.thinking.traitorstown.ai.learning.model.GameState;
 import com.individual.thinking.traitorstown.ai.learning.model.TraitorsTownMDP;
 import com.individual.thinking.traitorstown.game.GameService;
@@ -19,7 +20,6 @@ import org.deeplearning4j.rl4j.network.dqn.IDQN;
 import org.deeplearning4j.rl4j.policy.Policy;
 import org.deeplearning4j.rl4j.space.DiscreteSpace;
 import org.nd4j.linalg.factory.Nd4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,14 +29,13 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Profile("learning")
-public class ReinforcementLearningService implements LearningService{
+public class ReinforcementLearningService {
 
     private QLearning.QLConfiguration TRAITORS_QL =
             new QLearning.QLConfiguration(
                     123,   //Random seed
                     100000,//Max step By epoch
-                    10000, //Max step default 80000
+                    80000, //Max step default 80000
                     10000, //Max size of experience replay
                     32,    //size of batches
                     100,   //target update (hard)
@@ -86,6 +85,8 @@ public class ReinforcementLearningService implements LearningService{
     private final UserService userService;
     private final GameService gameService;
     private final RewardService rewardService;
+    private final DiscreteActionSpace actionSpace;
+    private final TraitorsTownConfiguration configuration;
 
     private final LearningRepository learningRepository;
     private List<Player> players = new ArrayList<>();
@@ -104,19 +105,23 @@ public class ReinforcementLearningService implements LearningService{
 
     private void prepareSession() throws Exception {
         players.add(userService.register("learner","learner", false).getPlayer());
-        while (players.size() < Configuration.MAXIMUM_AMOUNT_OF_PLAYERS){
+        while (players.size() < configuration.getMaximumNumberOfPlayers()){
             players.add(userService.register("ai" + players.size(),"ai" + players.size(), true).getPlayer());
         }
 
         mdp = new TraitorsTownMDP(
                 gameService,
                 rewardService,
-                players.stream().map(p -> p.getId()).collect(Collectors.toList()));
+                players.stream().map(p -> p.getId()).collect(Collectors.toList()),
+                actionSpace,
+                configuration);
     }
 
     private void trainAI() {
         //define the training method
         Learning<GameState, Integer, DiscreteSpace, IDQN> dql = new QLearningDiscreteDense<>(mdp, TRAITORS_NET, TRAITORS_QL, learningRepository.getDataManager());
+
+        // TODO try other algorithm
 
         //start the training
         dql.train();

@@ -1,8 +1,8 @@
 package com.individual.thinking.traitorstown.ai;
 
-import com.individual.thinking.traitorstown.Configuration;
 import com.individual.thinking.traitorstown.ai.learning.LearningRepository;
 import com.individual.thinking.traitorstown.ai.learning.model.Action;
+import com.individual.thinking.traitorstown.ai.learning.model.DiscreteActionSpace;
 import com.individual.thinking.traitorstown.ai.learning.model.GameState;
 import com.individual.thinking.traitorstown.model.Game;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +16,7 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class ArtificialIntelligenceService {
     private final LearningRepository learningRepository;
+    private final DiscreteActionSpace actionSpace;
     private Policy<GameState, Integer> policy;
     private Random random = new Random();
 
@@ -34,8 +35,8 @@ public class ArtificialIntelligenceService {
     private Action getRecommendedActionForPlayer(GameState state){
         Integer action =  policy != null
                 ? policy.nextAction(Nd4j.create(state.toArray()))
-                : Configuration.ACTION_SPACE.randomAction();
-        return Configuration.ACTION_SPACE.convert(action);
+                : actionSpace.randomAction();
+        return actionSpace.convert(action);
     }
 
     public void setup() {

@@ -1,6 +1,6 @@
 package com.individual.thinking.traitorstown.authorization;
 
-import com.individual.thinking.traitorstown.Configuration;
+import com.individual.thinking.traitorstown.game.authorization.AuthorizedPlayer;
 import com.individual.thinking.traitorstown.user.User;
 import com.individual.thinking.traitorstown.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
         }
 
         User user = userService.getUserByToken(token);
-        request.setAttribute(Configuration.AUTHENTICATION_KEY, user.getPlayer());
+        request.setAttribute(AuthorizedPlayer.AUTHENTICATION_KEY, user.getPlayer());
         return true;
     }
 

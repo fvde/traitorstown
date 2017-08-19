@@ -24,7 +24,7 @@ public class User {
     @Column(unique=true)
     private String token;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "player_id")
     private Player player;
 

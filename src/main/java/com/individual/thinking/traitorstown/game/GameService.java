@@ -5,7 +5,6 @@ import com.individual.thinking.traitorstown.ai.ArtificialIntelligenceService;
 import com.individual.thinking.traitorstown.ai.learning.model.Action;
 import com.individual.thinking.traitorstown.game.exceptions.*;
 import com.individual.thinking.traitorstown.game.repository.GameRepository;
-import com.individual.thinking.traitorstown.game.repository.PlayerRepository;
 import com.individual.thinking.traitorstown.game.repository.TurnRepository;
 import com.individual.thinking.traitorstown.message.MessageService;
 import com.individual.thinking.traitorstown.model.*;
@@ -17,10 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,12 +26,12 @@ import java.util.stream.Collectors;
 public class GameService {
 
     private final GameRepository gameRepository;
-    private final PlayerRepository playerRepository;
     private final TurnRepository turnRepository;
     private final CardService cardService;
     private final ArtificialIntelligenceService artificialIntelligenceService;
     private final MessageService messageService;
     private final TraitorsTownConfiguration configuration;
+    private final PlayerService playerService;
 
     public Game createNewGame() {
         return gameRepository.save(Game.builder()
@@ -60,14 +57,14 @@ public class GameService {
             throw new GameFullException("This game is already full");
         }
 
-        Player player = getPlayerById(playerId);
+        Player player = playerService.getPlayerById(playerId);
 
         if (game.getPlayers().contains(player)){
             throw new AlreadyInGameException("Already in this game");
         }
 
         game.addPlayer(player);
-        player.setReady(true);
+        playerService.setPlayerReady(playerId, true);
 
         if (game.isReadyToBeStarted()) {
             game = startGame(game);
@@ -86,7 +83,7 @@ public class GameService {
             throw new CannotLeaveRunningGameException("You can not leave a running game");
         }
 
-        game.removePlayer(getPlayerById(playerId));
+        game.removePlayer(playerService.getPlayerById(playerId));
         gameRepository.save(game);
         messageService.sendMessageToGame(game, "Player " + playerId + " left");
         return game;
@@ -94,9 +91,7 @@ public class GameService {
 
     public Game setPlayerReady(Long gameId, Long playerId, Boolean ready) throws GameNotFoundException, PlayerNotFoundException, RuleSetViolationException {
         Game game = getGameById(gameId);
-        Player player = getPlayerById(playerId);
-        player.setReady(ready);
-        playerRepository.save(player);
+        playerService.setPlayerReady(playerId, ready);
 
         if (game.isReadyToBeStarted()) {
             game = startGame(game);
@@ -113,8 +108,8 @@ public class GameService {
         }
 
         Card card = cardService.getCardById(cardId);
-        Player origin = getPlayerById(playerId);
-        Player target = getPlayerById(targetPlayerId);
+        Player origin = playerService.getPlayerById(playerId);
+        Player target = playerService.getPlayerById(targetPlayerId);
 
         log.info("Player {} playing card {} targeting player {}", origin.getId(), card.getName(), target.getId());
         game.playCard(origin, target, card);
@@ -130,6 +125,16 @@ public class GameService {
         if (game.isTurnOver()){
             startNextTurn(game);
         }
+    }
+
+    private Game startGame(Game game) throws RuleSetViolationException {
+        while (game.getPlayers().size() < configuration.getMaximumNumberOfPlayers()){
+            game.addPlayer(playerService.createPlayer(true));
+        }
+        messageService.sendMessageToGame(game, "And so the " + game.getPlayers().size() + " of you arrive in the city. Who can you trust? Who to believe? And who is a traitor?");
+        game.start();
+        startNextTurn(game);
+        return gameRepository.save(game);
     }
 
     private void startNextTurn(Game game){
@@ -151,29 +156,6 @@ public class GameService {
         );
     }
 
-    private Game startGame(Game game) throws RuleSetViolationException {
-        messageService.sendMessageToGame(game, "And so the " + game.getPlayers().size() + " of you arrive in the city. Who can you trust? Who to believe? And who is a traitor?");
-        // TODO add AI players
-        game.start();
-        return gameRepository.save(game);
-    }
-
-    public List<Card> getPlayerCards(Long playerId) throws PlayerNotFoundException {
-        return getPlayerCards(getPlayerById(playerId));
-    }
-
-    private List<Card> getPlayerCards(Player player){
-        return player.getHandCards()
-                .stream()
-                .sorted(Comparator.comparing(Card::getId))
-                .collect(Collectors.toList());
-    }
-
-    public Player getPlayerById(Long id) throws PlayerNotFoundException {
-        return playerRepository.findById(id)
-                .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
-    }
-
     public Game getGameById(Long id) throws GameNotFoundException {
         Game game = gameRepository.findById(id).get();
         if (game == null){
@@ -192,10 +174,11 @@ public class GameService {
     }
 
     public Game getGameByPlayerId(Long playerId) throws PlayerNotInGameException, PlayerNotFoundException, GameNotFoundException {
-        Player player = getPlayerById(playerId);
+        Player player = playerService.getPlayerById(playerId);
         if (player.getGameId() == null){
             throw new PlayerNotInGameException("Currently not playing a game");
         }
+
         return getGameById(player.getGameId());
     }
 }

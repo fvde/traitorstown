@@ -6,6 +6,7 @@ import com.individual.thinking.traitorstown.ai.learning.model.DiscreteActionSpac
 import com.individual.thinking.traitorstown.ai.learning.model.GameState;
 import com.individual.thinking.traitorstown.ai.learning.model.TraitorsTownMDP;
 import com.individual.thinking.traitorstown.game.GameService;
+import com.individual.thinking.traitorstown.game.PlayerService;
 import com.individual.thinking.traitorstown.model.Player;
 import com.individual.thinking.traitorstown.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -84,6 +85,7 @@ public class ReinforcementLearningService {
 
     private final UserService userService;
     private final GameService gameService;
+    private final PlayerService playerService;
     private final RewardService rewardService;
     private final DiscreteActionSpace actionSpace;
     private final TraitorsTownConfiguration configuration;
@@ -104,6 +106,7 @@ public class ReinforcementLearningService {
     }
 
     private void prepareSession() throws Exception {
+        TRAITORS_QL.setMaxStep(configuration.getLearningSteps());
         players.add(userService.register("learner","learner", false).getPlayer());
         while (players.size() < configuration.getMaximumNumberOfPlayers()){
             players.add(userService.register("ai" + players.size(),"ai" + players.size(), true).getPlayer());
@@ -111,6 +114,7 @@ public class ReinforcementLearningService {
 
         mdp = new TraitorsTownMDP(
                 gameService,
+                playerService,
                 rewardService,
                 players.stream().map(p -> p.getId()).collect(Collectors.toList()),
                 actionSpace,

@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 public class GameController {
 
     private final GameService gameService;
+    private final PlayerService playerService;
 
     @PostMapping("/games")
     public GameRepresentation createNewGame(HttpServletRequest request) throws Exception {
@@ -65,7 +66,7 @@ public class GameController {
     @GetMapping(path = "/games/{gameId}/players/{playerId}/cards")
     public List<CardRepresentation> getPlayerCards(@PathVariable Long gameId, @PathVariable Long playerId, HttpServletRequest request) throws GameNotFoundException, PlayerUnauthorizedException, PlayerNotFoundException {
         AuthorizedPlayer player = new AuthorizedPlayer(request).authorize(gameId, playerId);
-        return gameService.getPlayerCards(player.getPlayer().getId()).stream().map(CardRepresentation::fromCard).collect(Collectors.toList());
+        return playerService.getPlayerCards(player.getPlayer().getId()).stream().map(CardRepresentation::fromCard).collect(Collectors.toList());
     }
 
     @GetMapping(path = "/games/{gameId}/turns/{turnCounter}")

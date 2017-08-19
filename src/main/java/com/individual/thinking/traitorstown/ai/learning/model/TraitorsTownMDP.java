@@ -4,6 +4,7 @@ import com.individual.thinking.traitorstown.Configuration;
 import com.individual.thinking.traitorstown.TraitorsTownConfiguration;
 import com.individual.thinking.traitorstown.ai.learning.RewardService;
 import com.individual.thinking.traitorstown.game.GameService;
+import com.individual.thinking.traitorstown.game.PlayerService;
 import com.individual.thinking.traitorstown.game.exceptions.PlayerNotFoundException;
 import com.individual.thinking.traitorstown.model.Card;
 import com.individual.thinking.traitorstown.model.Game;
@@ -24,6 +25,7 @@ import java.util.Random;
 public class TraitorsTownMDP implements MDP<GameState, Integer, DiscreteSpace> {
 
     private GameService gameService;
+    private PlayerService playerService;
     private RewardService rewardService;
     private final Long aiPlayerId;
     private List<Long> players;
@@ -40,8 +42,9 @@ public class TraitorsTownMDP implements MDP<GameState, Integer, DiscreteSpace> {
     @Getter
     private final ObservationSpace<GameState> observationSpace;
 
-    public TraitorsTownMDP(GameService gameService, RewardService rewardService, List<Long> players, DiscreteActionSpace actionSpace, TraitorsTownConfiguration configuration){
+    public TraitorsTownMDP(GameService gameService, PlayerService playerService, RewardService rewardService, List<Long> players, DiscreteActionSpace actionSpace, TraitorsTownConfiguration configuration){
         this.gameService = gameService;
+        this.playerService = playerService;
         this.rewardService = rewardService;
         this.aiPlayerId = players.get(0);
         this.players = players;
@@ -57,13 +60,12 @@ public class TraitorsTownMDP implements MDP<GameState, Integer, DiscreteSpace> {
     public GameState reset() {
         Game game = gameService.createNewGame();
         try {
-            int desiredAmountOfOpponents = random.nextInt(configuration.getMaximumNumberOfPlayers());
+            /*int desiredAmountOfOpponents = random.nextInt(configuration.getMaximumNumberOfPlayers());
             int opponentIndex = 1;
             while (desiredAmountOfOpponents > 0){
                 game = gameService.addPlayerToGame(game.getId(), players.get(opponentIndex++));
                 desiredAmountOfOpponents--;
-            }
-
+            }*/
             // join game so enough 'human' players are ready
             game = gameService.addPlayerToGame(game.getId(), aiPlayerId);
         } catch (Exception e) {
@@ -75,7 +77,7 @@ public class TraitorsTownMDP implements MDP<GameState, Integer, DiscreteSpace> {
         timesInSameTurn = 0;
         gameState = GameState.fromGameAndPlayer(game, aiPlayerId);
         gameId = game.getId();
-        turn = game.getTurn();
+        turn = 1;
 
         return gameState;
     }
@@ -137,13 +139,13 @@ public class TraitorsTownMDP implements MDP<GameState, Integer, DiscreteSpace> {
 
     @Override
     public TraitorsTownMDP newInstance() {
-        return new TraitorsTownMDP(gameService, rewardService, players, actionSpace, configuration);
+        return new TraitorsTownMDP(gameService, playerService, rewardService, players, actionSpace, configuration);
     }
 
     private Long getCardIdFromAction(Action action) {
         List<Card> playerCards;
         try {
-            playerCards = gameService.getPlayerCards(aiPlayerId);
+            playerCards = playerService.getPlayerCards(aiPlayerId);
         } catch (PlayerNotFoundException e) {
             playerCards = Collections.emptyList();
         }
@@ -153,7 +155,7 @@ public class TraitorsTownMDP implements MDP<GameState, Integer, DiscreteSpace> {
     public String getReadable(Action action){
         try {
             Long cardId = getCardIdFromAction(action);
-            Optional<Card> card = gameService.getPlayerCards(aiPlayerId).stream().filter(c -> c.getId() == cardId).findFirst();
+            Optional<Card> card = playerService.getPlayerCards(aiPlayerId).stream().filter(c -> c.getId() == cardId).findFirst();
             if (card.isPresent()){
                 return "Playing card " + card.get().getName() + " targeting player " + action.getPlayerSlot();
             }

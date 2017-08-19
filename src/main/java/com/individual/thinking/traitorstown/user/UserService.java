@@ -1,6 +1,6 @@
 package com.individual.thinking.traitorstown.user;
 
-import com.individual.thinking.traitorstown.game.CardService;
+import com.individual.thinking.traitorstown.game.PlayerService;
 import com.individual.thinking.traitorstown.model.Player;
 import com.individual.thinking.traitorstown.user.encryption.Secure;
 import com.individual.thinking.traitorstown.user.exceptions.EmailAlreadyInUseException;
@@ -16,7 +16,7 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final CardService cardService;
+    private final PlayerService playerService;
 
     public User register(String email, String password) throws Exception {
         return register(email, password, false);
@@ -28,11 +28,12 @@ public class UserService {
             throw new EmailAlreadyInUseException("Email already in use!");
         }
 
+        Player player = playerService.createPlayer(ai);
         User user = User.builder()
                 .email(email)
                 .password(Secure.getSaltedHash(password))
                 .token(Secure.getToken())
-                .player(Player.builder().decks(cardService.getStandardDecks()).ready(false).ai(ai).build())
+                .player(player)
                 .build();
 
         userRepository.save(user);

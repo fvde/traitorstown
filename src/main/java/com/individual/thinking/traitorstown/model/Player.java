@@ -35,17 +35,20 @@ public class Player {
 
     @ManyToMany
     @JoinTable(name = "player_deck_card", joinColumns = @JoinColumn(name = "player_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "card_id", referencedColumnName = "id"))
+    @Builder.Default
     private List<Card> deckCards = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @Fetch(value = FetchMode.SUBSELECT)
     @JoinTable(name = "player_hand_card", joinColumns = @JoinColumn(name = "player_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "card_id", referencedColumnName = "id"))
+    @Builder.Default
     private List<Card> handCards = new ArrayList<>();
 
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @Fetch(value = FetchMode.SUBSELECT)
     @JoinColumn(name = "player_id")
+    @Builder.Default
     private List<EffectActive> activeEffects = new ArrayList<>();
 
     @Getter(value = AccessLevel.PRIVATE)

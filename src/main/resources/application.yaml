@@ -20,6 +20,7 @@ logging:
 
 com.individual.thinking.traitorstown:
   learning-enabled: false
+  learning-steps: 80000
   messaging-enabled: true
   minimum-number-of-players: 4
   maximum-number-of-players: 8
@@ -36,10 +37,12 @@ spring:
     driver-class-name: org.h2.Driver
 
 com.individual.thinking.traitorstown:
+  learning-enabled: true
+  learning-steps: 1000
+  messaging-enabled: false
   minimum-number-of-players: 1
   maximum-number-of-players: 8
-  learning-enabled: true
-  messaging-enabled: false
+
 
 logging:
   level:
@@ -57,7 +60,7 @@ spring:
 
 com.individual.thinking.traitorstown:
   minimum-number-of-players: 1
-  maximum-number-of-players: 1
+  maximum-number-of-players: 4
 
 ---
 #production environment

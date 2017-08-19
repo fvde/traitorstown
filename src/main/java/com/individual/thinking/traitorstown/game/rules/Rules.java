@@ -12,7 +12,7 @@ import java.util.*;
 @Component
 public class Rules {
 
-    public static final Integer INITIAL_AMOUNT_OF_CARDS = 3;
+    public static final Integer INITIAL_AMOUNT_OF_CARDS = 2;
     public static final Integer INITIAL_AMOUNT_OF_GOLD = 10;
     public static final Integer INITIAL_AMOUNT_OF_REPUTATION = 10;
     public static Integer MAXIMUM_NUMBER_OF_CARDS = 8;

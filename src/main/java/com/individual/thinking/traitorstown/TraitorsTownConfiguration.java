@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 public class TraitorsTownConfiguration {
 
     private Boolean learningEnabled;
+    private Integer LearningSteps;
     private Boolean messagingEnabled;
     private Integer minimumNumberOfPlayers;
     private Integer maximumNumberOfPlayers;
@@ -54,5 +55,13 @@ public class TraitorsTownConfiguration {
 
     public void setMessagingEnabled(Boolean messagingEnabled) {
         this.messagingEnabled = messagingEnabled;
+    }
+
+    public Integer getLearningSteps() {
+        return LearningSteps;
+    }
+
+    public void setLearningSteps(Integer learningSteps) {
+        LearningSteps = learningSteps;
     }
 }

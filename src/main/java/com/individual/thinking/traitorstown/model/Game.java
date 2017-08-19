@@ -58,10 +58,14 @@ public class Game {
 
     public void start() throws RuleSetViolationException {
         setStatus(GameStatus.PLAYING);
-        Turn firstTurn = Turn.builder().counter(1).build();
-        turns.add(firstTurn);
+        turns.add(Turn.builder().counter(0).build());
         Rules.getRolesForPlayers(players).forEach((role, players) ->
                 players.forEach(p -> p.startGameWithRole(role)));
+    }
+
+    public void end(){
+        status = GameStatus.FINISHED;
+        winner = getMayor().get().getRole();
     }
 
     public void playCard(Player player, Player target, Card card) throws NotCurrentTurnException, PlayerDoesNotHaveCardException, PlayedAlreadyPlayedCardThisTurnException, PlayerMayNotPlayThisCardException, InactiveGameException, TargetPlayerNotInGameException {
@@ -91,8 +95,7 @@ public class Game {
         }
 
         if (getMayor().isPresent() && Day.isElectionDay(next.getCounter())) {
-            status = GameStatus.FINISHED;
-            winner = getMayor().get().getRole();
+            end();
         } else {
             turns.add(next);
             players.forEach(Player::drawCard);

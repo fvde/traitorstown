@@ -38,4 +38,4 @@ ROOT.war:
 
 deploy_traitors: ROOT.war
 	#echo $(VERSION) $(VERSION_PATH)
-	VERSION=$(VERSION) eb_deploy -p $(VERSION_PATH) -e traitors-prod -c config/router.yml
+	VERSION=$(VERSION) eb_deploy -p $(VERSION_PATH) -e traitors-prod -c config/traitors.yml

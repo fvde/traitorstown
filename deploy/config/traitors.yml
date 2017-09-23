@@ -36,7 +36,7 @@ common:
       value: t2.micro
     - namespace: aws:autoscaling:launchconfiguration
       option_name: IamInstanceProfile
-      value: arn:aws:iam::384967171918:instance-profile/aws-elasticbeanstalk-ec2-role
+      value: arn:aws:iam::003931264098:instance-profile/aws-elasticbeanstalk-ec2-role
 
     - namespace: aws:elasticbeanstalk:healthreporting:system
       option_name: SystemType

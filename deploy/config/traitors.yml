@@ -1,0 +1,141 @@
+# application name
+application: router
+
+# common settings for all environments
+common:
+  solution_stack_name: 64bit Amazon Linux 2016.03 v2.1.1 running Tomcat 8 Java 8
+  tier: WebServer
+  region: eu-west-1
+  phoenix_mode: false
+  keep_latest: 50
+  version_label: <%= ENV['VERSION'] || package_digest %>
+
+  smoke_test: |
+    curl_http_code = "curl -s -o /dev/null -w \"%{http_code}\" http://#{host_name}/health"
+    Timeout.timeout(300) do
+      until ['200', '301', '302'].include?(`#{curl_http_code}`.strip)
+        sleep 5
+      end
+    end
+
+  # Elastic Beanstalk settings that will apply to the environments you are
+  # deploying.
+  # For all available options take a look at
+  # http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options.html
+  option_settings:
+    # common options
+    - namespace: aws:elasticbeanstalk:environment
+      option_name: EnvironmentType
+      value: LoadBalanced
+    - namespace: aws:elasticbeanstalk:environment
+      option_name: ServiceRole
+      value: aws-elasticbeanstalk-service-role
+
+    - namespace: aws:autoscaling:launchconfiguration
+      option_name: InstanceType
+      value: t2.micro
+    - namespace: aws:autoscaling:launchconfiguration
+      option_name: IamInstanceProfile
+      value: arn:aws:iam::384967171918:instance-profile/aws-elasticbeanstalk-ec2-role
+
+    - namespace: aws:elasticbeanstalk:healthreporting:system
+      option_name: SystemType
+      value: enhanced
+
+    - namespace: aws:elasticbeanstalk:container:tomcat:jvmoptions
+      option_name: Xms
+      value: 128m
+    - namespace: aws:elasticbeanstalk:container:tomcat:jvmoptions
+      option_name: Xmx
+      value: 256m
+
+    #- namespace: aws:autoscaling:launchconfiguration
+    #  option_name: EC2KeyName
+    #  value: scoober
+
+    - namespace: aws:elb:loadbalancer
+      option_name: LoadBalancerHTTPSPort
+      value: '443'
+    - namespace: aws:elbv2:listener:443
+      option_name: SSLCertificateArns
+      value: 'arn:aws:acm:eu-west-1:003931264098:certificate/0bcb348a-6411-49de-869c-88a2ba7b79a9'
+    - namespace: aws:elbv2:listener:443
+      option_name: Protocol
+      value: HTTPS
+
+    - namespace: aws:elb:loadbalancer
+      option_name: CrossZone
+      value: 'true'
+    - namespace: aws:elb:policies
+      option_name: ConnectionDrainingEnabled
+      value: 'true'
+    - namespace: aws:elb:policies
+      option_name: ConnectionDrainingTimeout
+      value: '20'
+
+    - namespace: aws:elb:healthcheck
+      option_name: Interval
+      value: '20'
+    - namespace: aws:elasticbeanstalk:application
+      option_name: Application Healthcheck URL
+      value: /health
+
+    # Scaling
+    - namespace: aws:autoscaling:asg
+      option_name: MinSize
+      value: '1'
+    - namespace: aws:autoscaling:asg
+      option_name: MaxSize
+      value: '1'
+    - namespace: aws:autoscaling:asg
+      option_name: 'Availability Zones'
+      value: 'Any'
+
+    - namespace: aws:autoscaling:trigger
+      option_name: BreachDuration
+      value: '5'
+    - namespace: aws:autoscaling:trigger
+      option_name: LowerBreachScaleIncrement
+      value: '-1'
+    - namespace: aws:autoscaling:trigger
+      option_name: LowerThreshold
+      value: '2000000'
+    - namespace: aws:autoscaling:trigger
+      option_name: MeasureName
+      value: NetworkOut
+    - namespace: aws:autoscaling:trigger
+      option_name: Period
+      value: '5'
+    - namespace: aws:autoscaling:trigger
+      option_name: Statistic
+      value: Average
+    - namespace: aws:autoscaling:trigger
+      option_name: Unit
+      value: Bytes
+    - namespace: aws:autoscaling:trigger
+      option_name: UpperBreachScaleIncrement
+      value: '1'
+    - namespace: aws:autoscaling:trigger
+      option_name: UpperThreshold
+      value: '6000000'
+
+# You can define environment here. Each environment can overriden any common settings
+environments:
+
+  ##############
+  # production #
+  ##############
+
+  traitors-prod:
+    strategy: inplace-update
+    option_settings:
+      - namespace: aws:elasticbeanstalk:application:environment
+        option_name: spring.profiles.active
+        value: production
+      - namespace: aws:autoscaling:launchconfiguration
+        option_name: SecurityGroups
+        value: "traitors-town-game-db-access"
+    tags:
+      Environment: production
+      Application: traitors
+    cname_prefix:  traitors-town-production

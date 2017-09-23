@@ -38,10 +38,10 @@ spring:
 
 com.individual.thinking.traitorstown:
   learning-enabled: true
-  learning-steps: 1000
+  learning-steps: 40000
   messaging-enabled: false
   minimum-number-of-players: 1
-  maximum-number-of-players: 8
+  maximum-number-of-players: 5
 
 
 logging:
@@ -59,16 +59,16 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
 
 com.individual.thinking.traitorstown:
-  minimum-number-of-players: 1
-  maximum-number-of-players: 4
+  minimum-number-of-players: 2
+  maximum-number-of-players: 5
 
 ---
 #production environment
 spring:
   profiles: production
   datasource:
-    url:
+    url: traitors-town-game.csah8eocqs8t.eu-west-1.rds.amazonaws.com
     username:
-    password:
+    password: YbmCugQEQFbDepAuJbJekVzYuBZUKFtc
     driver-class-name: com.mysql.jdbc.Driver
 

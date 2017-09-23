@@ -29,6 +29,10 @@ public class GameControllerTest extends MockMvcBase{
     @MockBean
     private GameService gameService;
 
+    @MockBean
+    private PlayerService playerService;
+
+
     private Long validUserId = 62532532L;
     private Long validGameId = 97217217L;
     private String validToken = "1srioisp5mb07drbbejqni519eib2pti";
@@ -154,7 +158,7 @@ public class GameControllerTest extends MockMvcBase{
 
     @Test
     public void getPlayerCards() throws Exception {
-        when(gameService.getPlayerCards(anyLong())).thenReturn(cards);
+        when(playerService.getPlayerCards(anyLong())).thenReturn(cards);
 
         this.mockMvc.perform(get("/games/{gameId}/players/{playerId}/cards", validGameId, validUserId)
                 .with(authorizedPlayer(player))

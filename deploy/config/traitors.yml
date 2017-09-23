@@ -3,11 +3,11 @@ application: traitors-town
 
 # common settings for all environments
 common:
-  solution_stack_name: 64bit Amazon Linux 2016.03 v2.1.1 running Tomcat 8 Java 8
+  solution_stack_name: 64bit Amazon Linux 2017.03 v2.6.4 running Tomcat 8 Java 8
   tier: WebServer
   region: eu-west-1
   phoenix_mode: false
-  keep_latest: 50
+  keep_latest: 10
   version_label: <%= ENV['VERSION'] || package_digest %>
 
   smoke_test: |

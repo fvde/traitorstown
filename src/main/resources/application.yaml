@@ -67,8 +67,8 @@ com.individual.thinking.traitorstown:
 spring:
   profiles: production
   datasource:
-    url: traitors-town-game.csah8eocqs8t.eu-west-1.rds.amazonaws.com
-    username:
-    password: YbmCugQEQFbDepAuJbJekVzYuBZUKFtc
+    url: jdbc:mysql://traitors-town-db-prod.csah8eocqs8t.eu-west-1.rds.amazonaws.com:3306/traitorstown
+    username: traitorstown
+    password: cqymgmfJkJqUhNUVyTrALNNLCWSfkKhy
     driver-class-name: com.mysql.jdbc.Driver
 

@@ -49,9 +49,9 @@ common:
       option_name: Xmx
       value: 256m
 
-    #- namespace: aws:autoscaling:launchconfiguration
-    #  option_name: EC2KeyName
-    #  value: scoober
+    - namespace: aws:autoscaling:launchconfiguration
+      option_name: EC2KeyName
+      value: traitors
 
     - namespace: aws:elb:loadbalancer
       option_name: LoadBalancerHTTPSPort

@@ -7,7 +7,7 @@ common:
   tier: WebServer
   region: eu-west-1
   phoenix_mode: false
-  keep_latest: 10
+  keep_latest: 3
   version_label: <%= ENV['VERSION'] || package_digest %>
 
   smoke_test: |

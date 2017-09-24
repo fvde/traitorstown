@@ -1,5 +1,8 @@
 FROM jenkins/jenkins:lts
 
+ENV JENKINS_OPTS --httpPort=8081
+EXPOSE 8081
+
 USER root
 RUN apt-get update
 RUN apt-get install -y ruby

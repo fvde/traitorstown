@@ -176,6 +176,11 @@ environments:
       - namespace: aws:elasticbeanstalk:container:tomcat:jvmoptions
         option_name: Xmx
         value: 512m
+      # we need local storage
+      - namespace: aws:autoscaling:launchconfiguration
+        option_name: InstanceType
+        value: m1.small
+
     tags:
       Environment: production
       Application: traitors

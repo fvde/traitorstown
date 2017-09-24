@@ -39,3 +39,7 @@ ROOT.war:
 deploy_traitors: ROOT.war
 	#echo $(VERSION) $(VERSION_PATH)
 	VERSION=$(VERSION) eb_deploy -p $(VERSION_PATH) -e traitors-prod -c config/traitors.yml
+
+learn_traitors: ROOT.war
+    #echo $(VERSION) $(VERSION_PATH)
+    VERSION=$(VERSION) eb_deploy -p $(VERSION_PATH) -e traitors-learn -c config/traitors.yml

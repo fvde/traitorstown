@@ -26,15 +26,20 @@ import java.util.UUID;
 @Repository
 public class LearningRepository {
 
-    private final LearningDataManager learningDataManager;
+    private LearningDataManager learningDataManager;
     private final AmazonS3 amazonS3Client;
     private final String bucketName;
+    private final boolean learningEnabled;
 
     @Autowired
     public LearningRepository(TraitorsTownConfiguration configuration, AmazonS3 amazonS3Client){
-        this.learningDataManager = new LearningDataManager(configuration.getLearningEnabled());
         this.amazonS3Client = amazonS3Client;
         this.bucketName = configuration.getBucket();
+        this.learningEnabled = configuration.getLearningEnabled();
+    }
+
+    public void initialize(){
+        this.learningDataManager = new LearningDataManager(learningEnabled);
     }
 
     public void save(Learning<GameState, Integer, DiscreteSpace, IDQN> learning){

@@ -8,7 +8,7 @@ import org.deeplearning4j.rl4j.util.DataManager;
 
 import java.io.File;
 
-public class LearningDataManager extends DataManager{
+public class LearningDataManager extends DataManager {
     private static final String LEARNING_NAME = "traitorstown.training";
     public static final String ROOT_LEARNING_DIR = "learning";
 

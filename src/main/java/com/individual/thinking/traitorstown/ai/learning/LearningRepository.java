@@ -34,7 +34,7 @@ public class LearningRepository {
     public LearningRepository(TraitorsTownConfiguration configuration, AmazonS3 amazonS3Client){
         this.learningDataManager = new LearningDataManager(configuration.getLearningEnabled());
         this.amazonS3Client = amazonS3Client;
-        this.bucketName = configuration.getLearningBucket();
+        this.bucketName = configuration.getBucket();
     }
 
     public void save(Learning<GameState, Integer, DiscreteSpace, IDQN> learning){

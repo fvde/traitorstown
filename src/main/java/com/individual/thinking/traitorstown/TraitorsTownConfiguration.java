@@ -9,7 +9,7 @@ public class TraitorsTownConfiguration {
 
     private Boolean learningEnabled;
     private Integer LearningSteps;
-    private String LearningBucket;
+    private String Bucket;
     private Boolean messagingEnabled;
     private Integer minimumNumberOfPlayers;
     private Integer maximumNumberOfPlayers;
@@ -66,11 +66,11 @@ public class TraitorsTownConfiguration {
         LearningSteps = learningSteps;
     }
 
-    public String getLearningBucket() {
-        return LearningBucket;
+    public String getBucket() {
+        return Bucket;
     }
 
-    public void setLearningBucket(String learningBucket) {
-        LearningBucket = learningBucket;
+    public void setBucket(String bucket) {
+        Bucket = bucket;
     }
 }

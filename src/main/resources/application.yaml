@@ -23,7 +23,7 @@ logging:
 com.individual.thinking.traitorstown:
   learning-enabled: false
   learning-steps: 80000
-  learning-bucket : traitors-town.learnings-development
+  bucket : traitors-town.learnings-development
   messaging-enabled: true
   minimum-number-of-players: 4
   maximum-number-of-players: 8
@@ -76,7 +76,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
 
 com.individual.thinking.traitorstown:
-  learning-bucket : traitors-town.learnings-production
+  bucket : traitors-town.learnings-production
 
 
 

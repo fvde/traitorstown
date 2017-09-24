@@ -39,8 +39,9 @@ ROOT.war:
 
 deploy_traitors: ROOT.war
 	#echo $(VERSION) $(VERSION_PATH) $(TIMEOUT)
-	VERSION=$(VERSION) eb_deploy -p $(VERSION_PATH) -e traitors-prod -c config/traitors.yml
+	VERSION=$(VERSION) TIMEOUT=$(TIMEOUT) eb_deploy -p $(VERSION_PATH) -e traitors-prod -c config/traitors.yml
 
 learn_traitors: ROOT.war
+	TIMEOUT=3600
 	#echo $(VERSION) $(VERSION_PATH) $(TIMEOUT)
-	VERSION=$(VERSION) eb_deploy -p $(VERSION_PATH) -e traitors-learn -c config/traitors.yml
+	VERSION=$(VERSION) TIMEOUT=$(TIMEOUT) eb_deploy -p $(VERSION_PATH) -e traitors-learn -c config/traitors.yml

@@ -168,8 +168,8 @@ environments:
         option_name: spring.profiles.active
         value: learning
       - namespace: aws:elasticbeanstalk:application:environment
-        option_name: com.individual.thinking.traitorstown.learningBucket
-        value: traitors-town.learnings-production
+        option_name: com.individual.thinking.traitorstown.bucket
+        value: 'traitors-town.learnings-production'
       - namespace: aws:elasticbeanstalk:container:tomcat:jvmoptions
         option_name: Xms
         value: 256m

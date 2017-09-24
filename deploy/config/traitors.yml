@@ -12,7 +12,7 @@ common:
 
   smoke_test: |
     curl_http_code = "curl -s -o /dev/null -w \"%{http_code}\" http://#{host_name}/application/health"
-    Timeout.timeout(ENV['TIMEOUT']) do
+    Timeout.timeout(300) do
       until ['200', '301', '302'].include?(`#{curl_http_code}`.strip)
         sleep 5
       end

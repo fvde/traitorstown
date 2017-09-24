@@ -21,6 +21,7 @@ import org.deeplearning4j.rl4j.network.dqn.IDQN;
 import org.deeplearning4j.rl4j.policy.Policy;
 import org.deeplearning4j.rl4j.space.DiscreteSpace;
 import org.nd4j.linalg.factory.Nd4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -94,7 +95,7 @@ public class ReinforcementLearningService {
     private List<Player> players = new ArrayList<>();
     private TraitorsTownMDP mdp;
 
-
+    @Async
     public void startLearning(){
         try {
             prepareSession();

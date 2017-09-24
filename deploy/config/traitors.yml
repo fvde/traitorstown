@@ -11,7 +11,7 @@ common:
   version_label: <%= ENV['VERSION'] || package_digest %>
 
   smoke_test: |
-    curl_http_code = "curl -s -o /dev/null -w \"%{http_code}\" http://#{host_name}/health"
+    curl_http_code = "curl -s -o /dev/null -w \"%{http_code}\" http://#{host_name}/application/health"
     Timeout.timeout(300) do
       until ['200', '301', '302'].include?(`#{curl_http_code}`.strip)
         sleep 5
@@ -81,7 +81,21 @@ common:
       value: '20'
     - namespace: aws:elasticbeanstalk:application
       option_name: Application Healthcheck URL
-      value: /health
+      value: /application/health
+
+    # rolling updates
+    - namespace: aws:autoscaling:updatepolicy:rollingupdate
+      option_name: RollingUpdateEnabled
+      value: 'true'
+    - namespace: aws:autoscaling:updatepolicy:rollingupdate
+      option_name: RollingUpdateType
+      value: Health
+    - namespace: aws:autoscaling:updatepolicy:rollingupdate
+      option_name: MaxBatchSize
+      value: '1'
+    - namespace: aws:autoscaling:updatepolicy:rollingupdate
+      option_name: MinInstancesInService
+      value: '1'
 
     # Scaling
     - namespace: aws:autoscaling:asg

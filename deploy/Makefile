@@ -13,6 +13,7 @@ WAR_FILENAME = $(shell basename $(WAR))
 WAR_DIRNAME = $(shell dirname $(WAR))
 VERSION = $(md5_war)-$(md5_eb)-$(WAR_FILENAME)
 TIMEOUT = 300
+TIMEOUT_LEARNING = 3600
 VERSION_PATH = $(WAR_DIRNAME)/$(VERSION)
 
 test:
@@ -42,6 +43,5 @@ deploy_traitors: ROOT.war
 	VERSION=$(VERSION) TIMEOUT=$(TIMEOUT) eb_deploy -p $(VERSION_PATH) -e traitors-prod -c config/traitors.yml
 
 learn_traitors: ROOT.war
-	TIMEOUT=3600
-	#echo $(VERSION) $(VERSION_PATH) $(TIMEOUT)
-	VERSION=$(VERSION) TIMEOUT=$(TIMEOUT) eb_deploy -p $(VERSION_PATH) -e traitors-learn -c config/traitors.yml
+	#echo $(VERSION) $(VERSION_PATH) $(TIMEOUT_LEARNING)
+	VERSION=$(VERSION) TIMEOUT=$(TIMEOUT_LEARNING) eb_deploy -p $(VERSION_PATH) -e traitors-learn -c config/traitors.yml

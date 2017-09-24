@@ -1,5 +1,8 @@
 package com.individual.thinking.traitorstown;
 
+import com.amazonaws.auth.InstanceProfileCredentialsProvider;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.individual.thinking.traitorstown.ai.learning.model.DiscreteActionSpace;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -28,6 +31,14 @@ public class TraitorstownApplication extends SpringBootServletInitializer {
 	    return new DiscreteActionSpace(
 	            configuration.getMaximumNumberOfCards(),
                 configuration.getMaximumNumberOfPlayers());
+    }
+
+    @Bean
+    public AmazonS3 amazonS3Client(){
+        return AmazonS3ClientBuilder.standard()
+                .withRegion("eu-west-1")
+                .withCredentials(InstanceProfileCredentialsProvider.createAsyncRefreshingProvider(false))
+                .build();
     }
 
 	@Bean

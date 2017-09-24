@@ -12,16 +12,20 @@ public class LearningDataManager extends DataManager{
     private static final String LEARNING_NAME = "traitorstown.training";
     public static final String ROOT_LEARNING_DIR = "learning";
 
-    public LearningDataManager(Boolean learningEnabled){
-        super(ROOT_LEARNING_DIR, learningEnabled);
+    public LearningDataManager(Boolean saveData){
+        super(ROOT_LEARNING_DIR, saveData);
     }
 
     public void save(Learning learning){
         save(getModelDir() + "/" + LEARNING_NAME, learning);
     }
 
-    public IDQN load() {
-        return load(new File(ROOT_LEARNING_DIR + "/" + findIndexOfLatestLearningDirectory() +  "/" + Constants.MODEL_DIR + "/" + LEARNING_NAME), QLearning.QLConfiguration.class).getFirst();
+    public IDQN load(File file ) {
+        return load(file, QLearning.QLConfiguration.class).getFirst();
+    }
+
+    public File getFile() {
+        return new File(ROOT_LEARNING_DIR + "/" + findIndexOfLatestLearningDirectory() +  "/" + Constants.MODEL_DIR + "/" + LEARNING_NAME);
     }
 
     private Integer findIndexOfLatestLearningDirectory(){

@@ -41,7 +41,7 @@ public class CardService {
         return card;
     }
 
-    public void initializeCards() {
+    public void initialize() {
         List<Card> mainCards = Arrays.asList(
                 createCardOfType(CardType.CONNECTIONS,
                         Card.builder().cardType(CardType.CONNECTIONS).name("Use Connections").description("Draw an additional card.").effects(

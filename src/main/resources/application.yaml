@@ -1,7 +1,8 @@
 spring:
   jpa:
     hibernate:
-      # TODO change when moving towards release
+      # ddl-auto: create-drop
+      # ddl-auto: update
       ddl-auto: create-drop
     properties:
       hibernate:
@@ -39,7 +40,7 @@ spring:
 
 com.individual.thinking.traitorstown:
   learning-enabled: true
-  learning-steps: 40000
+  learning-steps: 100
   messaging-enabled: false
   minimum-number-of-players: 1
   maximum-number-of-players: 5

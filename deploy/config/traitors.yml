@@ -12,7 +12,7 @@ common:
 
   smoke_test: |
     curl_http_code = "curl -s -o /dev/null -w \"%{http_code}\" http://#{host_name}/application/health"
-    Timeout.timeout(300) do
+    Timeout.timeout(ENV['TIMEOUT']) do
       until ['200', '301', '302'].include?(`#{curl_http_code}`.strip)
         sleep 5
       end
@@ -168,7 +168,7 @@ environments:
         option_name: spring.profiles.active
         value: learning
       - namespace: aws:elasticbeanstalk:application:environment
-        option_name: com.individual.thinking.traitorstown.learningBucket:
+        option_name: com.individual.thinking.traitorstown.learningBucket
         value: traitors-town.learnings-production
       - namespace: aws:elasticbeanstalk:container:tomcat:jvmoptions
         option_name: Xms

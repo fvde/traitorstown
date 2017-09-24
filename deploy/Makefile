@@ -12,6 +12,7 @@ md5_eb = $(shell $(MD5) .ebextensions/* | $(MD5)| awk '{ print $$1 }')
 WAR_FILENAME = $(shell basename $(WAR))
 WAR_DIRNAME = $(shell dirname $(WAR))
 VERSION = $(md5_war)-$(md5_eb)-$(WAR_FILENAME)
+TIMEOUT = 300
 VERSION_PATH = $(WAR_DIRNAME)/$(VERSION)
 
 test:
@@ -37,9 +38,9 @@ ROOT.war:
 # Traitor's Town deployment
 
 deploy_traitors: ROOT.war
-	#echo $(VERSION) $(VERSION_PATH)
+	#echo $(VERSION) $(VERSION_PATH) $(TIMEOUT)
 	VERSION=$(VERSION) eb_deploy -p $(VERSION_PATH) -e traitors-prod -c config/traitors.yml
 
 learn_traitors: ROOT.war
-	#echo $(VERSION) $(VERSION_PATH)
+	#echo $(VERSION) $(VERSION_PATH) $(TIMEOUT)
 	VERSION=$(VERSION) eb_deploy -p $(VERSION_PATH) -e traitors-learn -c config/traitors.yml

@@ -28,12 +28,13 @@ public class LearningRepository {
 
     private final LearningDataManager learningDataManager;
     private final AmazonS3 amazonS3Client;
-    private final String bucketName = "traitors-town.learnings";
+    private final String bucketName;
 
     @Autowired
     public LearningRepository(TraitorsTownConfiguration configuration, AmazonS3 amazonS3Client){
         this.learningDataManager = new LearningDataManager(configuration.getLearningEnabled());
         this.amazonS3Client = amazonS3Client;
+        this.bucketName = configuration.getLearningBucket();
     }
 
     public void save(Learning<GameState, Integer, DiscreteSpace, IDQN> learning){

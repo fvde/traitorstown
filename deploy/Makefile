@@ -43,3 +43,7 @@ deploy_traitors: ROOT.war
 learn_traitors: ROOT.war
 	#echo $(VERSION) $(VERSION_PATH)
 	VERSION=$(VERSION) eb_deploy -p $(VERSION_PATH) -e traitors-learn -c config/traitors.yml
+
+destroy_learn_traitors:
+	@echo Shutting down...
+	eb_deployer -d -e traitors-learn

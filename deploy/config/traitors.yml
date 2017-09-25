@@ -170,16 +170,6 @@ environments:
       - namespace: aws:elasticbeanstalk:application:environment
         option_name: com.individual.thinking.traitorstown.bucket
         value: 'traitors-town.learnings-production'
-      - namespace: aws:elasticbeanstalk:container:tomcat:jvmoptions
-        option_name: Xms
-        value: 256m
-      - namespace: aws:elasticbeanstalk:container:tomcat:jvmoptions
-        option_name: Xmx
-        value: 512m
-      # we need local storage
-      - namespace: aws:autoscaling:launchconfiguration
-        option_name: InstanceType
-        value: m1.small
 
     tags:
       Environment: production

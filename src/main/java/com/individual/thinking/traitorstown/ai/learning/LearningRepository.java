@@ -11,7 +11,6 @@ import org.deeplearning4j.rl4j.network.dqn.IDQN;
 import org.deeplearning4j.rl4j.policy.DQNPolicy;
 import org.deeplearning4j.rl4j.policy.Policy;
 import org.deeplearning4j.rl4j.space.DiscreteSpace;
-import org.deeplearning4j.rl4j.util.DataManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -26,10 +25,19 @@ import java.util.UUID;
 @Repository
 public class LearningRepository {
 
-    private LearningDataManager learningDataManager;
+    private static LearningDataManager learningDataManager;
+    private static boolean learningEnabled;
+
     private final AmazonS3 amazonS3Client;
     private final String bucketName;
-    private final boolean learningEnabled;
+
+    public static LearningDataManager DataManager(){
+        if (learningDataManager == null){
+            learningDataManager = new LearningDataManager(learningEnabled);
+        }
+
+        return learningDataManager;
+    }
 
     @Autowired
     public LearningRepository(TraitorsTownConfiguration configuration, AmazonS3 amazonS3Client){
@@ -38,13 +46,9 @@ public class LearningRepository {
         this.learningEnabled = configuration.getLearningEnabled();
     }
 
-    public void initialize(){
-        this.learningDataManager = new LearningDataManager(learningEnabled);
-    }
-
     public void save(Learning<GameState, Integer, DiscreteSpace, IDQN> learning){
-        learningDataManager.save(learning);
-        File file = learningDataManager.getFile();
+        DataManager().save(learning);
+        File file = DataManager().getFile();
         clearS3Bucket();
         amazonS3Client.putObject(new PutObjectRequest(bucketName, UUID.randomUUID().toString(), file));
     }
@@ -66,11 +70,7 @@ public class LearningRepository {
             e.printStackTrace();
         }
 
-        return new DQNPolicy<>(learningDataManager.load(tmp));
-    }
-
-    public DataManager getDataManager(){
-        return learningDataManager;
+        return new DQNPolicy<>(DataManager().load(tmp));
     }
 
     private void clearS3Bucket(){

@@ -124,7 +124,7 @@ public class ReinforcementLearningService {
 
     private void trainAI() {
         //define the training method
-        Learning<GameState, Integer, DiscreteSpace, IDQN> dql = new QLearningDiscreteDense<>(mdp, TRAITORS_NET, TRAITORS_QL, learningRepository.getDataManager());
+        Learning<GameState, Integer, DiscreteSpace, IDQN> dql = new QLearningDiscreteDense<>(mdp, TRAITORS_NET, TRAITORS_QL, LearningRepository.DataManager());
 
         // TODO try other algorithm
 

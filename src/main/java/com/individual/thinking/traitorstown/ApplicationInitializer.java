@@ -1,7 +1,6 @@
 package com.individual.thinking.traitorstown;
 
 import com.individual.thinking.traitorstown.ai.ArtificialIntelligenceService;
-import com.individual.thinking.traitorstown.ai.learning.LearningRepository;
 import com.individual.thinking.traitorstown.ai.learning.ReinforcementLearningService;
 import com.individual.thinking.traitorstown.game.CardService;
 import lombok.RequiredArgsConstructor;
@@ -19,11 +18,9 @@ public class ApplicationInitializer implements ApplicationRunner {
     private final ReinforcementLearningService reinforcementLearningService;
     private final TraitorsTownConfiguration configuration;
     private final ArtificialIntelligenceService artificialIntelligenceService;
-    private final LearningRepository learningRepository;
 
     public void run(ApplicationArguments args) {
         cardService.initialize();
-        learningRepository.initialize();
         artificialIntelligenceService.initialize();
 
         if (configuration.getLearningEnabled()){

@@ -2,21 +2,22 @@ package com.individual.thinking.traitorstown.ai.learning;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectListing;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.individual.thinking.traitorstown.TraitorsTownConfiguration;
 import com.individual.thinking.traitorstown.ai.learning.model.GameState;
 import org.deeplearning4j.rl4j.learning.Learning;
+import org.deeplearning4j.rl4j.learning.sync.qlearning.QLearning;
 import org.deeplearning4j.rl4j.network.dqn.IDQN;
 import org.deeplearning4j.rl4j.policy.DQNPolicy;
 import org.deeplearning4j.rl4j.policy.Policy;
 import org.deeplearning4j.rl4j.space.DiscreteSpace;
+import org.deeplearning4j.rl4j.util.DataManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
@@ -25,32 +26,22 @@ import java.util.UUID;
 @Repository
 public class LearningRepository {
 
-    private static LearningDataManager learningDataManager;
-    private static boolean learningEnabled;
-
+    private final DataManager dataManager;
     private final AmazonS3 amazonS3Client;
     private final String bucketName;
-
-    public static LearningDataManager DataManager(){
-        if (learningDataManager == null){
-            learningDataManager = new LearningDataManager(learningEnabled);
-        }
-
-        return learningDataManager;
-    }
 
     @Autowired
     public LearningRepository(TraitorsTownConfiguration configuration, AmazonS3 amazonS3Client){
         this.amazonS3Client = amazonS3Client;
         this.bucketName = configuration.getBucket();
-        this.learningEnabled = configuration.getLearningEnabled();
+        this.dataManager = new DataManager(false);
     }
 
     public void save(Learning<GameState, Integer, DiscreteSpace, IDQN> learning){
-        DataManager().save(learning);
-        File file = DataManager().getFile();
         clearS3Bucket();
-        amazonS3Client.putObject(new PutObjectRequest(bucketName, UUID.randomUUID().toString(), file));
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        DataManager.save(outStream, learning);
+        amazonS3Client.putObject(new PutObjectRequest(bucketName, UUID.randomUUID().toString(), new ByteArrayInputStream(outStream.toByteArray()), new ObjectMetadata()));
     }
 
     public Policy<GameState, Integer> load(){
@@ -70,7 +61,7 @@ public class LearningRepository {
             e.printStackTrace();
         }
 
-        return new DQNPolicy<>(DataManager().load(tmp));
+        return new DQNPolicy<>(dataManager.load(tmp, QLearning.QLConfiguration.class).getFirst());
     }
 
     private void clearS3Bucket(){
@@ -78,5 +69,9 @@ public class LearningRepository {
         for (S3ObjectSummary object : objects.getObjectSummaries()){
             amazonS3Client.deleteObject(bucketName, object.getKey());
         }
+    }
+
+    public DataManager getDataManager() {
+        return dataManager;
     }
 }

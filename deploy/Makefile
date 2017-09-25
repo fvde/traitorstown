@@ -46,4 +46,4 @@ learn_traitors: ROOT.war
 
 destroy_learn_traitors:
 	@echo Shutting down...
-	eb_deployer -d -e traitors-learn
+	eb_deploy -d -e traitors-learn

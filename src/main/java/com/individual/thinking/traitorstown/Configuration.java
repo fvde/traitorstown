@@ -17,9 +17,6 @@ public class Configuration {
 
         // reputation may fall below zero
         MINIMUM_RESOURCES.put(ResourceType.REPUTATION, Integer.MIN_VALUE);
-
-        // effect may cause you to discard cards, which is always allowed
-        MINIMUM_RESOURCES.put(ResourceType.CARD, Integer.MIN_VALUE);
     }
 
     public static final Integer TOTAL_NUMBER_OF_CARDS = 8;

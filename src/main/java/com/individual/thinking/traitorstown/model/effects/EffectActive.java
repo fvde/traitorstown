@@ -1,5 +1,6 @@
-package com.individual.thinking.traitorstown.model;
+package com.individual.thinking.traitorstown.model.effects;
 
+import com.individual.thinking.traitorstown.model.Player;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -60,23 +61,23 @@ public class EffectActive {
     }
 
     public boolean isCandidacy() {
-        return effect.getResourceType().equals(ResourceType.CANDIDACY);
+        return effect.isOfType(CandidacyEffect.class);
     }
 
     public boolean isVote() {
-        return effect.getResourceType().equals(ResourceType.VOTE);
+        return effect.isOfType(VoteEffect.class);
     }
 
     public boolean isMayor() {
-        return effect.getResourceType().equals(ResourceType.MAYOR);
+        return effect.isOfType(MayorEffect.class);
     }
 
     public boolean isTraitor() {
-        return effect.getResourceType().equals(ResourceType.TRAITOR);
+        return effect.isOfType(TraitorEffect.class);
     }
 
     public boolean isCitizen() {
-        return effect.getResourceType().equals(ResourceType.CITIZEN);
+        return effect.isOfType(CitizenEffect.class);
     }
 
     public boolean isVisibleFor(Player player){

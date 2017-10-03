@@ -1,7 +1,8 @@
 package com.individual.thinking.traitorstown.game.representation;
 
 import com.individual.thinking.traitorstown.model.Card;
-import com.individual.thinking.traitorstown.model.Effect;
+import com.individual.thinking.traitorstown.model.effects.Effect;
+import com.individual.thinking.traitorstown.model.effects.ResourceEffect;
 import lombok.Data;
 
 import java.util.List;
@@ -18,6 +19,9 @@ public class CardRepresentation {
         return new CardRepresentation(card.getId(),
                 card.getName(),
                 card.getDescription(),
-                card.getEffects().stream().filter(Effect::isCost).map(ResourceRepresentation::fromEffect).collect(Collectors.toList()));
+                card.getEffects().stream()
+                        .filter(Effect::isCost)
+                        .map(effect -> (ResourceEffect)effect)
+                        .map(ResourceRepresentation::fromEffect).collect(Collectors.toList()));
     }
 }

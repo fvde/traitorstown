@@ -1,6 +1,6 @@
 package com.individual.thinking.traitorstown.game.representation;
 
-import com.individual.thinking.traitorstown.model.EffectActive;
+import com.individual.thinking.traitorstown.model.effects.EffectActive;
 import lombok.Data;
 
 @Data

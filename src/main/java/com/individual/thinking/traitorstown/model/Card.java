@@ -1,5 +1,6 @@
 package com.individual.thinking.traitorstown.model;
 
+import com.individual.thinking.traitorstown.model.effects.Effect;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;

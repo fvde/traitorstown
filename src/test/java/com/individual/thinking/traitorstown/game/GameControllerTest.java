@@ -2,6 +2,7 @@ package com.individual.thinking.traitorstown.game;
 
 import com.individual.thinking.traitorstown.MockMvcBase;
 import com.individual.thinking.traitorstown.model.*;
+import com.individual.thinking.traitorstown.model.effects.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,8 +38,8 @@ public class GameControllerTest extends MockMvcBase{
     private Long validGameId = 97217217L;
     private String validToken = "1srioisp5mb07drbbejqni519eib2pti";
 
-    private final Effect removeGoldEffect = Effect.builder()
-            .effectTargetType(EffectTargetType.SINGLE)
+    private final Effect removeGoldEffect = ResourceEffect.builder()
+            .effectTargetType(EffectTargetType.TARGET)
             .operator(EffectOperator.REMOVE)
             .resourceType(ResourceType.GOLD)
             .amount(10)
@@ -47,7 +48,7 @@ public class GameControllerTest extends MockMvcBase{
 
     private final List<Card> cards = Arrays.asList(
             Card.builder().id(1L).cardType(CardType.HONEST_TRADE).name("Trade").description("get gold from people!").effects(Arrays.asList(removeGoldEffect)).build(),
-            Card.builder().id(2L).cardType(CardType.RUN_FOR_MAYOR).name("Run for mayor").description("Apply to become mayor!").effects(Arrays.asList(Effect.builder().effectTargetType(EffectTargetType.SINGLE).operator(EffectOperator.REMOVE).resourceType(ResourceType.REPUTATION).amount(20).duration(1).build())).build());
+            Card.builder().id(2L).cardType(CardType.RUN_FOR_MAYOR).name("Run for mayor").description("Apply to become mayor!").effects(Arrays.asList(ResourceEffect.builder().effectTargetType(EffectTargetType.TARGET).operator(EffectOperator.REMOVE).resourceType(ResourceType.REPUTATION).amount(20).duration(1).build())).build());
 
     private final Player opponent = Player.builder()
             .id(validUserId)

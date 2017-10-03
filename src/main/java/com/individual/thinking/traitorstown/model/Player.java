@@ -2,6 +2,9 @@ package com.individual.thinking.traitorstown.model;
 
 import com.individual.thinking.traitorstown.game.CardService;
 import com.individual.thinking.traitorstown.game.rules.Rules;
+import com.individual.thinking.traitorstown.model.effects.Effect;
+import com.individual.thinking.traitorstown.model.effects.EffectActive;
+import com.individual.thinking.traitorstown.model.effects.EffectType;
 import com.individual.thinking.traitorstown.model.exceptions.PlayerDoesNotHaveCardException;
 import lombok.*;
 import lombok.experimental.Tolerate;

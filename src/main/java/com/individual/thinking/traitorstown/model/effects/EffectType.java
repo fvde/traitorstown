@@ -1,5 +1,6 @@
-package com.individual.thinking.traitorstown.model;
+package com.individual.thinking.traitorstown.model.effects;
 
+import com.individual.thinking.traitorstown.model.Role;
 import com.individual.thinking.traitorstown.model.exceptions.UnknownRoleException;
 
 public enum EffectType {

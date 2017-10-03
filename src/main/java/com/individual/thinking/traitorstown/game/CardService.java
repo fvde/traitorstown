@@ -90,7 +90,7 @@ public class CardService {
         createCardOfType(CardType.VOTE,
                 Card.builder().cardType(CardType.VOTE).name("Vote").description("Vote for a player to become mayor.").singleTurnOnly(true)
                         .effects(Arrays.asList(
-                                VoteEffect.builder().duration(1).build())
+                                VoteEffect.builder().duration(2).build())
         ).build());
 
         // SPECIAL EFFECTS

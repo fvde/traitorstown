@@ -26,11 +26,13 @@ public class VoteEffect extends SpecialEffect {
 
     @Override
     public void apply(Game game, Player player, Player target, boolean isNew) {
-        publishMessage(
-                Message.builder().content(" voted for ").structure(MessageStructure.PREFIX_ORIGIN_POSTFIX_TARGET).build(),
-                game.getId(),
-                game.getPlayers(),
-                Optional.of(player),
-                Optional.of(target));
+        if (isNew){
+            publishMessage(
+                    Message.builder().content(" voted for ").structure(MessageStructure.PREFIX_ORIGIN_POSTFIX_TARGET).build(),
+                    game.getId(),
+                    game.getPlayers(),
+                    Optional.of(player),
+                    Optional.of(target));
+        }
     }
 }

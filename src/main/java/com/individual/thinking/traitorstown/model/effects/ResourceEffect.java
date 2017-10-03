@@ -42,7 +42,7 @@ public class ResourceEffect extends Effect {
     }
 
     @Override
-    public void apply(Game game, Player player, Player target) {
+    public void apply(Game game, Player player, Player target, boolean isNew) {
         if (operator == EffectOperator.REMOVE) {
             target.removeResource(resourceType, amount);
         } else {

@@ -7,7 +7,7 @@ import java.util.List;
 
 @Builder
 @Value
-public class Message {
+public class MessageRepresentation {
     private final Long gameId;
     private final List<Long> recipients;
     private final Long from;

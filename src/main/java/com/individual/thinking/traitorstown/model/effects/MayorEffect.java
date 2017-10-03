@@ -1,14 +1,13 @@
 package com.individual.thinking.traitorstown.model.effects;
 
-import com.individual.thinking.traitorstown.model.Game;
-import com.individual.thinking.traitorstown.model.Player;
-import com.individual.thinking.traitorstown.model.Visibility;
+import com.individual.thinking.traitorstown.model.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.Tolerate;
 
 import javax.persistence.Entity;
+import java.util.Optional;
 
 @Entity
 @ToString(callSuper = true)
@@ -26,7 +25,14 @@ public class MayorEffect extends SpecialEffect {
     }
 
     @Override
-    public void apply(Game game, Player player, Player target) {
-        // does nothing currently, could add reputation or other?
+    public void apply(Game game, Player player, Player target, boolean isNew) {
+        if (isNew){
+            publishMessage(
+                    Message.builder().content(" was elected mayor!").structure(MessageStructure.PREFIX_TARGET).build(),
+                    game.getId(),
+                    game.getPlayers(),
+                    Optional.empty(),
+                    Optional.of(target));
+        }
     }
 }

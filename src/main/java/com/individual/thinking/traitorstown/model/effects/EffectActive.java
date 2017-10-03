@@ -42,7 +42,7 @@ public class EffectActive {
     EffectActive() {}
 
     public void apply(Game game){
-        effect.apply(game, player, target);
+        effect.apply(game, player, target, remainingTurns.equals(effect.getDuration()));
         remainingTurns--;
     }
 

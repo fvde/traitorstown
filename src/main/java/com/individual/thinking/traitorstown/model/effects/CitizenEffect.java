@@ -20,5 +20,5 @@ public class CitizenEffect extends SpecialEffect {
     }
 
     @Override
-    public void apply(Game game, Player origin, Player target) { }
+    public void apply(Game game, Player origin, Player target, boolean isNew) { }
 }

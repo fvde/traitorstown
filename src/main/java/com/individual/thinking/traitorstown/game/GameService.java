@@ -9,7 +9,6 @@ import com.individual.thinking.traitorstown.game.repository.TurnRepository;
 import com.individual.thinking.traitorstown.message.MessageService;
 import com.individual.thinking.traitorstown.model.*;
 import com.individual.thinking.traitorstown.model.exceptions.*;
-import com.individual.thinking.traitorstown.util.SwitchConsumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -114,13 +113,6 @@ public class GameService {
         log.info("Player {} playing card {} targeting player {}", origin.getId(), card.getName(), target.getId());
         game.playCard(origin, target, card);
         gameRepository.save(game);
-
-        card.getMessages().stream().forEach(SwitchConsumer.<Message>
-                inCase(m -> m.isForAll(), m -> messageService.sendMessageToGame(game, m.buildContent(origin, target)))
-                .elseIf(m -> m.isForOrigin(), m -> messageService.sendMessageToPlayer(game, m.buildContent(origin, target), origin))
-                .elseIf(m -> m.isForTarget(), m -> messageService.sendMessageToPlayer(game, m.buildContent(origin, target), target))
-                .elseDefault(m -> log.error("Message {} had no recipient!", m))
-        );
 
         if (game.isTurnOver()){
             startNextTurn(game);

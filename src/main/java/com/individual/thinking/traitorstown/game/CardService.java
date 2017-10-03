@@ -80,7 +80,6 @@ public class CardService {
                 ).build()),
                 createCardOfType(CardType.RUN_FOR_MAYOR,
                 Card.builder().version(1).cardType(CardType.RUN_FOR_MAYOR).name("Run for Mayor").description("Become mayor on election day. Stay alive for one week to win the game.")
-                        .messages(Collections.singletonList(Message.builder().structure(MessageStructure.PREFIX_TARGET).content(" just applied for the mayor position!").build()))
                         .effects(Arrays.asList(
                                 CandidacyEffect.builder().build(),
                                 ResourceEffect.builder().resourceType(ResourceType.REPUTATION).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(10).duration(1).build(),
@@ -91,7 +90,7 @@ public class CardService {
         createCardOfType(CardType.VOTE,
                 Card.builder().cardType(CardType.VOTE).name("Vote").description("Vote for a player to become mayor.").singleTurnOnly(true)
                         .effects(Arrays.asList(
-                                VoteEffect.builder().duration(2).build())
+                                VoteEffect.builder().duration(1).build())
         ).build());
 
         // SPECIAL EFFECTS

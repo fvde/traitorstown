@@ -20,7 +20,7 @@ public class DrawCardEffect extends SpecialEffect {
     }
 
     @Override
-    public void apply(Game game, Player player, Player target) {
+    public void apply(Game game, Player player, Player target, boolean isNew) {
         target.drawCard();
     }
 }

@@ -21,7 +21,7 @@ public class MessageController {
     private final MessageService messageService;
 
     @GetMapping(value = "/messages/{gameId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    Flux<ServerSentEvent<Message>> messages(@PathVariable Long gameId, HttpServletRequest request) throws PlayerUnauthorizedException {
+    Flux<ServerSentEvent<MessageRepresentation>> messages(@PathVariable Long gameId, HttpServletRequest request) throws PlayerUnauthorizedException {
         AuthorizedPlayer authorizedPlayer = new AuthorizedPlayer(request).authorize(gameId, null);
         return messageService.subscribe(gameId, authorizedPlayer.getPlayer().getId());
     }

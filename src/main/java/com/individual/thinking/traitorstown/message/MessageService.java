@@ -1,5 +1,8 @@
 package com.individual.thinking.traitorstown.message;
 
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.individual.thinking.traitorstown.TraitorsTownConfiguration;
 import com.individual.thinking.traitorstown.model.Game;
 import com.individual.thinking.traitorstown.model.Player;
@@ -18,19 +21,31 @@ import java.util.stream.Collectors;
 @Service
 public class MessageService {
 
-    private final EmitterProcessor<ServerSentEvent<Message>> emitter;
+    private final EmitterProcessor<ServerSentEvent<MessageRepresentation>> emitter;
     private final TraitorsTownConfiguration configuration;
+    public static EventBus EventBus = new EventBus();
 
     @Autowired
     MessageService(TraitorsTownConfiguration configuration) {
         this.configuration = configuration;
-        emitter = EmitterProcessor.create();
+        this.emitter = EmitterProcessor.create();
+        this.EventBus.register(this);
     }
 
-    public Flux<ServerSentEvent<Message>> subscribe(Long gameId, Long playerId) {
+    public Flux<ServerSentEvent<MessageRepresentation>> subscribe(Long gameId, Long playerId) {
         return emitter.filter(
                 msg -> msg.data().getGameId().equals(gameId)
                 && msg.data().getRecipients().contains(playerId));
+    }
+
+    @Subscribe
+    @AllowConcurrentEvents
+    public void handleMessage(MessageEvent message) {
+        publishMessage(
+                message.getGame(),
+                message.getPayload().buildContent(message.getFromPlayer(), message.getToPlayer()),
+                message.getRecipients(),
+                message.getFromPlayer());
     }
 
     public void sendMessageToGame(Game game, String content){
@@ -67,10 +82,10 @@ public class MessageService {
 
     public void publishMessage(Long game, String content, List<Long> recipients, Optional<Player> fromPlayer){
         if (!configuration.getMessagingEnabled()) return;
-        emitter.onNext(ServerSentEvent.<Message>builder()
+        emitter.onNext(ServerSentEvent.<MessageRepresentation>builder()
                         .id(UUID.randomUUID().toString())
                         .event("message")
-                        .data(Message.builder()
+                        .data(MessageRepresentation.builder()
                                 .gameId(game)
                                 .recipients(recipients)
                                 .from(fromPlayer.isPresent() ? fromPlayer.get().getId() : -1L)

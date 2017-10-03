@@ -4,53 +4,28 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
-import lombok.experimental.Tolerate;
 
-import javax.persistence.*;
+import java.util.Optional;
 
-@Entity
+@Getter
 @Builder
 @ToString
 public class Message {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @NonNull
-    @Enumerated(EnumType.STRING)
-    @Builder.Default
-    @Getter
-    private MessageDeliveryType deliveryType = MessageDeliveryType.ALL;
-
-    @NonNull
-    @Enumerated(EnumType.STRING)
     @Builder.Default
     private MessageStructure structure = MessageStructure.CONTENT;
 
     @NonNull
     private String content;
 
-    @Tolerate
-    Message() {}
-
-    public String buildContent(Player origin, Player target){
+    public String buildContent(Optional<Player> origin, Optional<Player> target){
         switch (structure) {
             case CONTENT: return content;
-            case PREFIX_TARGET: return target.getId() + content;
+            case PREFIX_ORIGIN: return (origin.isPresent() ? "Player " + origin.get().getId() : "Unknown player") + content;
+            case PREFIX_TARGET: return (target.isPresent() ? "Player " + target.get().getId() : "Unknown player") + content;
+            case PREFIX_ORIGIN_POSTFIX_TARGET: return "Player " + origin.get().getId() + content + "Player " + target.get().getId();
+
             default: return content;
         }
-    }
-
-    public boolean isForTarget(){
-        return deliveryType == MessageDeliveryType.ORIGIN;
-    }
-
-    public boolean isForOrigin(){
-        return deliveryType == MessageDeliveryType.TARGET;
-    }
-
-    public boolean isForAll(){
-        return deliveryType == MessageDeliveryType.ALL;
     }
 }

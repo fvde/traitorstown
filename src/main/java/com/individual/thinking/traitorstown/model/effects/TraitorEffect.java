@@ -20,7 +20,7 @@ public class TraitorEffect extends SpecialEffect {
     }
 
     @Override
-    public void apply(Game game, Player player, Player target) {
+    public void apply(Game game, Player player, Player target, boolean isNew) {
         // no special benefits
     }
 }

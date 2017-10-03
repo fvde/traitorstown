@@ -35,11 +35,6 @@ public class Card {
     @JoinTable(name = "card_effect", joinColumns = @JoinColumn(name = "card_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "effect_id", referencedColumnName = "id"))
     private List<Effect> effects = new ArrayList<>();
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
-    @JoinTable(name = "card_message", joinColumns = @JoinColumn(name = "card_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "message_id", referencedColumnName = "id"))
-    @Builder.Default
-    private List<Message> messages = new ArrayList<>();
-
     @NonNull
     @Builder.Default
     private Boolean singleTurnOnly = false;
@@ -53,13 +48,5 @@ public class Card {
 
     public boolean mayPlayCard(Player player){
         return effects.stream().allMatch(effect -> effect.mayApply(player));
-    }
-
-    public void updateCard(Card newCard){
-        name = newCard.name;
-        description = newCard.description;
-        effects = newCard.effects;
-        singleTurnOnly = newCard.singleTurnOnly;
-        version = newCard.version;
     }
 }

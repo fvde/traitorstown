@@ -1,5 +1,6 @@
 package com.individual.thinking.traitorstown.model.effects;
 
+import com.individual.thinking.traitorstown.model.Game;
 import com.individual.thinking.traitorstown.model.Player;
 import com.individual.thinking.traitorstown.model.Visibility;
 import lombok.Builder;
@@ -19,7 +20,5 @@ public class CandidacyEffect extends SpecialEffect {
     }
 
     @Override
-    public void apply(Player player, Player target) {
-        // no special benefits
-    }
+    public void apply(Game game, Player origin, Player target) { }
 }

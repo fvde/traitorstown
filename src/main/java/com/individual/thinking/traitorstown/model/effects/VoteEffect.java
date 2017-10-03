@@ -1,5 +1,6 @@
 package com.individual.thinking.traitorstown.model.effects;
 
+import com.individual.thinking.traitorstown.model.Game;
 import com.individual.thinking.traitorstown.model.Player;
 import com.individual.thinking.traitorstown.model.Visibility;
 import lombok.Builder;
@@ -25,7 +26,7 @@ public class VoteEffect extends SpecialEffect {
     }
 
     @Override
-    public void apply(Player player, Player target) {
+    public void apply(Game game, Player player, Player target) {
         // no special benefits
     }
 }

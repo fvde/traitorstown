@@ -15,7 +15,7 @@ public abstract class SpecialEffect extends Effect {
 
     protected SpecialEffect(Visibility visibility, Integer duration) {
         super(visibility == null ? Visibility.PLAYER : visibility,
-                duration);
+                EffectTargetType.TARGET, duration);
     }
 
     @Tolerate

@@ -4,6 +4,7 @@ import com.individual.thinking.traitorstown.game.CardService;
 import com.individual.thinking.traitorstown.game.rules.Rules;
 import com.individual.thinking.traitorstown.model.effects.Effect;
 import com.individual.thinking.traitorstown.model.effects.EffectActive;
+import com.individual.thinking.traitorstown.model.effects.EffectTargetType;
 import com.individual.thinking.traitorstown.model.effects.EffectType;
 import com.individual.thinking.traitorstown.model.exceptions.PlayerDoesNotHaveCardException;
 import lombok.*;
@@ -103,7 +104,13 @@ public class Player {
             throw new PlayerDoesNotHaveCardException("You cannot play a card you don't have!");
         }
 
-        card.getEffects().forEach(effect -> target.addEffect(effect));
+        card.getEffects().forEach(effect -> {
+            if (effect.getEffectTargetType().equals(EffectTargetType.TARGET)){
+                target.addEffect(effect);
+            } else {
+                this.addEffect(effect);
+            }
+        });
 
         if (!card.getSingleTurnOnly()){
             deckCards.add(card);
@@ -150,8 +157,8 @@ public class Player {
         handCards.add(card);
     }
 
-    public void endTurn() {
-        activeEffects.stream().forEach(EffectActive::apply);
+    public void endTurn(Game game) {
+        activeEffects.stream().forEach(e -> e.apply(game));
         activeEffects = activeEffects.stream().filter(EffectActive::isActive).collect(Collectors.toList());
         handCards = handCards.stream().filter(card -> !card.getSingleTurnOnly()).collect(Collectors.toList());
     }

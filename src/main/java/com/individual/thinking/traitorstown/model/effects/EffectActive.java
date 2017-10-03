@@ -1,5 +1,6 @@
 package com.individual.thinking.traitorstown.model.effects;
 
+import com.individual.thinking.traitorstown.model.Game;
 import com.individual.thinking.traitorstown.model.Player;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,24 +41,13 @@ public class EffectActive {
     @Tolerate
     EffectActive() {}
 
-    public void apply(){
-        effect.apply(player, target);
+    public void apply(Game game){
+        effect.apply(game, player, target);
         remainingTurns--;
     }
 
     public boolean isActive(){
         return remainingTurns > 0;
-    }
-
-    @Override
-    public String toString() {
-        return "EffectActive{" +
-                "id=" + id +
-                ", effect=" + effect +
-                ", remainingTurns=" + remainingTurns +
-                ", player=" + player.getId() +
-                ", target=" + target.getId() +
-                '}';
     }
 
     public boolean isCandidacy() {

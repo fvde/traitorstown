@@ -1,5 +1,6 @@
 package com.individual.thinking.traitorstown.model.effects;
 
+import com.individual.thinking.traitorstown.model.Game;
 import com.individual.thinking.traitorstown.model.Player;
 import com.individual.thinking.traitorstown.model.Visibility;
 import lombok.Getter;
@@ -20,10 +21,14 @@ public abstract class Effect {
     @Enumerated(EnumType.STRING)
     private Visibility visibility;
 
+    @Enumerated(EnumType.STRING)
+    private EffectTargetType effectTargetType;
+
     private Integer duration;
 
-    Effect(Visibility visibility, Integer duration){
+    Effect(Visibility visibility, EffectTargetType effectTargetType, Integer duration){
         this.visibility = visibility;
+        this.effectTargetType = effectTargetType;
         this.duration = duration;
     }
 
@@ -32,7 +37,7 @@ public abstract class Effect {
         // for hibernate
     }
 
-    public abstract void apply(Player player, Player target);
+    public abstract void apply(Game game, Player origin, Player target);
     public abstract boolean mayApply(Player target);
     public abstract boolean isCost();
     public abstract String getName();

@@ -1,6 +1,7 @@
 package com.individual.thinking.traitorstown.model.effects;
 
 import com.individual.thinking.traitorstown.Configuration;
+import com.individual.thinking.traitorstown.model.Game;
 import com.individual.thinking.traitorstown.model.Player;
 import com.individual.thinking.traitorstown.model.ResourceType;
 import com.individual.thinking.traitorstown.model.Visibility;
@@ -22,19 +23,15 @@ public class ResourceEffect extends Effect {
     private EffectOperator operator;
 
     @Enumerated(EnumType.STRING)
-    private EffectTargetType effectTargetType;
-
-    @Enumerated(EnumType.STRING)
     private ResourceType resourceType;
 
     private Integer amount;
 
     @Builder
-    protected ResourceEffect(Visibility visibility,  Integer duration, EffectOperator operator, EffectTargetType effectTargetType, ResourceType resourceType, Integer amount) {
+    protected ResourceEffect(Visibility visibility, EffectTargetType effectTargetType, Integer duration, EffectOperator operator, ResourceType resourceType, Integer amount) {
         super(visibility == null ? Visibility.PLAYER : visibility,
-                duration);
+                effectTargetType, duration);
         this.operator = operator;
-        this.effectTargetType = effectTargetType;
         this.resourceType = resourceType;
         this.amount = amount;
     }
@@ -45,23 +42,11 @@ public class ResourceEffect extends Effect {
     }
 
     @Override
-    public void apply(Player player, Player target) {
+    public void apply(Game game, Player player, Player target) {
         if (operator == EffectOperator.REMOVE) {
-            if (effectTargetType == EffectTargetType.SELF) {
-                player.removeResource(resourceType, amount);
-            } else if (effectTargetType == EffectTargetType.TARGET) {
-                target.removeResource(resourceType, amount);
-            } else {
-                throw new RuntimeException("Unknown effect target type!");
-            }
+            target.removeResource(resourceType, amount);
         } else {
-            if (effectTargetType == EffectTargetType.SELF) {
-                player.addResource(resourceType, amount);
-            } else if (effectTargetType == EffectTargetType.TARGET) {
-                target.addResource(resourceType, amount);
-            } else {
-                throw new RuntimeException("Unknown effect target type!");
-            }
+            target.addResource(resourceType, amount);
         }
     }
 

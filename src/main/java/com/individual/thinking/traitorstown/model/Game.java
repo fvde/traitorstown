@@ -84,7 +84,7 @@ public class Game {
     }
 
     public void startNextTurn(){
-        players.forEach(Player::endTurn);
+        players.forEach(p -> p.endTurn(this));
         Turn next = getCurrentTurn().get().end();
 
         if (Day.isElectionDay(next.getCounter()) && players.stream().filter(Player::isCandidate).count() > 0){

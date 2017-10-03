@@ -60,23 +60,23 @@ public class EffectActive {
     }
 
     public boolean isCandidacy() {
-        return effect.getTargetResource().equals(Resource.CANDIDACY);
+        return effect.getResourceType().equals(ResourceType.CANDIDACY);
     }
 
     public boolean isVote() {
-        return effect.getTargetResource().equals(Resource.VOTE);
+        return effect.getResourceType().equals(ResourceType.VOTE);
     }
 
     public boolean isMayor() {
-        return effect.getTargetResource().equals(Resource.MAYOR);
+        return effect.getResourceType().equals(ResourceType.MAYOR);
     }
 
     public boolean isTraitor() {
-        return effect.getTargetResource().equals(Resource.TRAITOR);
+        return effect.getResourceType().equals(ResourceType.TRAITOR);
     }
 
     public boolean isCitizen() {
-        return effect.getTargetResource().equals(Resource.CITIZEN);
+        return effect.getResourceType().equals(ResourceType.CITIZEN);
     }
 
     public boolean isVisibleFor(Player player){

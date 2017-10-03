@@ -38,7 +38,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 @SpringBootTest
 public abstract class MockMvcBase {
 
-    private static final String DEFAULT_AUTHORIZATION = "Resource is public.";
+    private static final String DEFAULT_AUTHORIZATION = "ResourceType is public.";
 
     @Autowired
     private WebApplicationContext context;

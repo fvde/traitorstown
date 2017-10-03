@@ -34,7 +34,7 @@ public class Effect {
 
     @Enumerated(EnumType.STRING)
     @NonNull
-    private Resource targetResource;
+    private ResourceType resourceType;
 
     @NonNull
     private Integer amount;
@@ -51,15 +51,15 @@ public class Effect {
 
     public void apply(Player player, Player target) {
         if (operator == EffectOperator.REMOVE){
-            player.setResource(targetResource, operator.apply(target.getResource(targetResource), amount));
+            player.setResource(resourceType, operator.apply(target.getResource(resourceType), amount));
         } else {
-            target.setResource(targetResource, operator.apply(target.getResource(targetResource), amount));
+            target.setResource(resourceType, operator.apply(target.getResource(resourceType), amount));
         }
     }
 
     public boolean mayApply(Player player){
         if (operator.equals(EffectOperator.REMOVE)){
-            return player.getResource(targetResource) - amount >= Configuration.MINIMUM_RESOURCES.get(targetResource);
+            return player.getResource(resourceType) - amount >= Configuration.MINIMUM_RESOURCES.get(resourceType);
         }
 
         return true;
@@ -70,6 +70,6 @@ public class Effect {
     }
 
     public String getName() {
-        return operator + " " + amount + " " + targetResource;
+        return operator + " " + amount + " " + resourceType;
     }
 }

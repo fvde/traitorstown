@@ -62,8 +62,8 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
 
 com.individual.thinking.traitorstown:
-  minimum-number-of-players: 2
-  maximum-number-of-players: 5
+  minimum-number-of-players: 1
+  maximum-number-of-players: 4
 
 ---
 #production environment

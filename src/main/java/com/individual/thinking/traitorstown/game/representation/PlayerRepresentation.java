@@ -1,7 +1,7 @@
 package com.individual.thinking.traitorstown.game.representation;
 
 import com.individual.thinking.traitorstown.model.Player;
-import com.individual.thinking.traitorstown.model.Resource;
+import com.individual.thinking.traitorstown.model.ResourceType;
 import lombok.Data;
 
 import java.util.Arrays;
@@ -21,7 +21,7 @@ public class PlayerRepresentation {
                 player.getId(),
                 player.isReady(),
                 player.getId().equals(asPlayer.getId())
-                        ? Arrays.asList(new ResourceRepresentation(Resource.GOLD.ordinal(), player.getResource(Resource.GOLD)), new ResourceRepresentation(Resource.REPUTATION.ordinal(), player.getResource(Resource.REPUTATION)))
+                        ? Arrays.asList(new ResourceRepresentation(ResourceType.GOLD.ordinal(), player.getResource(ResourceType.GOLD)), new ResourceRepresentation(ResourceType.REPUTATION.ordinal(), player.getResource(ResourceType.REPUTATION)))
                         : Collections.emptyList(),
                 player.getActiveEffects().stream()
                         .filter(effect -> effect.isVisibleFor(asPlayer))

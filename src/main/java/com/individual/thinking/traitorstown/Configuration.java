@@ -1,7 +1,7 @@
 package com.individual.thinking.traitorstown;
 
 import com.individual.thinking.traitorstown.ai.learning.model.GameState;
-import com.individual.thinking.traitorstown.model.Resource;
+import com.individual.thinking.traitorstown.model.ResourceType;
 import org.deeplearning4j.rl4j.space.ArrayObservationSpace;
 import org.deeplearning4j.rl4j.space.ObservationSpace;
 
@@ -9,17 +9,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Configuration {
-    public static final Map<Resource, Integer> MINIMUM_RESOURCES;
+    public static final Map<ResourceType, Integer> MINIMUM_RESOURCES;
     static
     {
         MINIMUM_RESOURCES = new HashMap<>();
-        MINIMUM_RESOURCES.put(Resource.GOLD, 0);
+        MINIMUM_RESOURCES.put(ResourceType.GOLD, 0);
 
         // reputation may fall below zero
-        MINIMUM_RESOURCES.put(Resource.REPUTATION, Integer.MIN_VALUE);
+        MINIMUM_RESOURCES.put(ResourceType.REPUTATION, Integer.MIN_VALUE);
 
         // effect may cause you to discard cards, which is always allowed
-        MINIMUM_RESOURCES.put(Resource.CARD, Integer.MIN_VALUE);
+        MINIMUM_RESOURCES.put(ResourceType.CARD, Integer.MIN_VALUE);
     }
 
     public static final Integer TOTAL_NUMBER_OF_CARDS = 8;

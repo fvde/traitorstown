@@ -1,6 +1,6 @@
 package com.individual.thinking.traitorstown.model;
 
-public enum Resource {
+public enum ResourceType {
     GOLD,
     REPUTATION,
     CARD,

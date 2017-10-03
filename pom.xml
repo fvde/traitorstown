@@ -194,11 +194,11 @@
                                 ${project.build.outputDirectory}/static/docs
                             </outputDirectory>
                             <resources>
-                                <resource>
+                                <resourceType>
                                     <directory>
                                         ${project.build.directory}/generated-docs
                                     </directory>
-                                </resource>
+                                </resourceType>
                             </resources>
                         </configuration>
                     </execution>

@@ -9,9 +9,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -56,6 +54,14 @@ public class Player {
 
     @Getter(value = AccessLevel.PRIVATE)
     private Integer reputation = 0;
+
+    @ElementCollection
+    @CollectionTable(name="resources", joinColumns=@JoinColumn(name="player_id", referencedColumnName = "id"))
+    @MapKeyColumn(name = "resource")
+    @MapKeyEnumerated(EnumType.STRING)
+    @Builder.Default
+    @Column(name = "amount")
+    private Map<ResourceType, Integer> resources = new HashMap<>();
 
     @Setter
     @NonNull
@@ -170,8 +176,8 @@ public class Player {
     @Tolerate
     Player () {}
 
-    public Integer getResource(Resource resource){
-        switch (resource) {
+    public Integer getResource(ResourceType resourceType){
+        switch (resourceType) {
             case GOLD: return gold;
             case REPUTATION: return reputation;
             case CARD: return handCards.size();
@@ -179,8 +185,10 @@ public class Player {
         }
     }
 
-    public void setResource(Resource resource, Integer value){
-        switch (resource) {
+    public void setResource(ResourceType resourceType, Integer value){
+        resources.put(resourceType, value);
+
+        switch (resourceType) {
             case GOLD: {
                 gold = value;
                 break;

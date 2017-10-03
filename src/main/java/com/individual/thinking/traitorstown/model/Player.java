@@ -79,8 +79,10 @@ public class Player {
         handCards.clear();
 
         addEffect(CardService.Effects.get(EffectType.fromRole(role)));
-        gold = Rules.INITIAL_AMOUNT_OF_GOLD;
-        reputation = Rules.INITIAL_AMOUNT_OF_REPUTATION;
+        for (ResourceType type : ResourceType.values()){
+            resources.put(type, Rules.STARTING_RESOURCES.containsKey(type) ? Rules.STARTING_RESOURCES.get(type) : 0);
+        }
+
         deckCards.addAll(getDeckForRole(role).getCards());
         drawCards(Rules.INITIAL_AMOUNT_OF_CARDS);
     }
@@ -124,7 +126,7 @@ public class Player {
         return decks.stream().filter(deck -> deck.getRole().equals(role)).collect(singletonCollector());
     }
 
-    private void drawCards(Integer amount){
+    public void drawCards(Integer amount){
         // may not draw more cards than in deck
         amount = Math.min(amount, deckCards.size());
 
@@ -176,35 +178,16 @@ public class Player {
     @Tolerate
     Player () {}
 
-    public Integer getResource(ResourceType resourceType){
-        switch (resourceType) {
-            case GOLD: return gold;
-            case REPUTATION: return reputation;
-            case CARD: return handCards.size();
-            default: return 0;
-        }
+    public void addResource(ResourceType type, Integer amount){
+        resources.put(type, resources.get(type) + amount);
     }
 
-    public void setResource(ResourceType resourceType, Integer value){
-        resources.put(resourceType, value);
+    public void removeResource(ResourceType type, Integer amount){
+        resources.put(type, resources.get(type) - amount);
+    }
 
-        switch (resourceType) {
-            case GOLD: {
-                gold = value;
-                break;
-            }
-            case REPUTATION: {
-                reputation = value;
-                break;
-            }
-            case CARD: {
-                drawCards(Math.max(value - handCards.size(), 0));
-                break;
-            }
-            default: {
-                break;
-            }
-        }
+    public Integer getResource(ResourceType resourceType){
+        return resources.get(resourceType);
     }
 
     public void clearCandidacy() {

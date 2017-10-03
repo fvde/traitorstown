@@ -2,6 +2,7 @@ package com.individual.thinking.traitorstown.game.rules;
 
 import com.individual.thinking.traitorstown.TraitorsTownConfiguration;
 import com.individual.thinking.traitorstown.model.Player;
+import com.individual.thinking.traitorstown.model.ResourceType;
 import com.individual.thinking.traitorstown.model.Role;
 import com.individual.thinking.traitorstown.model.exceptions.RuleSetViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +14,15 @@ import java.util.*;
 public class Rules {
 
     public static final Integer INITIAL_AMOUNT_OF_CARDS = 2;
-    public static final Integer INITIAL_AMOUNT_OF_GOLD = 10;
-    public static final Integer INITIAL_AMOUNT_OF_REPUTATION = 10;
     public static Integer MAXIMUM_NUMBER_OF_CARDS = 8;
+
+    public static final Map<ResourceType, Integer> STARTING_RESOURCES;
+    static
+    {
+        STARTING_RESOURCES = new HashMap<>();
+        STARTING_RESOURCES.put(ResourceType.GOLD, 10);
+        STARTING_RESOURCES.put(ResourceType.REPUTATION, 10);
+    }
 
     @Autowired
     public Rules(TraitorsTownConfiguration configuration){

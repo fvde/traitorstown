@@ -50,10 +50,18 @@ public class Effect {
     Effect() {}
 
     public void apply(Player player, Player target) {
-        if (operator == EffectOperator.REMOVE){
-            player.setResource(resourceType, operator.apply(target.getResource(resourceType), amount));
+        if (operator == EffectOperator.REMOVE) {
+            if (effectTargetType == EffectTargetType.SELF) {
+                player.removeResource(resourceType, amount);
+            } else {
+                target.removeResource(resourceType, amount);
+            }
         } else {
-            target.setResource(resourceType, operator.apply(target.getResource(resourceType), amount));
+            if (effectTargetType == EffectTargetType.SELF) {
+                player.addResource(resourceType, amount);
+            } else {
+                target.addResource(resourceType, amount);
+            }
         }
     }
 

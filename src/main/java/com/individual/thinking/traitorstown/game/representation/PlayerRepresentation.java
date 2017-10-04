@@ -33,7 +33,7 @@ public class PlayerRepresentation {
             return Arrays.stream(ResourceType.values()).map(type -> new ResourceRepresentation(type.ordinal(), player.getResource(type))).collect(Collectors.toList());
         } else {
             return Arrays.stream(ResourceType.values())
-                    .filter(type -> type.equals(ResourceType.STOLEN_GOLD))
+                    .filter(type -> !type.equals(ResourceType.STOLEN_GOLD))
                     .map(type -> {
                         if (type == ResourceType.GOLD){
                             return new ResourceRepresentation(type.ordinal(), player.getResource(type) + player.getResource(ResourceType.STOLEN_GOLD));

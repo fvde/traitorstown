@@ -101,7 +101,9 @@ public class CardService {
 
         createEffect(SpecialEffectType.MAYOR, MayorEffect.builder().duration(7).build());
 
-        TOTAL_NUMBER_OF_CARDS = cardRepository.count();
+        if (TOTAL_NUMBER_OF_CARDS != cardRepository.count()){
+            throw new IllegalArgumentException("Incorrect number of total cards");
+        }
 
         if (deckRepository.count() == 0){
             // TODO version decks

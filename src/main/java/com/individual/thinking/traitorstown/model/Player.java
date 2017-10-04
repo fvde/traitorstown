@@ -7,13 +7,17 @@ import com.individual.thinking.traitorstown.model.effects.EffectActive;
 import com.individual.thinking.traitorstown.model.effects.EffectTargetType;
 import com.individual.thinking.traitorstown.model.effects.SpecialEffectType;
 import com.individual.thinking.traitorstown.model.exceptions.PlayerDoesNotHaveCardException;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 import lombok.experimental.Tolerate;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -52,12 +56,6 @@ public class Player {
     @JoinColumn(name = "player_id")
     @Builder.Default
     private List<EffectActive> activeEffects = new ArrayList<>();
-
-    @Getter(value = AccessLevel.PRIVATE)
-    private Integer gold = 0;
-
-    @Getter(value = AccessLevel.PRIVATE)
-    private Integer reputation = 0;
 
     @ElementCollection
     @CollectionTable(name="resources", joinColumns=@JoinColumn(name="player_id", referencedColumnName = "id"))
@@ -175,9 +173,18 @@ public class Player {
         return is(EffectActive::isCandidacy);
     }
 
+    public boolean isTraitor(){
+        return is(EffectActive::isTraitor);
+    }
+
+    public boolean isCitizen(){
+        return is(EffectActive::isCitizen);
+    }
+
+
     public Role getRole(){
-        if (is(EffectActive::isCitizen)){ return Role.CITIZEN; }
-        else if (is(EffectActive::isTraitor)){ return Role.TRAITOR; }
+        if (isCitizen()){ return Role.CITIZEN; }
+        else if (isTraitor()){ return Role.TRAITOR; }
         else { return Role.NONE; }
     }
 
@@ -193,7 +200,23 @@ public class Player {
     }
 
     public void removeResource(ResourceType type, Integer amount){
-        resources.put(type, resources.get(type) - amount);
+        int mainResourceAmount = amount;
+
+        if (type.equals(ResourceType.GOLD)){
+            // traitors can spend stolen gold instead of gold
+            if (isTraitor()){
+                mainResourceAmount = Math.max(0, amount - resources.get(ResourceType.STOLEN_GOLD));
+            }
+
+            // citizen will only spend stolen gold randomly (on accident)
+            if (isCitizen()){
+                mainResourceAmount = Math.max(0, amount - ThreadLocalRandom.current().nextInt(Math.min(amount,  resources.get(ResourceType.STOLEN_GOLD) + 1)));
+            }
+
+            resources.put(ResourceType.STOLEN_GOLD, resources.get(ResourceType.STOLEN_GOLD) - (amount - mainResourceAmount));
+        }
+
+        resources.put(type, resources.get(type) - mainResourceAmount);
     }
 
     public Integer getResource(ResourceType resourceType){

@@ -20,8 +20,11 @@ public class Rules {
     static
     {
         STARTING_RESOURCES = new HashMap<>();
+        for (ResourceType type : ResourceType.values()){
+            STARTING_RESOURCES.put(type, 0);
+        }
+
         STARTING_RESOURCES.put(ResourceType.GOLD, 5);
-        STARTING_RESOURCES.put(ResourceType.REPUTATION, 0);
     }
 
     @Autowired

@@ -21,7 +21,7 @@ public class PlayerRepresentation {
                 player.getId(),
                 player.isReady(),
                 player.getId().equals(asPlayer.getId())
-                        ? Arrays.asList(new ResourceRepresentation(ResourceType.GOLD.ordinal(), player.getResource(ResourceType.GOLD)), new ResourceRepresentation(ResourceType.REPUTATION.ordinal(), player.getResource(ResourceType.REPUTATION)))
+                        ? Arrays.stream(ResourceType.values()).map(type -> new ResourceRepresentation(type.ordinal(), player.getResource(type))).collect(Collectors.toList())
                         : Collections.emptyList(),
                 player.getActiveEffects().stream()
                         .filter(effect -> effect.isVisibleFor(asPlayer))

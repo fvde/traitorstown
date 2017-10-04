@@ -56,8 +56,6 @@ public class GameControllerTest extends MockMvcBase{
             .ready(true)
             .handCards(cards)
             .activeEffects(Collections.emptyList())
-            .gold(20)
-            .reputation(15)
             .build();
 
     private final Player player = Player.builder()
@@ -66,8 +64,6 @@ public class GameControllerTest extends MockMvcBase{
             .ready(true)
             .handCards(cards)
             .activeEffects(Collections.singletonList(EffectActive.builder().effect(removeGoldEffect).player(opponent).target(opponent).remainingTurns(5).build()))
-            .gold(20)
-            .reputation(15)
             .build();
 
     private final Game game = Game.builder()

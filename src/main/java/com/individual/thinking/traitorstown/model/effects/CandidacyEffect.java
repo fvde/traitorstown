@@ -1,12 +1,13 @@
 package com.individual.thinking.traitorstown.model.effects;
 
-import com.individual.thinking.traitorstown.model.*;
+import com.individual.thinking.traitorstown.model.Game;
+import com.individual.thinking.traitorstown.model.Player;
+import com.individual.thinking.traitorstown.model.Visibility;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
 import javax.persistence.Entity;
-import java.util.Optional;
 
 @Entity
 @ToString(callSuper = true)
@@ -21,12 +22,7 @@ public class CandidacyEffect extends SpecialEffect {
     @Override
     public void apply(Game game, Player origin, Player target, boolean isNew) {
         if (isNew){
-            publishMessage(
-                    Message.builder().content(" just applied for the mayor position").structure(MessageStructure.PREFIX_TARGET).build(),
-                    game.getId(),
-                    game.getPlayers(),
-                    Optional.empty(),
-                    Optional.of(target));
+            publishMessage(target.getName() + " applied for the mayor position", game.getPlayers());
         }
     }
 }

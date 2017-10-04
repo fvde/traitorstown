@@ -8,47 +8,60 @@ import com.individual.thinking.traitorstown.model.Game;
 import com.individual.thinking.traitorstown.model.Player;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.EmitterProcessor;
+import reactor.core.publisher.DirectProcessor;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class MessageService {
 
-    private final EmitterProcessor<ServerSentEvent<MessageRepresentation>> emitter;
+    private final DirectProcessor<MessageEvent> messages;
+    private Map<Long, List<FluxSink<?>>> activeGames = new HashMap<>();
+
     private final TraitorsTownConfiguration configuration;
     public static EventBus EventBus = new EventBus();
 
     @Autowired
     MessageService(TraitorsTownConfiguration configuration) {
         this.configuration = configuration;
-        this.emitter = EmitterProcessor.create();
+        this.messages = DirectProcessor.create();
         this.EventBus.register(this);
     }
 
-    public Flux<ServerSentEvent<MessageRepresentation>> subscribe(Long gameId, Long playerId) {
-        return emitter.filter(
-                msg -> msg.data().getGameId().equals(gameId)
-                && msg.data().getRecipients().contains(playerId));
+    public Flux<MessageEvent> subscribe(Long gameId, Long playerId) {
+        return Flux.create(sink -> {
+            messages.subscribe(message -> {
+                if (message.getRecipients().contains(playerId)
+                        && message.getGameId().equals(gameId)) {
+                    sink.next(message);
+                }
+            });
+
+            addSession(gameId, sink);
+        });
+    }
+
+    private void addSession(Long gameId, FluxSink<MessageEvent> sink) {
+        if(activeGames.containsKey(gameId)){
+            activeGames.get(gameId).add(sink);
+        } else {
+            LinkedList<FluxSink<?>> connections = new LinkedList<>();
+            connections.add(sink);
+            activeGames.put(gameId, connections);
+        }
     }
 
     @Subscribe
     @AllowConcurrentEvents
-    public void handleMessage(MessageEvent message) {
+    public void publishMessage(MessageEvent message) {
         log.info("Publishing message {}", message);
-        publishMessage(
-                message.getGame(),
-                message.getPayload().buildContent(message.getFromPlayer(), message.getToPlayer()),
-                message.getRecipients(),
-                Optional.empty());
+        if (!configuration.getMessagingEnabled()) return;
+        messages.onNext(message);
     }
 
     public void sendMessageToGame(Game game, String content){
@@ -59,41 +72,12 @@ public class MessageService {
                 Optional.empty());
     }
 
-    public void sendMessageToGameFromPlayer(Game game, String content, Player fromPlayer){
-        publishMessage(
-                game.getId(),
-                content,
-                game.getPlayers().stream().map(Player::getId).collect(Collectors.toList()),
-                Optional.of(fromPlayer));
-    }
-
-    public void sendMessageToPlayer(Game game, String content, Player toPlayer){
-        publishMessage(
-                game.getId(),
-                content,
-                Collections.singletonList(toPlayer.getId()),
-                Optional.empty());
-    }
-
-    public void sendMessageToPlayerFromPlayer(Game game, String content, Player fromPlayer, Player toPlayer){
-        publishMessage(
-                game.getId(),
-                content,
-                Collections.singletonList(toPlayer.getId()),
-                Optional.of(fromPlayer));
-    }
-
     public void publishMessage(Long game, String content, List<Long> recipients, Optional<Player> fromPlayer){
-        if (!configuration.getMessagingEnabled()) return;
-        emitter.onNext(ServerSentEvent.<MessageRepresentation>builder()
-                        .id(UUID.randomUUID().toString())
-                        .event("message")
-                        .data(MessageRepresentation.builder()
-                                .gameId(game)
-                                .recipients(recipients)
-                                .from(fromPlayer.isPresent() ? fromPlayer.get().getId() : -1L)
-                                .content(content)
-                                .build())
-                        .build());
+        publishMessage(MessageEvent.builder()
+                .content(content)
+                .gameId(game)
+                .recipients(recipients)
+                .from(fromPlayer.isPresent() ? fromPlayer.get().getId() : -1L)
+                .build());
     }
 }

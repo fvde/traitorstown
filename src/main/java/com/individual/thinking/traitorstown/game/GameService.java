@@ -123,7 +123,7 @@ public class GameService {
         while (game.getPlayers().size() < configuration.getMaximumNumberOfPlayers()){
             game.addPlayer(playerService.createPlayer(true));
         }
-        messageService.sendMessageToGame(game, "And so the " + game.getPlayers().size() + " of you arrive in the city. Who can you trust? Who to believe? And who is a traitor?");
+        messageService.sendMessageToGame(game, "And so the " + game.getPlayers().size() + " of you arrive in the city. Who can you trust? And who is a traitor?");
         game.start();
         startNextTurn(game);
         return gameRepository.save(game);

@@ -3,22 +3,22 @@ package com.individual.thinking.traitorstown.model.effects;
 import com.individual.thinking.traitorstown.message.MessageEvent;
 import com.individual.thinking.traitorstown.message.MessageService;
 import com.individual.thinking.traitorstown.model.Game;
-import com.individual.thinking.traitorstown.model.Message;
 import com.individual.thinking.traitorstown.model.Player;
 import com.individual.thinking.traitorstown.model.Visibility;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.Tolerate;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Entity
 @Getter
 @ToString
+@Slf4j
 public abstract class Effect {
 
     @Id
@@ -55,13 +55,18 @@ public abstract class Effect {
         return getClass() == type;
     }
 
-    public void publishMessage(Message content, Long gameId, List<Player> recipients, Optional<Player> from, Optional<Player> to){
+    public void publishMessage(String content, List<Player> recipients){
+        if (recipients.isEmpty()){
+            log.warn("Trying to send message without recipients...");
+            return;
+        }
+
         MessageService.EventBus.post(
                 MessageEvent.builder()
-                        .payload(content)
-                        .game(gameId)
+                        .content(content)
+                        .gameId(recipients.get(0).getGameId())
                         .recipients(recipients.stream().map(player -> player.getId()).collect(Collectors.toList()))
-                        .fromPlayer(from)
-                        .toPlayer(to).build());
+                        .from(-1L)
+                        .build());
     }
 }

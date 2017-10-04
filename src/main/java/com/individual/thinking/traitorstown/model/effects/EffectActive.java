@@ -29,9 +29,9 @@ public class EffectActive {
     private Integer remainingTurns;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "player_id")
+    @JoinColumn(name = "origin_id")
     @NonNull
-    private Player player;
+    private Player origin;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "target_id")
@@ -42,7 +42,7 @@ public class EffectActive {
     EffectActive() {}
 
     public void apply(Game game){
-        effect.apply(game, player, target, remainingTurns.equals(effect.getDuration()));
+        effect.apply(game, origin, target, remainingTurns.equals(effect.getDuration()));
         remainingTurns--;
     }
 

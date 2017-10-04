@@ -6,7 +6,6 @@ import com.individual.thinking.traitorstown.game.representation.MessageVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
@@ -21,7 +20,7 @@ public class MessageController {
     private final MessageService messageService;
 
     @GetMapping(value = "/messages/{gameId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    Flux<ServerSentEvent<MessageRepresentation>> messages(@PathVariable Long gameId, HttpServletRequest request) throws PlayerUnauthorizedException {
+    Flux<MessageEvent> messages(@PathVariable Long gameId, HttpServletRequest request) throws PlayerUnauthorizedException {
         AuthorizedPlayer authorizedPlayer = new AuthorizedPlayer(request).authorize(gameId, null);
         return messageService.subscribe(gameId, authorizedPlayer.getPlayer().getId());
     }

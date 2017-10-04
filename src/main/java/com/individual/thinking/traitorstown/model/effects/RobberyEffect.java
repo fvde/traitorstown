@@ -1,13 +1,15 @@
 package com.individual.thinking.traitorstown.model.effects;
 
-import com.individual.thinking.traitorstown.model.*;
+import com.individual.thinking.traitorstown.model.Game;
+import com.individual.thinking.traitorstown.model.Player;
+import com.individual.thinking.traitorstown.model.ResourceType;
+import com.individual.thinking.traitorstown.model.Visibility;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
 import javax.persistence.Entity;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Entity
@@ -41,35 +43,13 @@ public class RobberyEffect extends SpecialEffect {
             player.addResource(ResourceType.STOLEN_GOLD, target.getResource(ResourceType.GOLD));
             target.removeResource(ResourceType.GOLD, target.getResource(ResourceType.GOLD));
 
-            publishMessage(
-                    Message.builder().content("You were robbed last night! Who could it be?").structure(MessageStructure.CONTENT).build(),
-                    game.getId(),
-                    Collections.singletonList(target),
-                    Optional.of(player),
-                    Optional.of(target));
-
-            publishMessage(
-                    Message.builder().content(" left the door wide open. The robbery was a success!").structure(MessageStructure.PREFIX_TARGET).build(),
-                    game.getId(),
-                    Collections.singletonList(player),
-                    Optional.of(player),
-                    Optional.of(target));
+            publishMessage("You were robbed last night! Who could it be?", Collections.singletonList(target));
+            publishMessage(target.getName() +" left the door wide open. The robbery was a success!", Collections.singletonList(player));
 
         } else {
             // failure, thief was seen
-            publishMessage(
-                    Message.builder().content(" tried to rob you last night. He must be a traitor!").structure(MessageStructure.PREFIX_ORIGIN).build(),
-                    game.getId(),
-                    Collections.singletonList(target),
-                    Optional.of(player),
-                    Optional.of(target));
-
-            publishMessage(
-                    Message.builder().content(" caught you red-handed! They know that you are a traitor...").structure(MessageStructure.PREFIX_TARGET).build(),
-                    game.getId(),
-                    Collections.singletonList(player),
-                    Optional.of(player),
-                    Optional.of(target));
+            publishMessage(player.getName() + " tried to rob you last night. He must be a traitor!", Collections.singletonList(target));
+            publishMessage(target.getName() + " caught you red-handed! They know that you are a traitor...", Collections.singletonList(player));
         }
     }
 }

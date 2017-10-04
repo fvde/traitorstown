@@ -53,7 +53,7 @@ public class Player {
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @Fetch(value = FetchMode.SUBSELECT)
-    @JoinColumn(name = "player_id")
+    @JoinColumn(name = "target_id")
     @Builder.Default
     private List<EffectActive> activeEffects = new ArrayList<>();
 
@@ -124,7 +124,7 @@ public class Player {
     private void addEffect(Effect effect, Player origin){
         activeEffects.add(EffectActive.builder()
                 .effect(effect)
-                .player(origin)
+                .origin(origin)
                 .target(this)
                 .remainingTurns(effect.getDuration())
                 .build());
@@ -238,6 +238,10 @@ public class Player {
         Player player = (Player) o;
 
         return id.equals(player.id);
+    }
+
+    public String getName(){
+        return "Player " + getId();
     }
 
     @Override

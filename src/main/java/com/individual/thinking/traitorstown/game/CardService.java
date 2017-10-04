@@ -74,7 +74,7 @@ public class CardService {
                         .effects(Arrays.asList(
                                 CandidacyEffect.builder().build(),
                                 ResourceEffect.builder().resourceType(ResourceType.REPUTATION).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(10).duration(1).build(),
-                                ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(10).duration(1).build())
+                                ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(1).duration(1).build())
                 ).build()));
 
         List<Card> citizenCards = Arrays.asList(

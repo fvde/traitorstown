@@ -2,7 +2,7 @@ package com.individual.thinking.traitorstown.model;
 
 import com.individual.thinking.traitorstown.game.CardService;
 import com.individual.thinking.traitorstown.game.rules.Rules;
-import com.individual.thinking.traitorstown.model.effects.EffectType;
+import com.individual.thinking.traitorstown.model.effects.SpecialEffectType;
 import com.individual.thinking.traitorstown.model.exceptions.*;
 import lombok.*;
 import lombok.experimental.Tolerate;
@@ -108,7 +108,7 @@ public class Game {
 
         if (electedPlayer.getVotes() > 0){
             // TODO add mayor cards
-            electedPlayer.addEffect(CardService.Effects.get(EffectType.MAYOR));
+            electedPlayer.addEffect(CardService.Effects.get(SpecialEffectType.MAYOR));
         }
         // clean up candidacies
         players.stream().forEach(Player::clearCandidacy);

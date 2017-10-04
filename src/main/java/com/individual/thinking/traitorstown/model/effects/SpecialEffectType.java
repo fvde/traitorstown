@@ -3,13 +3,12 @@ package com.individual.thinking.traitorstown.model.effects;
 import com.individual.thinking.traitorstown.model.Role;
 import com.individual.thinking.traitorstown.model.exceptions.UnknownRoleException;
 
-public enum EffectType {
+public enum SpecialEffectType {
     MAYOR,
     CITIZEN,
-    TRAITOR,
-    OTHER;
+    TRAITOR;
 
-    public static EffectType fromRole(Role role){
+    public static SpecialEffectType fromRole(Role role){
         switch (role) {
             case CITIZEN: return CITIZEN;
             case TRAITOR: return TRAITOR;

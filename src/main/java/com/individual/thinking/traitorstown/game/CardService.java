@@ -22,7 +22,7 @@ import static com.individual.thinking.traitorstown.Configuration.TOTAL_NUMBER_OF
 public class CardService {
 
     public static Map<CardType, Card> Cards = new HashMap<>();
-    public static Map<EffectType, Effect> Effects = new HashMap<>();
+    public static Map<SpecialEffectType, Effect> Effects = new HashMap<>();
 
     private final DeckRepository deckRepository;
     private final CardRepository cardRepository;
@@ -44,42 +44,42 @@ public class CardService {
 
     public void initialize() {
         List<Card> mainCards = Arrays.asList(
-                createCardOfType(CardType.CONNECTIONS,
-                        Card.builder().cardType(CardType.CONNECTIONS).name("Use Connections").description("Draw an additional card.").effects(
-                        Arrays.asList(
-                                DrawCardEffect.builder().build(),
-                                ResourceEffect.builder().resourceType(ResourceType.REPUTATION).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(5).duration(1).build())
-                ).build()),
+//                createCardOfType(CardType.CONNECTIONS,
+//                        Card.builder().cardType(CardType.CONNECTIONS).name("Use Connections").description("Draw an additional card.").effects(
+//                        Arrays.asList(
+//                                DrawCardEffect.builder().build(),
+//                                ResourceEffect.builder().resourceType(ResourceType.REPUTATION).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(5).duration(1).build())
+//                ).build()),
                 createCardOfType(CardType.FARM,
-                        Card.builder().cardType(CardType.FARM).name("Build Farm").description("Provides a low amount of gold for the next 2 weeks.").effects(
+                        Card.builder().cardType(CardType.FARM).name("Build Farm").description("Provides a low amount of gold for the next week.").effects(
                         Arrays.asList(
-                                ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.TARGET).amount(3).duration(14).build())
+                                ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.TARGET).amount(1).duration(7).build())
                 ).build()),
-                createCardOfType(CardType.TAVERN,
-                Card.builder().cardType(CardType.TAVERN).name("Go to the Tavern").description("Increase your reputation").effects(
-                        Arrays.asList(
-                                ResourceEffect.builder().resourceType(ResourceType.REPUTATION).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.TARGET).amount(5).duration(1).build(),
-                                ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(1).duration(1).build())
-                ).build()),
-                createCardOfType(CardType.PARTY,
-                Card.builder().cardType(CardType.PARTY).name("Throw Party").description("Increase your popularity by a considerable amount").effects(
-                        Arrays.asList(
-                                ResourceEffect.builder().resourceType(ResourceType.REPUTATION).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.TARGET).amount(15).duration(1).build(),
-                                ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(5).duration(1).build())
-                ).build()),
-                createCardOfType(CardType.HONEST_TRADE,
-                Card.builder().cardType(CardType.HONEST_TRADE).name("Honest Trade").description("Receive a small amount of gold during the next week").effects(
-                        Arrays.asList(
-                                ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.TARGET).amount(3).duration(7).build())
-                ).build()),
-                createCardOfType(CardType.DISHONEST_TRADE,
-                Card.builder().cardType(CardType.DISHONEST_TRADE).name("Dishonest Trade").description("Receive a decent amount of gold during the next week, but suffer a loss of reputation").effects(
-                        Arrays.asList(
-                                ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.TARGET).amount(5).duration(7).build(),
-                                ResourceEffect.builder().resourceType(ResourceType.REPUTATION).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(1).duration(7).build())
-                ).build()),
+//                createCardOfType(CardType.TAVERN,
+//                Card.builder().cardType(CardType.TAVERN).name("Go to the Tavern").description("Increase your reputation").effects(
+//                        Arrays.asList(
+//                                ResourceEffect.builder().resourceType(ResourceType.REPUTATION).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.TARGET).amount(5).duration(1).build(),
+//                                ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(1).duration(1).build())
+//                ).build()),
+//                createCardOfType(CardType.PARTY,
+//                Card.builder().cardType(CardType.PARTY).name("Throw Party").description("Increase your popularity by a considerable amount").effects(
+//                        Arrays.asList(
+//                                ResourceEffect.builder().resourceType(ResourceType.REPUTATION).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.TARGET).amount(15).duration(1).build(),
+//                                ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(5).duration(1).build())
+//                ).build()),
+//                createCardOfType(CardType.HONEST_TRADE,
+//                Card.builder().cardType(CardType.HONEST_TRADE).name("Honest Trade").description("Receive a small amount of gold during the next week").effects(
+//                        Arrays.asList(
+//                                ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.TARGET).amount(3).duration(7).build())
+//                ).build()),
+//                createCardOfType(CardType.DISHONEST_TRADE,
+//                Card.builder().cardType(CardType.DISHONEST_TRADE).name("Dishonest Trade").description("Receive a decent amount of gold during the next week, but suffer a loss of reputation").effects(
+//                        Arrays.asList(
+//                                ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.TARGET).amount(5).duration(7).build(),
+//                                ResourceEffect.builder().resourceType(ResourceType.REPUTATION).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(1).duration(7).build())
+//                ).build()),
                 createCardOfType(CardType.RUN_FOR_MAYOR,
-                Card.builder().version(1).cardType(CardType.RUN_FOR_MAYOR).name("Run for Mayor").description("Become mayor on election day. Stay alive for one week to win the game.")
+                Card.builder().version(1).cardType(CardType.RUN_FOR_MAYOR).name("Run for Mayor").description("Become mayor on election day. Find and put all traitors on trial!")
                         .effects(Arrays.asList(
                                 CandidacyEffect.builder().build(),
                                 ResourceEffect.builder().resourceType(ResourceType.REPUTATION).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(10).duration(1).build(),
@@ -95,15 +95,13 @@ public class CardService {
 
         // SPECIAL EFFECTS
 
-        createEffect(EffectType.CITIZEN, CitizenEffect.builder().build());
+        createEffect(SpecialEffectType.CITIZEN, CitizenEffect.builder().build());
 
-        createEffect(EffectType.TRAITOR, TraitorEffect.builder().build());
+        createEffect(SpecialEffectType.TRAITOR, TraitorEffect.builder().build());
 
-        createEffect(EffectType.MAYOR, MayorEffect.builder().duration(7).build());
+        createEffect(SpecialEffectType.MAYOR, MayorEffect.builder().duration(7).build());
 
-        if (TOTAL_NUMBER_OF_CARDS != cardRepository.count()){
-            throw new IllegalArgumentException("Incorrect number of total cards");
-        }
+        TOTAL_NUMBER_OF_CARDS = cardRepository.count();
 
         if (deckRepository.count() == 0){
             // TODO version decks
@@ -135,7 +133,7 @@ public class CardService {
         }
     }
 
-    private Effect createEffect(EffectType type, Effect effect){
+    private Effect createEffect(SpecialEffectType type, Effect effect){
         effectRepository.save(effect);
         Effects.put(type, effect);
         return effect;

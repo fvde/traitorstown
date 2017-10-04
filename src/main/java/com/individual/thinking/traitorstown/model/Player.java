@@ -5,7 +5,7 @@ import com.individual.thinking.traitorstown.game.rules.Rules;
 import com.individual.thinking.traitorstown.model.effects.Effect;
 import com.individual.thinking.traitorstown.model.effects.EffectActive;
 import com.individual.thinking.traitorstown.model.effects.EffectTargetType;
-import com.individual.thinking.traitorstown.model.effects.EffectType;
+import com.individual.thinking.traitorstown.model.effects.SpecialEffectType;
 import com.individual.thinking.traitorstown.model.exceptions.PlayerDoesNotHaveCardException;
 import lombok.*;
 import lombok.experimental.Tolerate;
@@ -82,7 +82,7 @@ public class Player {
         deckCards.clear();
         handCards.clear();
 
-        addEffect(CardService.Effects.get(EffectType.fromRole(role)));
+        addEffect(CardService.Effects.get(SpecialEffectType.fromRole(role)));
         for (ResourceType type : ResourceType.values()){
             resources.put(type, Rules.STARTING_RESOURCES.containsKey(type) ? Rules.STARTING_RESOURCES.get(type) : 0);
         }

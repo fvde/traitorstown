@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EffectRepository extends CrudRepository<Effect, Long> {
-    //Optional<Effect> findByEffectType(EffectType type);
+    //Optional<Effect> findByEffectType(SpecialEffectType type);
 }

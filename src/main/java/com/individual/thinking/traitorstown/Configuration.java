@@ -19,7 +19,7 @@ public class Configuration {
         MINIMUM_RESOURCES.put(ResourceType.REPUTATION, Integer.MIN_VALUE);
     }
 
-    public static final Integer TOTAL_NUMBER_OF_CARDS = 8;
-    public static final Integer ARRAY_OBSERVATION_SPACE_SIZE = GameState.GAME_STATE_GENERAL_INFORMATION_SIZE + TOTAL_NUMBER_OF_CARDS;
+    public static Long TOTAL_NUMBER_OF_CARDS = null;
+    public static final Integer ARRAY_OBSERVATION_SPACE_SIZE = GameState.GAME_STATE_GENERAL_INFORMATION_SIZE + TOTAL_NUMBER_OF_CARDS.intValue();
     public static final ObservationSpace<GameState> OBSERVATION_SPACE = new ArrayObservationSpace(new int[]{ARRAY_OBSERVATION_SPACE_SIZE});
 }

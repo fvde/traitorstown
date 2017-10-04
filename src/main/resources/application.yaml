@@ -2,7 +2,7 @@ spring:
   jpa:
     hibernate:
       # ddl-auto: create-drop
-      # ddl-auto: update
+      #ddl-auto: update
       ddl-auto: create-drop
     properties:
       hibernate:
@@ -63,7 +63,7 @@ spring:
 
 com.individual.thinking.traitorstown:
   minimum-number-of-players: 1
-  maximum-number-of-players: 4
+  maximum-number-of-players: 5
 
 ---
 #production environment

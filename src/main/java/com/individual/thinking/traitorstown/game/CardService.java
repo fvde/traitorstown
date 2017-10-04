@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.individual.thinking.traitorstown.Configuration.TOTAL_NUMBER_OF_CARDS;
 
@@ -50,17 +52,6 @@ public class CardService {
 //                                DrawCardEffect.builder().build(),
 //                                ResourceEffect.builder().resourceType(ResourceType.REPUTATION).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(5).duration(1).build())
 //                ).build()),
-                createCardOfType(CardType.FARM,
-                        Card.builder().cardType(CardType.FARM).name("Build Farm").description("Provides a low amount of gold for the next week.").effects(
-                        Arrays.asList(
-                                ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.TARGET).amount(1).duration(7).build())
-                ).build()),
-//                createCardOfType(CardType.TAVERN,
-//                Card.builder().cardType(CardType.TAVERN).name("Go to the Tavern").description("Increase your reputation").effects(
-//                        Arrays.asList(
-//                                ResourceEffect.builder().resourceType(ResourceType.REPUTATION).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.TARGET).amount(5).duration(1).build(),
-//                                ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(1).duration(1).build())
-//                ).build()),
 //                createCardOfType(CardType.PARTY,
 //                Card.builder().cardType(CardType.PARTY).name("Throw Party").description("Increase your popularity by a considerable amount").effects(
 //                        Arrays.asList(
@@ -86,6 +77,23 @@ public class CardService {
                                 ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(10).duration(1).build())
                 ).build()));
 
+        List<Card> citizenCards = Arrays.asList(
+                createCardOfType(CardType.FARM,
+                        Card.builder().cardType(CardType.FARM).name("Build Farm").description("Provides a low amount of gold for the next week.").effects(
+                                Arrays.asList(
+                                        ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.TARGET).amount(1).duration(7).build())
+                        ).build())
+        );
+
+        List<Card> traitorCards = Arrays.asList(
+                createCardOfType(CardType.ROBBERY,
+                        Card.builder().cardType(CardType.ROBBERY).name("Robbery").description("Steal a players gold. Very risky if the target is at home!").effects(
+                                Arrays.asList(
+                                        RobberyEffect.builder().build(),
+                                        NotAtHomeEffect.builder().effectTargetType(EffectTargetType.SELF).duration(1).build())
+                        ).build())
+                );
+
         // SPECIAL CARDS
         createCardOfType(CardType.VOTE,
                 Card.builder().cardType(CardType.VOTE).name("Vote").description("Vote for a player to become mayor.").singleTurnOnly(true)
@@ -107,8 +115,16 @@ public class CardService {
 
         if (deckRepository.count() == 0){
             // TODO version decks
-            buildDeckForRole(Role.CITIZEN, mainCards);
-            buildDeckForRole(Role.TRAITOR, mainCards);
+            buildDeckForRole(Role.CITIZEN, Stream.concat(
+                    mainCards.stream(),
+                    citizenCards.stream())
+                    .collect(Collectors.toList()));
+
+            buildDeckForRole(Role.TRAITOR,
+                    Stream.concat(
+                            mainCards.stream(),
+                            traitorCards.stream())
+                    .collect(Collectors.toList()));
         }
     }
 

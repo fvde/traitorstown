@@ -104,7 +104,7 @@ public class Player {
 
         card.getEffects().forEach(effect -> {
             if (effect.getEffectTargetType().equals(EffectTargetType.TARGET)){
-                target.addEffect(effect);
+                target.addEffect(effect, this);
             } else {
                 this.addEffect(effect);
             }
@@ -121,11 +121,11 @@ public class Player {
         addEffect(effect, this);
     }
 
-    private void addEffect(Effect effect, Player target){
+    private void addEffect(Effect effect, Player origin){
         activeEffects.add(EffectActive.builder()
                 .effect(effect)
-                .player(this)
-                .target(target)
+                .player(origin)
+                .target(this)
                 .remainingTurns(effect.getDuration())
                 .build());
     }
@@ -181,6 +181,9 @@ public class Player {
         return is(EffectActive::isCitizen);
     }
 
+    public boolean isNotAtHome(){
+        return is(EffectActive::isNotAtHome);
+    }
 
     public Role getRole(){
         if (isCitizen()){ return Role.CITIZEN; }

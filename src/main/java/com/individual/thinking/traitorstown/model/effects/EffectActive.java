@@ -70,6 +70,10 @@ public class EffectActive {
         return effect.isOfType(CitizenEffect.class);
     }
 
+    public boolean isNotAtHome() {
+        return effect.isOfType(NotAtHomeEffect.class);
+    }
+
     public boolean isVisibleFor(Player player){
         if (player == null){
             return false;

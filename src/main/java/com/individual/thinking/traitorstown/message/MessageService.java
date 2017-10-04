@@ -6,6 +6,7 @@ import com.google.common.eventbus.Subscribe;
 import com.individual.thinking.traitorstown.TraitorsTownConfiguration;
 import com.individual.thinking.traitorstown.model.Game;
 import com.individual.thinking.traitorstown.model.Player;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class MessageService {
 
     private final EmitterProcessor<ServerSentEvent<MessageRepresentation>> emitter;
@@ -41,11 +43,12 @@ public class MessageService {
     @Subscribe
     @AllowConcurrentEvents
     public void handleMessage(MessageEvent message) {
+        log.info("Publishing message {}", message);
         publishMessage(
                 message.getGame(),
                 message.getPayload().buildContent(message.getFromPlayer(), message.getToPlayer()),
                 message.getRecipients(),
-                message.getFromPlayer());
+                Optional.empty());
     }
 
     public void sendMessageToGame(Game game, String content){

@@ -7,6 +7,7 @@ import com.individual.thinking.traitorstown.model.Message;
 import com.individual.thinking.traitorstown.model.Player;
 import com.individual.thinking.traitorstown.model.Visibility;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.Tolerate;
 
@@ -25,11 +26,14 @@ public abstract class Effect {
     private Long id;
 
     @Enumerated(EnumType.STRING)
+    @NonNull
     private Visibility visibility;
 
     @Enumerated(EnumType.STRING)
+    @NonNull
     private EffectTargetType effectTargetType;
 
+    @NonNull
     private Integer duration;
 
     Effect(Visibility visibility, EffectTargetType effectTargetType, Integer duration){

@@ -3,7 +3,7 @@ package com.individual.thinking.traitorstown.model;
 public enum CardType {
     CONNECTIONS,
     FARM,
-    TAVERN,
+    ROBBERY,
     PARTY,
     HONEST_TRADE,
     DISHONEST_TRADE,

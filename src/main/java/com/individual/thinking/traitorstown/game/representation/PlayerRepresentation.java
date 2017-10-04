@@ -21,10 +21,27 @@ public class PlayerRepresentation {
                 player.getId(),
                 player.isReady(),
                 player.getId().equals(asPlayer.getId())
-                        ? Arrays.stream(ResourceType.values()).map(type -> new ResourceRepresentation(type.ordinal(), player.getResource(type))).collect(Collectors.toList())
+                        ? getResourceRepresentation(player)
                         : Collections.emptyList(),
                 player.getActiveEffects().stream()
                         .filter(effect -> effect.isVisibleFor(asPlayer))
                         .map(EffectRepresentation::fromActiveEffect).collect(Collectors.toList()));
+    }
+
+    private static List<ResourceRepresentation> getResourceRepresentation(Player player) {
+        if (player.isTraitor()){
+            return Arrays.stream(ResourceType.values()).map(type -> new ResourceRepresentation(type.ordinal(), player.getResource(type))).collect(Collectors.toList());
+        } else {
+            return Arrays.stream(ResourceType.values())
+                    .filter(type -> type.equals(ResourceType.STOLEN_GOLD))
+                    .map(type -> {
+                        if (type == ResourceType.GOLD){
+                            return new ResourceRepresentation(type.ordinal(), player.getResource(type) + player.getResource(ResourceType.STOLEN_GOLD));
+                        } else {
+                            return new ResourceRepresentation(type.ordinal(), player.getResource(type));
+                        }
+                    })
+                    .collect(Collectors.toList());
+        }
     }
 }

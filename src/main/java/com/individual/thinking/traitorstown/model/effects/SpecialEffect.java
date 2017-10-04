@@ -14,8 +14,13 @@ import javax.persistence.Entity;
 public abstract class SpecialEffect extends Effect {
 
     protected SpecialEffect(Visibility visibility, Integer duration) {
+        this(visibility, EffectTargetType.TARGET, duration);
+    }
+
+    protected SpecialEffect(Visibility visibility, EffectTargetType effectTargetType, Integer duration) {
         super(visibility == null ? Visibility.PLAYER : visibility,
-                EffectTargetType.TARGET, duration);
+                effectTargetType == null ? EffectTargetType.TARGET : effectTargetType,
+                duration == null ? 1 : duration);
     }
 
     @Tolerate

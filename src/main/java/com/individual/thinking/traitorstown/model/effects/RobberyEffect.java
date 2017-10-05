@@ -52,4 +52,9 @@ public class RobberyEffect extends SpecialEffect {
             publishMessage(target.getName() + " caught you red-handed! They know that you are a traitor...", Collections.singletonList(player));
         }
     }
+
+    @Override
+    public boolean mayApply(Player origin, Player target) {
+        return !origin.getId().equals(target.getId());
+    }
 }

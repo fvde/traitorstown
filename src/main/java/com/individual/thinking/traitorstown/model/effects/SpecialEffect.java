@@ -30,7 +30,7 @@ public abstract class SpecialEffect extends Effect {
 
 
     @Override
-    public boolean mayApply(Player target) {
+    public boolean mayApply(Player origin, Player target) {
         return true;
     }
 

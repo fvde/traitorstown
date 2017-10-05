@@ -93,8 +93,8 @@ public class Player {
         drawCards(1);
     }
 
-    public boolean mayPlayCard(Card card){
-        return card.mayPlayCard(this);
+    public boolean mayPlayCard(Card card, Player target){
+        return card.mayPlayCard(this, target);
     }
 
     public void playCard(Card card, Player target) throws PlayerDoesNotHaveCardException {

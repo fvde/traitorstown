@@ -43,7 +43,7 @@ public class Turn {
             throw new PlayedAlreadyPlayedCardThisTurnException("Already played a card this turn");
         }
 
-        if (!player.mayPlayCard(card)){
+        if (!player.mayPlayCard(card, target)){
             throw new PlayerMayNotPlayThisCardException("The requirements to play this card are not met");
         }
 

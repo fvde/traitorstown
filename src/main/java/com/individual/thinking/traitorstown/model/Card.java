@@ -46,7 +46,7 @@ public class Card {
     @Tolerate
     Card() {}
 
-    public boolean mayPlayCard(Player player){
-        return effects.stream().allMatch(effect -> effect.mayApply(player));
+    public boolean mayPlayCard(Player origin, Player target){
+        return effects.stream().allMatch(effect -> effect.mayApply(origin, target));
     }
 }

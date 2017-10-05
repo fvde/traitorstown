@@ -31,4 +31,9 @@ public class VoteEffect extends SpecialEffect {
             publishMessage(player.getName() + " voted for " + target.getName(), game.getPlayers());
         }
     }
+
+    @Override
+    public boolean mayApply(Player origin, Player target) {
+        return target.isCandidate();
+    }
 }

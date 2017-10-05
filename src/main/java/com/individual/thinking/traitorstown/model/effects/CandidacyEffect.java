@@ -25,4 +25,9 @@ public class CandidacyEffect extends SpecialEffect {
             publishMessage(target.getName() + " applied for the mayor position", game.getPlayers());
         }
     }
+
+    @Override
+    public boolean mayApply(Player origin, Player target) {
+        return origin.getId().equals(target.getId());
+    }
 }

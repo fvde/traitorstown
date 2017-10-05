@@ -48,7 +48,7 @@ public abstract class Effect {
     }
 
     public abstract void apply(Game game, Player origin, Player target, boolean isNew);
-    public abstract boolean mayApply(Player target);
+    public abstract boolean mayApply(Player origin, Player target);
     public abstract boolean isCost();
     public abstract String getName();
     public boolean isOfType(Class<? extends Effect> type) {

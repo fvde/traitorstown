@@ -49,14 +49,13 @@ public class CardService {
         List<Card> mainCards = asList(
                 createCardOfType(CardType.PARTY,
                         Card.builder().cardType(CardType.PARTY).name("Throw Party").description("Invite all honest citizens. Increases your " + ResourceType.REPUTATION.name().toLowerCase() + ".").effects(asList(
-                                PartyEffect.builder().build())
-                                //ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(3).duration(1).build())
+                                PartyEffect.builder().build(),
+                                ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(3).duration(1).build())
                         ).build()),
-//                createCardOfType(CardType.HONEST_TRADE,
-//                Card.builder().cardType(CardType.HONEST_TRADE).name("Honest Trade").description("Receive a small amount of gold during the next week").effects(
-//                        Arrays.asList(
-//                                ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.TARGET).amount(3).duration(7).build())
-//                ).build()),
+                createCardOfType(CardType.TRADE,
+                        Card.builder().cardType(CardType.TRADE).name("Trade").description("Receive a good amount of " + ResourceType.GOLD.name().toLowerCase() + " if the target trades with you.").effects(asList(
+                                TradeEffect.builder().duration(7).build())
+                        ).build()),
 //                createCardOfType(CardType.DISHONEST_TRADE,
 //                Card.builder().cardType(CardType.DISHONEST_TRADE).name("Dishonest Trade").description("Receive a decent amount of gold during the next week, but suffer a loss of reputation").effects(
 //                        Arrays.asList(

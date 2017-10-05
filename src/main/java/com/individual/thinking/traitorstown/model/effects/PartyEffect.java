@@ -21,6 +21,9 @@ public class PartyEffect extends SpecialEffect {
         super(Visibility.ALL, 2);
     }
 
+    /***
+     * Receive reputation if others attend your party.
+     */
     @Override
     public void apply(Game game, Player player, Player target, boolean isNew) {
         if (isNew){

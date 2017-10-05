@@ -78,8 +78,12 @@ public class EffectActive {
         return effect.isOfType(PartyEffect.class) && remainingTurns == 1;
     }
 
-    public boolean isPartyWithGuest(Player guest)  {
-        return effect.isOfType(AttendPartyEffect.class) && origin.is(guest);
+    public boolean isPartyWithGuest(Player origin)  {
+        return effect.isOfType(AttendPartyEffect.class) && origin.is(origin);
+    }
+
+    public boolean isTradeFromPlayer(Player player)  {
+        return effect.isOfType(TradeEffect.class) && origin.is(player);
     }
 
     public boolean isVisibleFor(Player player){

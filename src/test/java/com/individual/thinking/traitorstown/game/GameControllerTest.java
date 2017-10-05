@@ -49,7 +49,7 @@ public class GameControllerTest extends MockMvcBase{
             .build();
 
     private final List<Card> cards = Arrays.asList(
-            Card.builder().id(1L).cardType(CardType.HONEST_TRADE).name("Trade").description("get gold from people!").effects(Arrays.asList(removeGoldEffect)).build(),
+            Card.builder().id(1L).cardType(CardType.TRADE).name("Trade").description("get gold from people!").effects(Arrays.asList(removeGoldEffect)).build(),
             Card.builder().id(2L).cardType(CardType.RUN_FOR_MAYOR).name("Run for mayor").description("Apply to become mayor!").effects(Arrays.asList(ResourceEffect.builder().effectTargetType(EffectTargetType.TARGET).operator(EffectOperator.REMOVE).resourceType(ResourceType.REPUTATION).amount(20).duration(1).build())).build());
 
     private final Player opponent = Player.builder()

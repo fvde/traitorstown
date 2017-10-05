@@ -198,11 +198,13 @@ public class Player {
 
     public boolean isHostingAParty() {return is(EffectActive::isParty);}
 
-    public boolean isBeingVisitedForPartyByPlayer(Player guest) {return is(e -> e.isPartyWithGuest(guest));}
+    public boolean isBeingVisitedForPartyByPlayer(Player origin) {return is(e -> e.isPartyWithGuest(origin));}
 
     public boolean hasNoPartyInvitation(){
         return !hasCardOfType(CardType.ATTEND_PARTY);
     }
+
+    public boolean isTradingWith(Player origin) {return is(e -> e.isTradeFromPlayer(origin));}
 
     public Role getRole(){
         if (isCitizen()){ return Role.CITIZEN; }

@@ -5,7 +5,7 @@ public enum CardType {
     ROBBERY,
     PARTY,
     ATTEND_PARTY,
-    HONEST_TRADE,
+    TRADE,
     DISHONEST_TRADE,
     RUN_FOR_MAYOR,
     VOTE

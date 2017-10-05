@@ -1,20 +1,27 @@
 package com.individual.thinking.traitorstown.model;
 
-import com.individual.thinking.traitorstown.model.exceptions.PlayedAlreadyPlayedCardThisTurnException;
+import com.individual.thinking.traitorstown.TraitorstownApplication;
+import com.individual.thinking.traitorstown.game.rules.Rules;
+import com.individual.thinking.traitorstown.model.events.TurnEndedEvent;
 import com.individual.thinking.traitorstown.model.exceptions.PlayerDoesNotHaveCardException;
-import com.individual.thinking.traitorstown.model.exceptions.PlayerMayNotPlayThisCardException;
+import com.individual.thinking.traitorstown.model.exceptions.RuleSetViolationException;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.experimental.Tolerate;
 
 import javax.persistence.*;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 @Entity
 @Builder
 @Getter
+@ToString
 @Table(uniqueConstraints={
         @UniqueConstraint(columnNames = {"game_id", "counter"})
 })
@@ -30,6 +37,15 @@ public class Turn {
     @NonNull
     private Integer counter;
 
+    @NonNull
+    private Integer humanPlayers;
+
+    @Builder.Default
+    private Integer inactivePlayers = 0;
+
+    @NonNull
+    private Date startedAt;
+
     @ManyToMany
     @JoinTable(name = "turn_player", joinColumns = @JoinColumn(name = "turn_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "player_id", referencedColumnName = "id"))
     private List<Player> finishedPlayers = new ArrayList<>();
@@ -37,23 +53,37 @@ public class Turn {
     @Tolerate
     Turn () {}
 
-    public void playCard(Card card, Player player, Player target) throws PlayedAlreadyPlayedCardThisTurnException, PlayerDoesNotHaveCardException, PlayerMayNotPlayThisCardException {
+    public void playCard(Card card, Player player, Player target) throws PlayerDoesNotHaveCardException, RuleSetViolationException {
 
         if (finishedPlayers.contains(player)){
-            throw new PlayedAlreadyPlayedCardThisTurnException("Already played a card this turn");
-        }
-
-        if (!player.mayPlayCard(card, target)){
-            throw new PlayerMayNotPlayThisCardException("The requirements to play this card are not met");
+            throw new RuleSetViolationException("Already played a card this turn");
         }
 
         player.playCard(card, target);
-        finishedPlayers.add(player);
+
+        if (!player.isAi()){
+            finishedPlayers.add(player);
+        }
     }
 
-    public Turn end(){
+    public void end(){
+        if (finishedPlayers.size() == humanPlayers || startedAt.toInstant().plusSeconds(Rules.TURN_DURATION_IN_SECONDS).isAfter(Instant.now())){
+            inactivePlayers = humanPlayers - finishedPlayers.size();
+            TraitorstownApplication.EventBus.post(TurnEndedEvent.builder().turn(this).build());
+        }
+    }
+
+    public boolean allHumanPlayersInactive(){
+        return inactivePlayers.equals(humanPlayers);
+    }
+
+    public Turn startNext(){
         return Turn.builder()
                 .counter(counter + 1)
+                .finishedPlayers(Collections.emptyList())
+                .humanPlayers(humanPlayers)
+                .inactivePlayers(0)
+                .startedAt(new Date())
                 .build();
     }
 }

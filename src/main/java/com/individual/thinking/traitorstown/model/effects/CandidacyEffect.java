@@ -28,6 +28,6 @@ public class CandidacyEffect extends SpecialEffect {
 
     @Override
     public boolean mayApply(Player origin, Player target) {
-        return origin.getId().equals(target.getId());
+        return origin.is(target);
     }
 }

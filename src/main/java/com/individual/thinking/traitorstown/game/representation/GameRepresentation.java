@@ -1,6 +1,7 @@
 package com.individual.thinking.traitorstown.game.representation;
 
 import com.individual.thinking.traitorstown.model.Game;
+import com.individual.thinking.traitorstown.model.GameStatus;
 import com.individual.thinking.traitorstown.model.Player;
 import lombok.Data;
 
@@ -19,7 +20,7 @@ public class GameRepresentation {
         return new GameRepresentation(game.getId(),
                 game.getPlayers().stream().map(player -> PlayerRepresentation.fromPlayer(player, asPlayer)).collect(Collectors.toList()),
                 game.getStatus().ordinal(),
-                game.getCurrentTurn().isPresent() ? game.getCurrentTurn().get().getCounter() : 0,
+                game.getStatus().equals(GameStatus.PLAYING) ? game.getCurrentTurn().getCounter() : 0,
                 game.getWinner().ordinal());
     }
 }

@@ -13,8 +13,22 @@ import java.util.*;
 @Component
 public class Rules {
 
-    public static final Integer INITIAL_AMOUNT_OF_CARDS = 2;
-    public static Integer MAXIMUM_NUMBER_OF_CARDS = 8;
+    public static final Integer INITIAL_AMOUNT_OF_CARDS = 3;
+    public static final Long TURN_DURATION_IN_SECONDS = 300L;
+    public static Integer MAXIMUM_NUMBER_OF_CARDS = 6;
+
+    public static final Map<ResourceType, Integer> MINIMUM_RESOURCES;
+    static
+    {
+        // default minimum is zero
+        MINIMUM_RESOURCES = new HashMap<>();
+        for (ResourceType type : ResourceType.values()){
+            MINIMUM_RESOURCES.put(type, 0);
+        }
+
+        // reputation may fall below zero
+        // MINIMUM_RESOURCES.put(ResourceType.REPUTATION, Integer.MIN_VALUE);
+    }
 
     public static final Map<ResourceType, Integer> STARTING_RESOURCES;
     static

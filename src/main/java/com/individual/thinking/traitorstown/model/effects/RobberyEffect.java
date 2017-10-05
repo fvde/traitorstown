@@ -55,6 +55,6 @@ public class RobberyEffect extends SpecialEffect {
 
     @Override
     public boolean mayApply(Player origin, Player target) {
-        return !origin.getId().equals(target.getId());
+        return origin.isNot(target);
     }
 }

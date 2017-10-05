@@ -1,11 +1,12 @@
 package com.individual.thinking.traitorstown.message;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.individual.thinking.traitorstown.TraitorsTownConfiguration;
+import com.individual.thinking.traitorstown.TraitorstownApplication;
 import com.individual.thinking.traitorstown.model.Game;
 import com.individual.thinking.traitorstown.model.Player;
+import com.individual.thinking.traitorstown.model.events.MessageEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,13 +25,12 @@ public class MessageService {
     private Map<Long, List<FluxSink<?>>> activeGames = new HashMap<>();
 
     private final TraitorsTownConfiguration configuration;
-    public static EventBus EventBus = new EventBus();
 
     @Autowired
     MessageService(TraitorsTownConfiguration configuration) {
         this.configuration = configuration;
         this.messages = DirectProcessor.create();
-        this.EventBus.register(this);
+        TraitorstownApplication.EventBus.register(this);
     }
 
     public Flux<MessageEvent> subscribe(Long gameId, Long playerId) {
@@ -59,7 +59,6 @@ public class MessageService {
     @Subscribe
     @AllowConcurrentEvents
     public void publishMessage(MessageEvent message) {
-        log.info("Publishing message {}", message);
         if (!configuration.getMessagingEnabled()) return;
         messages.onNext(message);
     }

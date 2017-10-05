@@ -1,5 +1,6 @@
 package com.individual.thinking.traitorstown.game;
 
+import com.google.common.collect.ImmutableMap;
 import com.individual.thinking.traitorstown.MockMvcBase;
 import com.individual.thinking.traitorstown.model.*;
 import com.individual.thinking.traitorstown.model.effects.*;
@@ -12,6 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import static com.individual.thinking.traitorstown.TestUtils.readFileFromResource;
@@ -55,6 +57,11 @@ public class GameControllerTest extends MockMvcBase{
             .gameId(validGameId)
             .ready(true)
             .handCards(cards)
+            .resources(ImmutableMap.of(
+                    ResourceType.GOLD, 12,
+                    ResourceType.REPUTATION, -15,
+                    ResourceType.STOLEN_GOLD, 31
+            ))
             .activeEffects(Collections.emptyList())
             .build();
 
@@ -63,15 +70,20 @@ public class GameControllerTest extends MockMvcBase{
             .gameId(validGameId)
             .ready(true)
             .handCards(cards)
-            .activeEffects(Collections.singletonList(EffectActive.builder().effect(removeGoldEffect).player(opponent).target(opponent).remainingTurns(5).build()))
+            .resources(ImmutableMap.of(
+                    ResourceType.GOLD, 17,
+                    ResourceType.REPUTATION, 5,
+                    ResourceType.STOLEN_GOLD, 0
+            ))
+            .activeEffects(Collections.singletonList(EffectActive.builder().effect(removeGoldEffect).origin(opponent).target(opponent).remainingTurns(5).build()))
             .build();
 
     private final Game game = Game.builder()
             .players(singletonList(player))
             .status(GameStatus.PLAYING)
             .turns(Arrays.asList(
-                    Turn.builder().counter(1).build(),
-                    Turn.builder().counter(2).build()))
+                    Turn.builder().counter(1).humanPlayers(3).startedAt(new Date()).build(),
+                    Turn.builder().counter(2).humanPlayers(4).startedAt(new Date()).build()))
             .build();
 
     @Test
@@ -166,7 +178,7 @@ public class GameControllerTest extends MockMvcBase{
 
     @Test
     public void getTurn() throws Exception {
-        when(gameService.getTurnByGameIdAndCounter(anyLong(), anyInt())).thenReturn(Turn.builder().counter(1).build());
+        when(gameService.getTurnByGameIdAndCounter(anyLong(), anyInt())).thenReturn(Turn.builder().counter(1).humanPlayers(7).startedAt(new Date()).build());
 
         this.mockMvc.perform(get("/games/{gameId}/turns/{turnCounter}", validGameId, 1).header("token", validToken)
                 .with(authorizedPlayer(player))

@@ -105,7 +105,7 @@ public class TraitorsTownMDP implements MDP<GameState, Integer, DiscreteSpace> {
 
             Game game = gameService.getGameById(gameId);
             gameState = GameState.fromGameAndPlayer(game, aiPlayerId);
-            turn = game.getTurn();
+            turn = game.getCurrentTurnCounter();
             reward = rewardService.getReward(gameState, turn);
 
         } catch (Exception e) {

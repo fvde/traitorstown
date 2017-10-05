@@ -7,6 +7,7 @@ import com.individual.thinking.traitorstown.model.effects.EffectActive;
 import com.individual.thinking.traitorstown.model.effects.EffectTargetType;
 import com.individual.thinking.traitorstown.model.effects.SpecialEffectType;
 import com.individual.thinking.traitorstown.model.exceptions.PlayerDoesNotHaveCardException;
+import com.individual.thinking.traitorstown.model.exceptions.RuleSetViolationException;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -97,9 +98,13 @@ public class Player {
         return card.mayPlayCard(this, target);
     }
 
-    public void playCard(Card card, Player target) throws PlayerDoesNotHaveCardException {
+    public void playCard(Card card, Player target) throws PlayerDoesNotHaveCardException, RuleSetViolationException {
         if (!handCards.contains(card)){
             throw new PlayerDoesNotHaveCardException("You cannot play a card you don't have!");
+        }
+
+        if (!mayPlayCard(card, target)){
+            throw new RuleSetViolationException("The requirements to play this card are not met");
         }
 
         card.getEffects().forEach(effect -> {
@@ -155,10 +160,16 @@ public class Player {
         handCards.add(card);
     }
 
-    public void endTurn(Game game) {
+    public void discardSingleTurnCards(){
+        handCards = handCards.stream().filter(Card::isNotSingleTurnOnly).collect(Collectors.toList());
+    }
+
+    public void applyCardEffects(Game game) {
         activeEffects.stream().forEach(e -> e.apply(game));
+    }
+
+    public void removeInactiveEffects() {
         activeEffects = activeEffects.stream().filter(EffectActive::isActive).collect(Collectors.toList());
-        handCards = handCards.stream().filter(card -> !card.getSingleTurnOnly()).collect(Collectors.toList());
     }
 
     public Long getVotes(){
@@ -185,6 +196,14 @@ public class Player {
         return is(EffectActive::isNotAtHome);
     }
 
+    public boolean isHostingAParty() {return is(EffectActive::isParty);}
+
+    public boolean isBeingVisitedForPartyByPlayer(Player guest) {return is(e -> e.isPartyWithGuest(guest));}
+
+    public boolean hasNoPartyInvitation(){
+        return !hasCardOfType(CardType.ATTEND_PARTY);
+    }
+
     public Role getRole(){
         if (isCitizen()){ return Role.CITIZEN; }
         else if (isTraitor()){ return Role.TRAITOR; }
@@ -194,6 +213,13 @@ public class Player {
     private boolean is(Predicate<? super EffectActive> predicate){
         return activeEffects.stream().filter(predicate).findFirst().isPresent();
     }
+
+    private boolean hasCardOfType(CardType type){
+        return handCards.stream().filter(card -> card.getCardType().equals(type)).findFirst().isPresent();
+    }
+
+    public boolean is (Player other) {return getId().equals(other.getId());}
+    public boolean isNot (Player other) {return !is(other);}
 
     @Tolerate
     Player () {}

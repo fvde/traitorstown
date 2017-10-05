@@ -49,4 +49,8 @@ public class Card {
     public boolean mayPlayCard(Player origin, Player target){
         return effects.stream().allMatch(effect -> effect.mayApply(origin, target));
     }
+
+    public boolean isNotSingleTurnOnly(){
+        return !singleTurnOnly;
+    }
 }

@@ -27,7 +27,7 @@ com.individual.thinking.traitorstown:
   messaging-enabled: true
   minimum-number-of-players: 4
   maximum-number-of-players: 8
-  maximum-number-of-cards: 8
+  maximum-number-of-cards: 6
 
 ---
 # learning
@@ -41,7 +41,7 @@ spring:
 
 com.individual.thinking.traitorstown:
   learning-enabled: true
-  learning-steps: 100
+  learning-steps: 500
   messaging-enabled: false
   minimum-number-of-players: 1
   maximum-number-of-players: 5

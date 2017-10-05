@@ -2,6 +2,7 @@ package com.individual.thinking.traitorstown.model.effects;
 
 import com.individual.thinking.traitorstown.model.Game;
 import com.individual.thinking.traitorstown.model.Player;
+import com.individual.thinking.traitorstown.model.ResourceType;
 import com.individual.thinking.traitorstown.model.Visibility;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +21,7 @@ public class TraitorEffect extends SpecialEffect {
     }
 
     @Override
-    public void apply(Game game, Player player, Player target, boolean isNew) {
-        // no special benefits
+    public void apply(Game game, Player origin, Player target, boolean isNew) {
+        origin.addResource(ResourceType.STOLEN_GOLD, 1);
     }
 }

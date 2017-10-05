@@ -74,6 +74,14 @@ public class EffectActive {
         return effect.isOfType(NotAtHomeEffect.class);
     }
 
+    public boolean isParty()  {
+        return effect.isOfType(PartyEffect.class) && remainingTurns == 1;
+    }
+
+    public boolean isPartyWithGuest(Player guest)  {
+        return effect.isOfType(AttendPartyEffect.class) && origin.is(guest);
+    }
+
     public boolean isVisibleFor(Player player){
         if (player == null){
             return false;

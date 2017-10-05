@@ -1,10 +1,10 @@
 package com.individual.thinking.traitorstown.model.effects;
 
-import com.individual.thinking.traitorstown.message.MessageEvent;
-import com.individual.thinking.traitorstown.message.MessageService;
+import com.individual.thinking.traitorstown.TraitorstownApplication;
 import com.individual.thinking.traitorstown.model.Game;
 import com.individual.thinking.traitorstown.model.Player;
 import com.individual.thinking.traitorstown.model.Visibility;
+import com.individual.thinking.traitorstown.model.events.MessageEvent;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
@@ -61,7 +61,7 @@ public abstract class Effect {
             return;
         }
 
-        MessageService.EventBus.post(
+        TraitorstownApplication.EventBus.post(
                 MessageEvent.builder()
                         .content(content)
                         .gameId(recipients.get(0).getGameId())

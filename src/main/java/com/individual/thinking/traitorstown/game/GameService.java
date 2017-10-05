@@ -1,6 +1,9 @@
 package com.individual.thinking.traitorstown.game;
 
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 import com.individual.thinking.traitorstown.TraitorsTownConfiguration;
+import com.individual.thinking.traitorstown.TraitorstownApplication;
 import com.individual.thinking.traitorstown.ai.ArtificialIntelligenceService;
 import com.individual.thinking.traitorstown.ai.learning.model.Action;
 import com.individual.thinking.traitorstown.game.exceptions.*;
@@ -8,9 +11,13 @@ import com.individual.thinking.traitorstown.game.repository.GameRepository;
 import com.individual.thinking.traitorstown.game.repository.TurnRepository;
 import com.individual.thinking.traitorstown.message.MessageService;
 import com.individual.thinking.traitorstown.model.*;
-import com.individual.thinking.traitorstown.model.exceptions.*;
-import lombok.RequiredArgsConstructor;
+import com.individual.thinking.traitorstown.model.events.TurnEndedEvent;
+import com.individual.thinking.traitorstown.model.exceptions.InactiveGameException;
+import com.individual.thinking.traitorstown.model.exceptions.PlayerDoesNotHaveCardException;
+import com.individual.thinking.traitorstown.model.exceptions.RuleSetViolationException;
+import com.individual.thinking.traitorstown.model.exceptions.TargetPlayerNotInGameException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +26,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 @Slf4j
 public class GameService {
@@ -31,6 +37,19 @@ public class GameService {
     private final MessageService messageService;
     private final TraitorsTownConfiguration configuration;
     private final PlayerService playerService;
+
+    @Autowired
+    GameService(GameRepository gameRepository, TurnRepository turnRepository, CardService cardService, ArtificialIntelligenceService artificialIntelligenceService, MessageService messageService, TraitorsTownConfiguration configuration, PlayerService playerService) {
+        this.gameRepository = gameRepository;
+        this.turnRepository = turnRepository;
+        this.cardService = cardService;
+        this.artificialIntelligenceService = artificialIntelligenceService;
+        this.messageService = messageService;
+        this.configuration = configuration;
+        this.playerService = playerService;
+        TraitorstownApplication.EventBus.register(this);
+    }
+
 
     public Game createNewGame() {
         return gameRepository.save(Game.builder()
@@ -99,11 +118,11 @@ public class GameService {
         return game;
     }
 
-    public void playCard(Long gameId, Integer turn, Long cardId, Long playerId, Long targetPlayerId) throws GameNotFoundException, CardNotFoundException, PlayerNotFoundException, NotCurrentTurnException, PlayerDoesNotHaveCardException, PlayedAlreadyPlayedCardThisTurnException, PlayerMayNotPlayThisCardException, InactiveGameException, TargetPlayerNotInGameException {
+    public void playCard(Long gameId, Integer turn, Long cardId, Long playerId, Long targetPlayerId) throws GameNotFoundException, CardNotFoundException, PlayerNotFoundException, PlayerDoesNotHaveCardException, InactiveGameException, TargetPlayerNotInGameException, RuleSetViolationException {
         Game game = getGameById(gameId);
 
         if (!game.isCurrentTurn(turn)){
-            throw new NotCurrentTurnException("It is currently not turn " + turn);
+            throw new RuleSetViolationException("It is currently not turn " + turn);
         }
 
         Card card = cardService.getCardById(cardId);
@@ -113,10 +132,6 @@ public class GameService {
         log.info("Player {} playing card {} targeting player {}", origin.getId(), card.getName(), target.getId());
         game.playCard(origin, target, card);
         gameRepository.save(game);
-
-        if (game.isTurnOver()){
-            startNextTurn(game);
-        }
     }
 
     private Game startGame(Game game) throws RuleSetViolationException {
@@ -125,24 +140,50 @@ public class GameService {
         }
         messageService.sendMessageToGame(game, "And so the " + game.getPlayers().size() + " of you arrive in the city. Who can you trust? And who is a traitor?");
         game.start();
-        startNextTurn(game);
         return gameRepository.save(game);
     }
 
-    private void startNextTurn(Game game){
+    @Subscribe
+    @AllowConcurrentEvents
+    public void handleEndOfTurn(TurnEndedEvent turnEndedEvent) throws GameNotFoundException {
+        log.info("Turn is ending {}", turnEndedEvent.getTurn());
+        startNextTurn(getGameById(turnEndedEvent.getTurn().getGameId()));
+    }
+
+    private void startNextTurn(Game game) {
+        // let AI play
+        makeAISuggestions(game);
+
+        // begin next turn
         messageService.sendMessageToGame(game, "A new day dawns..");
         game.startNextTurn();
+        gameRepository.save(game);
+    }
+
+    private void makeAISuggestions(Game game) {
         game.getAIPlayers().forEach(player -> {
                     Action recommendedAction = artificialIntelligenceService.getRecommendedAction(game, player.getId());
                     try {
                         playCard(
                                 game.getId(),
-                                game.getTurn(),
+                                game.getCurrentTurnCounter(),
                                 player.getHandCards().get(recommendedAction.getCardSlot()).getId(),
                                 player.getId(),
                                 game.getPlayers().get(recommendedAction.getPlayerSlot()).getId());
-                    } catch (Exception e) {
-                        log.error("AI failed to make valid move, skipping turn: {}", e.getMessage());
+                    } catch (GameNotFoundException e) {
+                        log.info("AI failed to make move with exception {}", e.getMessage());
+                    } catch (CardNotFoundException e) {
+                        log.info("AI failed to make move with exception {}", e.getMessage());
+                    } catch (PlayerNotFoundException e) {
+                        log.info("AI failed to make move with exception {}", e.getMessage());
+                    } catch (PlayerDoesNotHaveCardException e) {
+                        log.info("AI failed to make move with exception {}", e.getMessage());
+                    } catch (InactiveGameException e) {
+                        log.info("AI failed to make move with exception {}", e.getMessage());
+                    } catch (TargetPlayerNotInGameException e) {
+                        log.info("AI failed to make move with exception {}", e.getMessage());
+                    } catch (RuleSetViolationException e) {
+                        log.info("AI failed to make move with exception {}", e.getMessage());
                     }
                 }
         );

@@ -1,4 +1,4 @@
-package com.individual.thinking.traitorstown.message;
+package com.individual.thinking.traitorstown.model.events;
 
 import lombok.Builder;
 import lombok.Value;

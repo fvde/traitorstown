@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.individual.thinking.traitorstown.Configuration.TOTAL_NUMBER_OF_CARDS;
+import static java.util.Arrays.asList;
 
 @Service
 @RequiredArgsConstructor
@@ -45,19 +46,12 @@ public class CardService {
     }
 
     public void initialize() {
-        List<Card> mainCards = Arrays.asList(
-//                createCardOfType(CardType.CONNECTIONS,
-//                        Card.builder().cardType(CardType.CONNECTIONS).name("Use Connections").description("Draw an additional card.").effects(
-//                        Arrays.asList(
-//                                DrawCardEffect.builder().build(),
-//                                ResourceEffect.builder().resourceType(ResourceType.REPUTATION).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(5).duration(1).build())
-//                ).build()),
-//                createCardOfType(CardType.PARTY,
-//                Card.builder().cardType(CardType.PARTY).name("Throw Party").description("Increase your popularity by a considerable amount").effects(
-//                        Arrays.asList(
-//                                ResourceEffect.builder().resourceType(ResourceType.REPUTATION).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.TARGET).amount(15).duration(1).build(),
-//                                ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(5).duration(1).build())
-//                ).build()),
+        List<Card> mainCards = asList(
+                createCardOfType(CardType.PARTY,
+                        Card.builder().cardType(CardType.PARTY).name("Throw Party").description("Invite all honest citizens. Increases your " + ResourceType.REPUTATION.name().toLowerCase() + ".").effects(asList(
+                                PartyEffect.builder().build())
+                                //ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(3).duration(1).build())
+                        ).build()),
 //                createCardOfType(CardType.HONEST_TRADE,
 //                Card.builder().cardType(CardType.HONEST_TRADE).name("Honest Trade").description("Receive a small amount of gold during the next week").effects(
 //                        Arrays.asList(
@@ -70,36 +64,43 @@ public class CardService {
 //                                ResourceEffect.builder().resourceType(ResourceType.REPUTATION).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(1).duration(7).build())
 //                ).build()),
                 createCardOfType(CardType.RUN_FOR_MAYOR,
-                Card.builder().version(1).cardType(CardType.RUN_FOR_MAYOR).name("Run for Mayor").description("Become mayor on election day. Find and put all traitors on trial!")
-                        .effects(Arrays.asList(
+                        Card.builder().version(1).cardType(CardType.RUN_FOR_MAYOR).name("Run for Mayor").description("Become mayor on election day. Find and put all traitors on trial!").effects(asList(
                                 CandidacyEffect.builder().build(),
-                                ResourceEffect.builder().resourceType(ResourceType.REPUTATION).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(10).duration(1).build(),
+                                ResourceEffect.builder().resourceType(ResourceType.REPUTATION).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(5).duration(1).build(),
                                 ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(1).duration(1).build())
                 ).build()));
 
-        List<Card> citizenCards = Arrays.asList(
+        List<Card> citizenCards = asList(
                 createCardOfType(CardType.FARM,
-                        Card.builder().cardType(CardType.FARM).name("Build Farm").description("Provides a low amount of gold for the next week.").effects(
-                                Arrays.asList(
-                                        ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.TARGET).amount(1).duration(7).build())
+                        Card.builder().cardType(CardType.FARM).name("Build Farm").description("Provides a low amount of " + ResourceType.GOLD.name().toLowerCase() + " for the next week.").effects(asList(
+                                ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.ADD).effectTargetType(EffectTargetType.TARGET).amount(1).duration(7).build())
                         ).build())
         );
 
-        List<Card> traitorCards = Arrays.asList(
+        List<Card> traitorCards = asList(
                 createCardOfType(CardType.ROBBERY,
-                        Card.builder().cardType(CardType.ROBBERY).name("Robbery").description("Steal a players gold. Very risky if the target is at home!").effects(
-                                Arrays.asList(
-                                        RobberyEffect.builder().build(),
-                                        NotAtHomeEffect.builder().effectTargetType(EffectTargetType.SELF).duration(1).build())
+                        Card.builder().cardType(CardType.ROBBERY).name("Robbery").description("Steal a players " + ResourceType.GOLD.name().toLowerCase() + ". Very risky if the target is at home!").effects(asList(
+                                RobberyEffect.builder().build(),
+                                NotAtHomeEffect.builder().effectTargetType(EffectTargetType.SELF).duration(1).build())
                         ).build())
                 );
 
         // SPECIAL CARDS
         createCardOfType(CardType.VOTE,
-                Card.builder().cardType(CardType.VOTE).name("Vote").description("Vote for a player to become mayor.").singleTurnOnly(true)
-                        .effects(Arrays.asList(
+                Card.builder().cardType(CardType.VOTE).name("Vote").description("Vote for a player to become mayor.")
+                        .singleTurnOnly(true)
+                        .effects(asList(
                                 VoteEffect.builder().duration(2).build())
-        ).build());
+                        ).build());
+
+        createCardOfType(CardType.ATTEND_PARTY,
+                Card.builder().cardType(CardType.ATTEND_PARTY).name("Attend Party").description("Attend party for increased " + ResourceType.REPUTATION.name().toLowerCase() + " and an alibi for the night....")
+                        .singleTurnOnly(true)
+                        .effects(
+                        asList(
+                                AttendPartyEffect.builder().build(),
+                                NotAtHomeEffect.builder().duration(1).effectTargetType(EffectTargetType.SELF).build())
+                        ).build());
 
         // SPECIAL EFFECTS
 
@@ -115,9 +116,10 @@ public class CardService {
 
         if (deckRepository.count() == 0){
             // TODO version decks
-            buildDeckForRole(Role.CITIZEN, Stream.concat(
-                    mainCards.stream(),
-                    citizenCards.stream())
+            buildDeckForRole(Role.CITIZEN,
+                    Stream.concat(
+                        mainCards.stream(),
+                        citizenCards.stream())
                     .collect(Collectors.toList()));
 
             buildDeckForRole(Role.TRAITOR,

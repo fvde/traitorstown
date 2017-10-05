@@ -41,6 +41,6 @@ public abstract class SpecialEffect extends Effect {
 
     @Override
     public String getName() {
-        return "ADD STATUS " + getClass().getSimpleName();
+        return getClass().getSimpleName().replaceAll("Effect", "");
     }
 }

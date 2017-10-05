@@ -1,6 +1,6 @@
 package com.individual.thinking.traitorstown.model.effects;
 
-import com.individual.thinking.traitorstown.Configuration;
+import com.individual.thinking.traitorstown.game.rules.Rules;
 import com.individual.thinking.traitorstown.model.Game;
 import com.individual.thinking.traitorstown.model.Player;
 import com.individual.thinking.traitorstown.model.ResourceType;
@@ -53,7 +53,9 @@ public class ResourceEffect extends Effect {
     @Override
     public boolean mayApply(Player origin, Player target) {
         if (operator.equals(EffectOperator.REMOVE) && resourceType.equals(ResourceType.GOLD)){
-            return target.getResource(ResourceType.GOLD) + target.getResource(ResourceType.STOLEN_GOLD) - amount >= Configuration.MINIMUM_RESOURCES.get(resourceType);
+            return target.getResource(ResourceType.GOLD) + target.getResource(ResourceType.STOLEN_GOLD) - amount >= Rules.MINIMUM_RESOURCES.get(resourceType);
+        } else if (operator.equals(EffectOperator.REMOVE)){
+            return target.getResource(resourceType) - amount >= Rules.MINIMUM_RESOURCES.get(resourceType);
         }
 
         return true;
@@ -66,6 +68,6 @@ public class ResourceEffect extends Effect {
 
     @Override
     public String getName() {
-        return operator + " " + amount + " " + resourceType;
+        return operator.toString().toLowerCase() + " " + amount + " " + resourceType.toString().toLowerCase();
     }
 }

@@ -23,7 +23,7 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @Fetch(value = FetchMode.SUBSELECT)
     @JoinColumn(name = "game_id")
     @OrderBy("id DESC")
@@ -59,18 +59,29 @@ public class Game {
 
     public void start() throws RuleSetViolationException {
         setStatus(GameStatus.PLAYING);
-        turns.add(Turn.builder().counter(0).build());
+        turns.add(Turn.builder()
+                .counter(0)
+                .finishedPlayers(Collections.emptyList())
+                .humanPlayers(players.size() - getAIPlayers().size())
+                .startedAt(new Date())
+                .build());
         Rules.getRolesForPlayers(players).forEach((role, players) ->
                 players.forEach(p -> p.startGameWithRole(role)));
     }
 
     public void end(){
         status = GameStatus.FINISHED;
-        winner = getMayor().get().getRole();
+        Optional<Player> mayor = getMayor();
+        if (mayor.isPresent()){
+            winner = mayor.get().getRole();
+        }
     }
 
-    public void playCard(Player player, Player target, Card card) throws NotCurrentTurnException, PlayerDoesNotHaveCardException, PlayedAlreadyPlayedCardThisTurnException, PlayerMayNotPlayThisCardException, InactiveGameException, TargetPlayerNotInGameException {
-        Turn turn = getCurrentTurn().get();
+    public void cancel(){
+        status = GameStatus.CANCELLED;
+    }
+
+    public void playCard(Player player, Player target, Card card) throws PlayerDoesNotHaveCardException, InactiveGameException, TargetPlayerNotInGameException, RuleSetViolationException {
 
         if (!status.equals(GameStatus.PLAYING)){
             throw new InactiveGameException("This game has not started or is already over!");
@@ -80,12 +91,29 @@ public class Game {
             throw new TargetPlayerNotInGameException("The player you are targeting is not in your game!");
         }
 
-        turn.playCard(card, player, target);
+        getCurrentTurn().playCard(card, player, target);
+
+        if (!player.isAi()){
+            getCurrentTurn().end();
+        }
     }
 
     public void startNextTurn(){
-        players.forEach(p -> p.endTurn(this));
-        Turn next = getCurrentTurn().get().end();
+        if (isInactive()){
+            cancel();
+        }
+
+        /**
+         * Order matters here
+         * 1) Temporary cards are discarded
+         * 2) Effects are applied for all players
+         * 3) Effects that are no longer active are removed
+         */
+        players.forEach(Player::discardSingleTurnCards);
+        players.forEach((Player p) -> p.applyCardEffects(this));
+        players.forEach(Player::removeInactiveEffects);
+
+        Turn next = getCurrentTurn().startNext();
 
         if (Day.isElectionDay(next.getCounter()) && players.stream().filter(Player::isCandidate).count() > 0){
             players.stream().forEach(player -> player.addCard(CardService.Cards.get(CardType.VOTE)));
@@ -114,11 +142,6 @@ public class Game {
         players.stream().forEach(Player::clearCandidacy);
     }
 
-    //TODO add timeout
-    public boolean isTurnOver(){
-        return getCurrentTurn().get().getFinishedPlayers().size() == getPlayers().size() - getAIPlayers().size();
-    }
-
     private List<Player> getReadyPlayers(){
         return players.stream()
                 .filter(Player::isReady)
@@ -143,17 +166,20 @@ public class Game {
                 status.equals(GameStatus.OPEN);
     }
 
-    public Optional<Turn> getCurrentTurn(){
-        return turns.isEmpty() ? Optional.empty() : Optional.of(turns.get(0));
+    public Turn getCurrentTurn(){
+        return turns.get(0);
     }
 
-    public int getTurn(){
-        Optional<Turn> turn = getCurrentTurn();
-        return turn.isPresent() ? turn.get().getCounter() : 0;
+    public int getCurrentTurnCounter(){
+        return getCurrentTurn().getCounter();
     }
 
     public boolean isCurrentTurn(Integer turn){
-        return getCurrentTurn().isPresent() && getCurrentTurn().get().getCounter().equals(turn);
+        return getCurrentTurnCounter() == turn.intValue();
+    }
+
+    public boolean isInactive(){
+        return getCurrentTurn().allHumanPlayersInactive();
     }
 
     @Tolerate

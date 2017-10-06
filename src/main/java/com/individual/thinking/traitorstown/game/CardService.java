@@ -39,11 +39,7 @@ public class CardService {
     }
 
     protected Card getCardById(Long id) throws CardNotFoundException {
-        Card card = cardRepository.findById(id).get();
-        if (card == null){
-            throw new CardNotFoundException("Card not found");
-        }
-        return card;
+        return cardRepository.findById(id).orElseThrow(() -> new CardNotFoundException("Card not found"));
     }
 
     public void initialize() {
@@ -87,7 +83,7 @@ public class CardService {
                         Card.builder().cardType(CardType.MURDER).name("Murder").description("Murder a citizen.").effects(asList(
                                 MurderEffect.builder().build(),
                                 NotAtHomeEffect.builder().effectTargetType(EffectTargetType.SELF).duration(1).build(),
-                                ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(1).duration(1).build())
+                                ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(25).duration(1).build())
                         ).build())
                 );
 

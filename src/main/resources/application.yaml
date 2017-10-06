@@ -41,7 +41,7 @@ spring:
 
 com.individual.thinking.traitorstown:
   learning-enabled: true
-  learning-steps: 500
+  learning-steps: 2000
   messaging-enabled: false
   minimum-number-of-players: 1
   maximum-number-of-players: 5

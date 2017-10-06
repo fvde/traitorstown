@@ -141,9 +141,10 @@ public class Game {
          */
         players.forEach(Player::discardSingleTurnCards);
         players.forEach(p -> p.applyEffects(this));
+        activeGameEffects.forEach(e -> e.apply(this));
+
         players.forEach(Player::removeInactiveEffects);
         postTurnEffects.forEach(e -> e.getTarget().addEffect(e.getEffect(), e.getOrigin()));
-        activeGameEffects.forEach(e -> e.apply(this));
     }
 
     private List<Player> getReadyPlayers(){

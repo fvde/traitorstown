@@ -5,10 +5,16 @@ import com.individual.thinking.traitorstown.TraitorsTownConfiguration;
 import com.individual.thinking.traitorstown.ai.learning.RewardService;
 import com.individual.thinking.traitorstown.game.GameService;
 import com.individual.thinking.traitorstown.game.PlayerService;
+import com.individual.thinking.traitorstown.game.exceptions.CardNotFoundException;
+import com.individual.thinking.traitorstown.game.exceptions.GameNotFoundException;
 import com.individual.thinking.traitorstown.game.exceptions.PlayerNotFoundException;
 import com.individual.thinking.traitorstown.model.Card;
 import com.individual.thinking.traitorstown.model.Game;
 import com.individual.thinking.traitorstown.model.GameStatus;
+import com.individual.thinking.traitorstown.model.exceptions.InactiveGameException;
+import com.individual.thinking.traitorstown.model.exceptions.PlayerDoesNotHaveCardException;
+import com.individual.thinking.traitorstown.model.exceptions.RuleSetViolationException;
+import com.individual.thinking.traitorstown.model.exceptions.TargetPlayerNotInGameException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.deeplearning4j.gym.StepReply;
@@ -19,7 +25,6 @@ import org.deeplearning4j.rl4j.space.ObservationSpace;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
 @Slf4j
 public class TraitorsTownMDP implements MDP<GameState, Integer, DiscreteSpace> {
@@ -33,7 +38,6 @@ public class TraitorsTownMDP implements MDP<GameState, Integer, DiscreteSpace> {
     private GameState gameState;
     private Long gameId = 0L;
     private Integer turn = 0;
-    private Random random;
 
     @Getter
     private final DiscreteActionSpace actionSpace;
@@ -51,7 +55,6 @@ public class TraitorsTownMDP implements MDP<GameState, Integer, DiscreteSpace> {
         this.actionSpace = actionSpace;
         this.configuration = configuration;
         this.observationSpace = Configuration.OBSERVATION_SPACE;
-        this.random = new Random();
 
         reset();
     }
@@ -60,13 +63,6 @@ public class TraitorsTownMDP implements MDP<GameState, Integer, DiscreteSpace> {
     public GameState reset() {
         Game game = gameService.createNewGame();
         try {
-            /*int desiredAmountOfOpponents = random.nextInt(configuration.getMaximumNumberOfPlayers());
-            int opponentIndex = 1;
-            while (desiredAmountOfOpponents > 0){
-                game = gameService.addPlayerToGame(game.getId(), players.get(opponentIndex++));
-                desiredAmountOfOpponents--;
-            }*/
-            // join game so enough 'human' players are ready
             game = gameService.addPlayerToGame(game.getId(), aiPlayerId);
         } catch (Exception e) {
             log.error("Failed to reset game with exception {}", e);
@@ -77,7 +73,7 @@ public class TraitorsTownMDP implements MDP<GameState, Integer, DiscreteSpace> {
         timesInSameTurn = 0;
         gameState = GameState.fromGameAndPlayer(game, aiPlayerId);
         gameId = game.getId();
-        turn = 1;
+        turn = 0;
 
         return gameState;
     }
@@ -101,20 +97,27 @@ public class TraitorsTownMDP implements MDP<GameState, Integer, DiscreteSpace> {
                     turn,
                     getCardIdFromAction(action),
                     aiPlayerId,
-                    players.get(action.getPlayerSlot()));
+                    getPlayerIdFromAction(action));
+
 
             Game game = gameService.getGameById(gameId);
             gameState = GameState.fromGameAndPlayer(game, aiPlayerId);
             turn = game.getCurrentTurnCounter();
             reward = rewardService.getReward(gameState, turn);
-
-        } catch (Exception e) {
-            log.error("Failed to execute action {} with exception {}, turn {}, card {}, target player {} ",
-                    action,
-                    e.getMessage(),
-                    turn,
-                    getCardIdFromAction(action),
-                    players.get(action.getPlayerSlot()));
+        } catch (GameNotFoundException e) {
+            log.error("Failed to execute action {} with exception {}, turn {}, card {}, target player {} ", action, e.getMessage(), turn, getCardIdFromAction(action), players.get(action.getPlayerSlot()));
+        } catch (CardNotFoundException e) {
+            log.error("Failed to execute action {} with exception {}, turn {}, card {}, target player {} ", action, e.getMessage(), turn, getCardIdFromAction(action), players.get(action.getPlayerSlot()));
+        } catch (PlayerNotFoundException e) {
+            log.error("Failed to execute action {} with exception {}, turn {}, card {}, target player {} ", action, e.getMessage(), turn, getCardIdFromAction(action), players.get(action.getPlayerSlot()));
+        } catch (PlayerDoesNotHaveCardException e) {
+            log.error("Failed to execute action {} with exception {}, turn {}, card {}, target player {} ", action, e.getMessage(), turn, getCardIdFromAction(action), players.get(action.getPlayerSlot()));
+        } catch (InactiveGameException e) {
+            log.error("Failed to execute action {} with exception {}, turn {}, card {}, target player {} ", action, e.getMessage(), turn, getCardIdFromAction(action), players.get(action.getPlayerSlot()));
+        } catch (TargetPlayerNotInGameException e) {
+            log.error("Failed to execute action {} with exception {}, turn {}, card {}, target player {} ", action, e.getMessage(), turn, getCardIdFromAction(action), players.get(action.getPlayerSlot()));
+        } catch (RuleSetViolationException e) {
+            log.error("Failed to execute action {} with exception {}, turn {}, card {}, target player {} ", action, e.getMessage(), turn, getCardIdFromAction(action), players.get(action.getPlayerSlot()));
         }
 
         if (isDone()){
@@ -142,6 +145,16 @@ public class TraitorsTownMDP implements MDP<GameState, Integer, DiscreteSpace> {
         return new TraitorsTownMDP(gameService, playerService, rewardService, players, actionSpace, configuration);
     }
 
+    private Long getPlayerIdFromAction(Action action) {
+        Game game = null;
+        try {
+            game = gameService.getGameById(gameId);
+        } catch (GameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return game.getPlayers().get(action.getPlayerSlot()).getId();
+    }
+
     private Long getCardIdFromAction(Action action) {
         List<Card> playerCards;
         try {
@@ -157,7 +170,9 @@ public class TraitorsTownMDP implements MDP<GameState, Integer, DiscreteSpace> {
             Long cardId = getCardIdFromAction(action);
             Optional<Card> card = playerService.getPlayerCards(aiPlayerId).stream().filter(c -> c.getId() == cardId).findFirst();
             if (card.isPresent()){
-                return "Playing card " + card.get().getName() + " targeting player " + action.getPlayerSlot();
+                return "Playing card " + card.get().getName() + " (slot " + action.getCardSlot() + ") targeting player " + action.getPlayerSlot();
+            } else {
+                return "Playing card " + null + " (slot " + action.getCardSlot() + ") targeting player " + action.getPlayerSlot();
             }
         } catch (Exception e) {
             e.printStackTrace();

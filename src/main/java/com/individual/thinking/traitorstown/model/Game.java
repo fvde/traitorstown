@@ -2,8 +2,7 @@ package com.individual.thinking.traitorstown.model;
 
 import com.individual.thinking.traitorstown.game.CardService;
 import com.individual.thinking.traitorstown.game.rules.Rules;
-import com.individual.thinking.traitorstown.model.effects.Effect;
-import com.individual.thinking.traitorstown.model.effects.SpecialEffectType;
+import com.individual.thinking.traitorstown.model.effects.*;
 import com.individual.thinking.traitorstown.model.exceptions.InactiveGameException;
 import com.individual.thinking.traitorstown.model.exceptions.PlayerDoesNotHaveCardException;
 import com.individual.thinking.traitorstown.model.exceptions.RuleSetViolationException;
@@ -41,6 +40,12 @@ public class Game {
     @NonNull
     private List<Turn> turns = new ArrayList<>();
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
+    @JoinColumn(name = "game_id")
+    @Builder.Default
+    private List<ActiveGameEffect> activeGameEffects = new ArrayList<>();
+
     @Enumerated(EnumType.STRING)
     @Setter
     @NonNull
@@ -74,6 +79,9 @@ public class Game {
                 .build());
         Rules.getRolesForPlayers(players).forEach((role, players) ->
                 players.forEach(p -> p.startGameWithRole(role)));
+
+        // apply global effects
+        activeGameEffects.add(((GlobalEffect)CardService.Effects.get(SpecialEffectType.ELECTIONS)).toActiveGameEffect());
     }
 
     public void end(Role role){
@@ -120,14 +128,6 @@ public class Game {
             turns.add(getCurrentTurn().startNext());
             players.forEach(Player::startTurn);
         }
-//
-//        if (Day.isElectionDay(next.getCounter()) && players.stream().filter(Player::isCandidate).count() > 0){
-//            getLivingPlayers().stream().forEach(player -> player.addCard(CardService.Cards.get(CardType.VOTE)));
-//        }
-//
-//        if (Day.isDayAfterElections(next.getCounter())){
-//            electMayor();
-//        }
     }
 
     private void finishPreviousTurn() {
@@ -137,22 +137,13 @@ public class Game {
          * 2) Effects are applied for all players
          * 3) Effects that are no longer active are removed
          * 4) Apply post turn effects that are created by this turn
+         * 5) Apply global effects
          */
         players.forEach(Player::discardSingleTurnCards);
         players.forEach(p -> p.applyEffects(this));
         players.forEach(Player::removeInactiveEffects);
         postTurnEffects.forEach(e -> e.getTarget().addEffect(e.getEffect(), e.getOrigin()));
-    }
-
-    private void electMayor(){
-        Player electedPlayer = Collections.max(players, Comparator.comparingLong(Player::getVotes));
-
-        if (electedPlayer.getVotes() > 0){
-            // TODO add mayor cards
-            electedPlayer.addEffect(CardService.Effects.get(SpecialEffectType.MAYOR), electedPlayer);
-        }
-        // clean up candidacies
-        players.stream().forEach(Player::clearCandidacy);
+        activeGameEffects.forEach(e -> e.apply(this));
     }
 
     private List<Player> getReadyPlayers(){

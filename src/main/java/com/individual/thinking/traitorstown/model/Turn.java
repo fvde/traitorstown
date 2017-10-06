@@ -73,6 +73,14 @@ public class Turn {
         }
     }
 
+    public boolean isElectionDay(){
+        return Day.isElectionDay(counter);
+    }
+
+    public boolean isDayBeforeElections(){
+        return Day.isDayBeforeElections(counter);
+    }
+
     public boolean allHumanPlayersInactive(){
         return inactivePlayers.equals(humanPlayers);
     }

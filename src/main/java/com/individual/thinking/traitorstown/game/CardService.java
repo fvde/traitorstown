@@ -117,6 +117,8 @@ public class CardService {
 
         createEffect(SpecialEffectType.DEATH, DeathEffect.builder().build());
 
+        createEffect(SpecialEffectType.ELECTIONS, ElectionsEffect.builder().build());
+
         if (TOTAL_NUMBER_OF_CARDS != cardRepository.count()){
             throw new IllegalArgumentException("Incorrect number of total cards");
         }

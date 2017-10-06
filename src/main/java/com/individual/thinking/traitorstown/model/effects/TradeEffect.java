@@ -21,7 +21,7 @@ public class TradeEffect extends SpecialEffect {
 
     @Builder
     protected TradeEffect(Integer duration) {
-        super(Visibility.PLAYER, duration);
+        super(Visibility.PLAYER_AND_ORIGIN, duration);
     }
 
     @Tolerate

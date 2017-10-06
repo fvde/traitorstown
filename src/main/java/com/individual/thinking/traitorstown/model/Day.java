@@ -19,7 +19,7 @@ public enum Day {
         return 0 == (turn % SUNDAY.day);
     }
 
-    public static boolean isDayAfterElections(int turn){
-        return MONDAY.day == (turn % SUNDAY.day);
+    public static boolean isDayBeforeElections(int turn){
+        return SATURDAY.day == (turn % SUNDAY.day);
     }
 }

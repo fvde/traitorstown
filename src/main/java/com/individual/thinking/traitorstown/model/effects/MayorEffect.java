@@ -26,9 +26,5 @@ public class MayorEffect extends SpecialEffect {
     }
 
     @Override
-    public void apply(Game game, Player player, Player target, boolean isNew) {
-        if (isNew){
-            publishMessage(target.getName() +" was elected mayor!", game.getPlayers());
-        }
-    }
+    public void apply(Game game, Player player, Player target, boolean isNew) { }
 }

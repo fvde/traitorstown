@@ -7,7 +7,8 @@ public enum SpecialEffectType {
     MAYOR,
     CITIZEN,
     TRAITOR,
-    DEATH;
+    DEATH,
+    ELECTIONS;
 
     public static SpecialEffectType fromRole(Role role){
         switch (role) {

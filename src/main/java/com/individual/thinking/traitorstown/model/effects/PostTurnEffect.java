@@ -1,6 +1,6 @@
-package com.individual.thinking.traitorstown.model;
+package com.individual.thinking.traitorstown.model.effects;
 
-import com.individual.thinking.traitorstown.model.effects.Effect;
+import com.individual.thinking.traitorstown.model.Player;
 import lombok.Builder;
 import lombok.Value;
 

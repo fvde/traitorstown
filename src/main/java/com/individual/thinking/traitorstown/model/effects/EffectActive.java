@@ -96,9 +96,11 @@ public class EffectActive {
         }
 
         switch (effect.getVisibility()) {
-            case ALL: { return true; }
+            case NONE: return false;
+            case ALL: return true;
             case FACTION: return target.getRole().equals(player.getRole());
             case PLAYER: return target.getId().equals(player.getId());
+            case PLAYER_AND_ORIGIN: return target.getId().equals(player.getId()) || origin.getId().equals(player.getId());
         }
 
         return false;

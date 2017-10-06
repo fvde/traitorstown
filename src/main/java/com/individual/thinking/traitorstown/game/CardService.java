@@ -1,5 +1,6 @@
 package com.individual.thinking.traitorstown.game;
 
+import com.google.common.collect.Streams;
 import com.individual.thinking.traitorstown.game.exceptions.CardNotFoundException;
 import com.individual.thinking.traitorstown.game.repository.CardRepository;
 import com.individual.thinking.traitorstown.game.repository.DeckRepository;
@@ -90,12 +91,33 @@ public class CardService {
                         ).build())
                 );
 
+        List<Card> mayorCards = asList(
+                createCardOfType(CardType.TRIAL,
+                        Card.builder().cardType(CardType.TRADE).name("Trial").description("Put target player on trial, so they may be judged for their sins.").effects(asList(
+                                TrialEffect.builder().build())
+                        ).build())
+        );
+
         // SPECIAL CARDS
         createCardOfType(CardType.VOTE,
                 Card.builder().cardType(CardType.VOTE).name("Vote").description("Vote for a player to become mayor.")
                         .singleTurnOnly(true)
                         .effects(asList(
-                                VoteEffect.builder().duration(2).build())
+                                VoteEffect.builder().build())
+                        ).build());
+
+        createCardOfType(CardType.VOTE_KILL,
+                Card.builder().cardType(CardType.VOTE_KILL).name("Vote Kill").description("The accused is clearly a traitor. He should die!")
+                        .singleTurnOnly(true)
+                        .effects(asList(
+                                VoteKillEffect.builder().build())
+                        ).build());
+
+        createCardOfType(CardType.VOTE_SPARE,
+                Card.builder().cardType(CardType.VOTE_SPARE).name("Vote Spare").description("Never has there been a more honorable citizen. He should live!")
+                        .singleTurnOnly(true)
+                        .effects(asList(
+                                VoteSpareEffect.builder().build())
                         ).build());
 
         createCardOfType(CardType.ATTEND_PARTY,
@@ -126,9 +148,11 @@ public class CardService {
         if (deckRepository.count() == 0){
             // TODO version decks
             buildDeckForRole(Role.CITIZEN,
-                    Stream.concat(
+                    Stream.of(
                         mainCards.stream(),
-                        citizenCards.stream())
+                        citizenCards.stream(),
+                        mayorCards.stream())
+                    .flatMap(Streams::concat)
                     .collect(Collectors.toList()));
 
             buildDeckForRole(Role.TRAITOR,

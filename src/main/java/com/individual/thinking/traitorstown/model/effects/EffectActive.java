@@ -58,8 +58,20 @@ public class EffectActive {
         return effect.isOfType(VoteEffect.class);
     }
 
+    public boolean isKillVote() {
+        return effect.isOfType(VoteKillEffect.class);
+    }
+
+    public boolean isSpareVote() {
+        return effect.isOfType(VoteSpareEffect.class);
+    }
+
     public boolean isMayor() {
         return effect.isOfType(MayorEffect.class);
+    }
+
+    public boolean isTrial() {
+        return effect.isOfType(TrialEffect.class);
     }
 
     public boolean isTraitor() {

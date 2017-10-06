@@ -1,10 +1,7 @@
 package com.individual.thinking.traitorstown.model.effects;
 
 import com.individual.thinking.traitorstown.game.CardService;
-import com.individual.thinking.traitorstown.model.CardType;
-import com.individual.thinking.traitorstown.model.Game;
-import com.individual.thinking.traitorstown.model.Player;
-import com.individual.thinking.traitorstown.model.Turn;
+import com.individual.thinking.traitorstown.model.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -39,34 +36,20 @@ public class ElectionsEffect extends GlobalEffect {
 
             votes.forEach((player, voting) -> publishMessage("Candidate " + player.getName() + ": " + voting + " votes.", game.getPlayers()));
 
+            Voting voting = new Voting(votes);
 
-            boolean tie = false;
-            Long highestVoting = 0L;
-            Player electedPlayer = null;
-
-            for (Player candidate : votes.keySet()){
-                Long voting = votes.get(candidate);
-                if (voting > highestVoting){
-                    highestVoting = voting;
-                    electedPlayer = candidate;
-                    tie = false;
-                } else if (voting == highestVoting){
-                    tie = true;
-                }
-            }
-
-            if (highestVoting == 0){
+            if (voting.getNoVotesWereCast()){
                 publishMessage("Looks like nobody can be trusted... :(!", game.getPlayers());
             }
 
-            if (tie) {
+            if (voting.getEndedWithTie()) {
                 publishMessage("It's a tie! :(!", game.getPlayers());
             }
 
-            if (electedPlayer != null && !tie){
-                // TODO add mayor cards
-                electedPlayer.addEffect(CardService.Effects.get(SpecialEffectType.MAYOR), electedPlayer);
-                publishMessage(electedPlayer.getName() +" was elected mayor!", game.getPlayers());
+            if (voting.getWinner() != null){
+                Player winner = voting.getWinner();
+                winner.addEffect(CardService.Effects.get(SpecialEffectType.MAYOR), winner);
+                publishMessage(winner.getName() +" was elected mayor!", game.getPlayers());
             }
             // clean up candidacies
             game.getPlayers().stream().forEach(Player::clearCandidacy);

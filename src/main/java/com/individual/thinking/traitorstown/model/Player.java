@@ -176,12 +176,23 @@ public class Player {
         return activeEffects.stream().filter(EffectActive::isVote).count();
     }
 
+    public Long getKillVotes(){
+        return activeEffects.stream().filter(EffectActive::isKillVote).count();
+    }
+    public Long getSpareVotes(){
+        return activeEffects.stream().filter(EffectActive::isSpareVote).count();
+    }
+
     public boolean isMayor(){
         return is(EffectActive::isMayor);
     }
 
     public boolean isCandidate(){
         return is(EffectActive::isCandidacy);
+    }
+
+    public boolean isOnTrial(){
+        return is(EffectActive::isTrial);
     }
 
     public boolean isTraitor(){

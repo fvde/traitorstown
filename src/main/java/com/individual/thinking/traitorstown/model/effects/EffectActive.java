@@ -78,6 +78,10 @@ public class EffectActive {
         return effect.isOfType(PartyEffect.class) && remainingTurns == 1;
     }
 
+    public boolean isDeath()  {
+        return effect.isOfType(DeathEffect.class);
+    }
+
     public boolean isPartyWithGuest(Player origin)  {
         return effect.isOfType(AttendPartyEffect.class) && origin.is(origin);
     }

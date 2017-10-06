@@ -81,6 +81,12 @@ public class CardService {
                         Card.builder().cardType(CardType.ROBBERY).name("Robbery").description("Steal a players " + ResourceType.GOLD.name().toLowerCase() + ". Very risky if the target is at home!").effects(asList(
                                 RobberyEffect.builder().build(),
                                 NotAtHomeEffect.builder().effectTargetType(EffectTargetType.SELF).duration(1).build())
+                        ).build()),
+                createCardOfType(CardType.MURDER,
+                        Card.builder().cardType(CardType.MURDER).name("Murder").description("Murder a citizen.").effects(asList(
+                                MurderEffect.builder().build(),
+                                NotAtHomeEffect.builder().effectTargetType(EffectTargetType.SELF).duration(1).build(),
+                                ResourceEffect.builder().resourceType(ResourceType.GOLD).operator(EffectOperator.REMOVE).effectTargetType(EffectTargetType.SELF).amount(1).duration(1).build())
                         ).build())
                 );
 
@@ -108,6 +114,8 @@ public class CardService {
         createEffect(SpecialEffectType.TRAITOR, TraitorEffect.builder().build());
 
         createEffect(SpecialEffectType.MAYOR, MayorEffect.builder().duration(7).build());
+
+        createEffect(SpecialEffectType.DEATH, DeathEffect.builder().build());
 
         if (TOTAL_NUMBER_OF_CARDS != cardRepository.count()){
             throw new IllegalArgumentException("Incorrect number of total cards");

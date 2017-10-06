@@ -2,8 +2,12 @@ package com.individual.thinking.traitorstown.model;
 
 import com.individual.thinking.traitorstown.game.CardService;
 import com.individual.thinking.traitorstown.game.rules.Rules;
+import com.individual.thinking.traitorstown.model.effects.Effect;
 import com.individual.thinking.traitorstown.model.effects.SpecialEffectType;
-import com.individual.thinking.traitorstown.model.exceptions.*;
+import com.individual.thinking.traitorstown.model.exceptions.InactiveGameException;
+import com.individual.thinking.traitorstown.model.exceptions.PlayerDoesNotHaveCardException;
+import com.individual.thinking.traitorstown.model.exceptions.RuleSetViolationException;
+import com.individual.thinking.traitorstown.model.exceptions.TargetPlayerNotInGameException;
 import lombok.*;
 import lombok.experimental.Tolerate;
 import org.hibernate.annotations.Fetch;
@@ -49,6 +53,9 @@ public class Game {
     @Builder.Default
     private Integer desiredNumberOfHumanPlayers = 1;
 
+    @Transient
+    private List<PostTurnEffect> postTurnEffects = new ArrayList<>();
+
     public void addPlayer(Player player){
         players.add(player);
     }
@@ -69,12 +76,9 @@ public class Game {
                 players.forEach(p -> p.startGameWithRole(role)));
     }
 
-    public void end(){
+    public void end(Role role){
         status = GameStatus.FINISHED;
-        Optional<Player> mayor = getMayor();
-        if (mayor.isPresent()){
-            winner = mayor.get().getRole();
-        }
+        winner = role;
     }
 
     public void cancel(){
@@ -91,6 +95,10 @@ public class Game {
             throw new TargetPlayerNotInGameException("The player you are targeting is not in your game!");
         }
 
+        if (target.isDead()){
+            throw new RuleSetViolationException("Can not target dead players!");
+        }
+
         getCurrentTurn().playCard(card, player, target);
 
         if (!player.isAi()){
@@ -99,36 +107,41 @@ public class Game {
     }
 
     public void startNextTurn(){
-        if (isInactive()){
-            cancel();
-        }
 
+        finishPreviousTurn();
+
+        if (isInactive() || getLivingHumanPlayers().size() == 0){
+            cancel();
+        } else if (onlyCitizensAlive()){
+            end(Role.CITIZEN);
+        } else if (onlyTraitorsAlive()){
+            end(Role.TRAITOR);
+        } else {
+            turns.add(getCurrentTurn().startNext());
+            players.forEach(Player::startTurn);
+        }
+//
+//        if (Day.isElectionDay(next.getCounter()) && players.stream().filter(Player::isCandidate).count() > 0){
+//            getLivingPlayers().stream().forEach(player -> player.addCard(CardService.Cards.get(CardType.VOTE)));
+//        }
+//
+//        if (Day.isDayAfterElections(next.getCounter())){
+//            electMayor();
+//        }
+    }
+
+    private void finishPreviousTurn() {
         /**
          * Order matters here
          * 1) Temporary cards are discarded
          * 2) Effects are applied for all players
          * 3) Effects that are no longer active are removed
+         * 4) Apply post turn effects that are created by this turn
          */
         players.forEach(Player::discardSingleTurnCards);
-        players.forEach((Player p) -> p.applyCardEffects(this));
+        players.forEach(p -> p.applyEffects(this));
         players.forEach(Player::removeInactiveEffects);
-
-        Turn next = getCurrentTurn().startNext();
-
-        if (Day.isElectionDay(next.getCounter()) && players.stream().filter(Player::isCandidate).count() > 0){
-            players.stream().forEach(player -> player.addCard(CardService.Cards.get(CardType.VOTE)));
-        }
-
-        if (Day.isDayAfterElections(next.getCounter())){
-            electMayor();
-        }
-
-        if (getMayor().isPresent() && Day.isElectionDay(next.getCounter())) {
-            end();
-        } else {
-            turns.add(next);
-            players.forEach(Player::drawCard);
-        }
+        postTurnEffects.forEach(e -> e.getTarget().addEffect(e.getEffect(), e.getOrigin()));
     }
 
     private void electMayor(){
@@ -136,7 +149,7 @@ public class Game {
 
         if (electedPlayer.getVotes() > 0){
             // TODO add mayor cards
-            electedPlayer.addEffect(CardService.Effects.get(SpecialEffectType.MAYOR));
+            electedPlayer.addEffect(CardService.Effects.get(SpecialEffectType.MAYOR), electedPlayer);
         }
         // clean up candidacies
         players.stream().forEach(Player::clearCandidacy);
@@ -151,6 +164,22 @@ public class Game {
 
     public List<Player> getAIPlayers(){
         return players.stream().filter(Player::isAi).collect(Collectors.toList());
+    }
+
+    public List<Player> getLivingHumanPlayers(){
+        return getLivingPlayers().stream().filter(Player::isHuman).collect(Collectors.toList());
+    }
+
+    public List<Player> getLivingPlayers(){
+        return players.stream().filter(Player::isAlive).collect(Collectors.toList());
+    }
+
+    public boolean onlyTraitorsAlive(){
+        return getLivingPlayers().stream().filter(Player::isTraitor).collect(Collectors.toList()).size() == getLivingPlayers().size();
+    }
+
+    public boolean onlyCitizensAlive(){
+        return getLivingPlayers().stream().filter(Player::isCitizen).collect(Collectors.toList()).size() == getLivingPlayers().size();
     }
 
     public Player getPlayer(Long id){
@@ -180,6 +209,10 @@ public class Game {
 
     public boolean isInactive(){
         return getCurrentTurn().allHumanPlayersInactive();
+    }
+
+    public void addPostTurnEffect(Effect effect, Player origin, Player target) {
+        postTurnEffects.add(PostTurnEffect.builder().effect(effect).origin(origin).target(target).build());
     }
 
     @Tolerate

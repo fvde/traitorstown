@@ -55,6 +55,15 @@ public abstract class Effect {
         return getClass() == type;
     }
 
+    public EffectActive toActive(Player origin, Player target){
+        return EffectActive.builder()
+                .effect(this)
+                .origin(origin)
+                .target(target)
+                .remainingTurns(duration)
+                .build();
+    }
+
     public void publishMessage(String content, List<Player> recipients){
         if (recipients.isEmpty()){
             log.warn("Trying to send message without recipients...");

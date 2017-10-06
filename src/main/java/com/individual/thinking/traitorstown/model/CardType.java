@@ -8,5 +8,6 @@ public enum CardType {
     TRADE,
     DISHONEST_TRADE,
     RUN_FOR_MAYOR,
+    MURDER,
     VOTE
 }

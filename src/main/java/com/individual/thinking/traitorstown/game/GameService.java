@@ -161,7 +161,10 @@ public class GameService {
     }
 
     private void makeAISuggestions(Game game) {
-        game.getAIPlayers().forEach(player -> {
+        game.getAIPlayers()
+                .stream()
+                .filter(Player::isAlive)
+                .forEach(player -> {
                     Action recommendedAction = artificialIntelligenceService.getRecommendedAction(game, player.getId());
                     try {
                         playCard(

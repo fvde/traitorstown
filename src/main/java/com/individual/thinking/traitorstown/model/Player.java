@@ -81,13 +81,17 @@ public class Player {
         deckCards.clear();
         handCards.clear();
 
-        addEffect(CardService.Effects.get(SpecialEffectType.fromRole(role)));
+        addEffect(CardService.Effects.get(SpecialEffectType.fromRole(role)), this);
         for (ResourceType type : ResourceType.values()){
             resources.put(type, Rules.STARTING_RESOURCES.containsKey(type) ? Rules.STARTING_RESOURCES.get(type) : 0);
         }
 
         deckCards.addAll(getDeckForRole(role).getCards());
         drawCards(Rules.INITIAL_AMOUNT_OF_CARDS);
+    }
+
+    public void startTurn(){
+        drawCard();
     }
 
     public void drawCard(){
@@ -111,7 +115,7 @@ public class Player {
             if (effect.getEffectTargetType().equals(EffectTargetType.TARGET)){
                 target.addEffect(effect, this);
             } else {
-                this.addEffect(effect);
+                this.addEffect(effect, this);
             }
         });
 
@@ -122,17 +126,8 @@ public class Player {
         handCards.remove(card);
     }
 
-    public void addEffect(Effect effect){
-        addEffect(effect, this);
-    }
-
-    private void addEffect(Effect effect, Player origin){
-        activeEffects.add(EffectActive.builder()
-                .effect(effect)
-                .origin(origin)
-                .target(this)
-                .remainingTurns(effect.getDuration())
-                .build());
+    public void addEffect(Effect effect, Player origin){
+        activeEffects.add(effect.toActive(origin, this));
     }
 
     private Deck getDeckForRole(Role role){
@@ -160,12 +155,17 @@ public class Player {
         handCards.add(card);
     }
 
+    public void die(){
+        deckCards.clear();
+        handCards.clear();
+    }
+
     public void discardSingleTurnCards(){
         handCards = handCards.stream().filter(Card::isNotSingleTurnOnly).collect(Collectors.toList());
     }
 
-    public void applyCardEffects(Game game) {
-        activeEffects.stream().forEach(e -> e.apply(game));
+    public void applyEffects(Game game) {
+        activeEffects.forEach(e -> e.apply(game));
     }
 
     public void removeInactiveEffects() {
@@ -197,6 +197,12 @@ public class Player {
     }
 
     public boolean isHostingAParty() {return is(EffectActive::isParty);}
+
+    public boolean isDead() {return is(EffectActive::isDeath);}
+
+    public boolean isAlive() {return !isDead();}
+
+    public boolean isHuman() {return !isAi();}
 
     public boolean isBeingVisitedForPartyByPlayer(Player origin) {return is(e -> e.isPartyWithGuest(origin));}
 

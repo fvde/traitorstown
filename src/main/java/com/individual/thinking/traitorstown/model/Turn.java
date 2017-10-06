@@ -14,9 +14,9 @@ import lombok.experimental.Tolerate;
 import javax.persistence.*;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Builder
@@ -80,7 +80,7 @@ public class Turn {
     public Turn startNext(){
         return Turn.builder()
                 .counter(counter + 1)
-                .finishedPlayers(Collections.emptyList())
+                .finishedPlayers(finishedPlayers.stream().filter(Player::isDead).collect(Collectors.toList()))
                 .humanPlayers(humanPlayers)
                 .inactivePlayers(0)
                 .startedAt(new Date())

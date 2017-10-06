@@ -6,7 +6,8 @@ import com.individual.thinking.traitorstown.model.exceptions.UnknownRoleExceptio
 public enum SpecialEffectType {
     MAYOR,
     CITIZEN,
-    TRAITOR;
+    TRAITOR,
+    DEATH;
 
     public static SpecialEffectType fromRole(Role role){
         switch (role) {

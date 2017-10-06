@@ -28,13 +28,13 @@ public class PartyEffect extends SpecialEffect {
     public void apply(Game game, Player player, Player target, boolean isNew) {
         if (isNew){
             publishMessage(target.getName() + " is throwing a party tomorrow! Inviting all honest citizens...", game.getPlayers());
-            game.getPlayers().stream()
+            game.getLivingPlayers().stream()
                     .filter(p -> p.isNot(target))
                     .filter(Player::hasNoPartyInvitation)
                     .forEach(p -> p.addCard(CardService.Cards.get(CardType.ATTEND_PARTY)));
         } else {
             // get rewarded for every guest
-            game.getPlayers().stream()
+            game.getLivingPlayers().stream()
                     .filter(p -> p.isNot(target) && target.isBeingVisitedForPartyByPlayer(p))
                     .forEach(p -> target.addResource(ResourceType.REPUTATION, HOST_REWARD));
         }

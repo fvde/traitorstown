@@ -39,6 +39,7 @@ public class TraitorstownApplication extends SpringBootServletInitializer {
     }
 
     @Bean
+    @Profile(value = {"development", "learning", "production"})
     public AmazonS3 amazonS3Client(){
         return AmazonS3ClientBuilder
                 .standard()

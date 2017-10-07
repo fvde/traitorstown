@@ -27,12 +27,13 @@ import java.util.UUID;
 public class LearningRepository {
 
     private final DataManager dataManager;
-    private final AmazonS3 amazonS3Client;
+
+    @Autowired(required=false)
+    private AmazonS3 amazonS3Client;
     private final String bucketName;
 
     @Autowired
-    public LearningRepository(TraitorsTownConfiguration configuration, AmazonS3 amazonS3Client){
-        this.amazonS3Client = amazonS3Client;
+    public LearningRepository(TraitorsTownConfiguration configuration){
         this.bucketName = configuration.getBucket();
         this.dataManager = new DataManager(false);
     }

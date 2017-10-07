@@ -35,7 +35,6 @@ public class GameControllerTest extends MockMvcBase{
     @MockBean
     private PlayerService playerService;
 
-
     private Long validUserId = 62532532L;
     private Long validGameId = 97217217L;
     private String validToken = "1srioisp5mb07drbbejqni519eib2pti";

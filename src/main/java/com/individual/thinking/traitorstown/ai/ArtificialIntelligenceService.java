@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.deeplearning4j.rl4j.policy.Policy;
 import org.nd4j.linalg.factory.Nd4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
@@ -16,11 +18,18 @@ import java.util.Random;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Profile(value = {"development", "learning", "production"})
 public class ArtificialIntelligenceService {
-    private final LearningRepository learningRepository;
-    private final DiscreteActionSpace actionSpace;
-    private Policy<GameState, Integer> policy;
-    private Random random = new Random();
+
+    private final DiscreteActionSpace discreteActionSpace;
+    private final Policy<GameState, Integer> policy;
+    private final Random random = new Random();
+
+    @Autowired
+    public ArtificialIntelligenceService(LearningRepository learningRepository, DiscreteActionSpace discreteActionSpace){
+        this.discreteActionSpace = discreteActionSpace;
+        this.policy = learningRepository.load();
+    }
 
     public Action getRecommendedAction(Game game, Long player) {
         Action proposal = getRecommendedActionForPlayer(GameState.fromGameAndPlayer(game, player));
@@ -35,7 +44,7 @@ public class ArtificialIntelligenceService {
     }
 
     private Action getRecommendedActionForPlayer(GameState state) {
-        Integer action = actionSpace.randomAction();
+        Integer action = discreteActionSpace.randomAction();
         if (policy != null) {
             try {
                 action = policy.nextAction(Nd4j.create(state.toArray()));
@@ -43,10 +52,6 @@ public class ArtificialIntelligenceService {
                 log.error("Failed to propose action with exception: {}", e);
             }
         }
-        return actionSpace.convert(action);
-    }
-
-    public void initialize(){
-        policy = learningRepository.load();
+        return discreteActionSpace.convert(action);
     }
 }

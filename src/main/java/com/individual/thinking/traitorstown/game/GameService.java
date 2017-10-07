@@ -33,17 +33,18 @@ public class GameService {
     private final GameRepository gameRepository;
     private final TurnRepository turnRepository;
     private final CardService cardService;
-    private final ArtificialIntelligenceService artificialIntelligenceService;
     private final MessageService messageService;
     private final TraitorsTownConfiguration configuration;
     private final PlayerService playerService;
 
+    @Autowired(required = false)
+    private ArtificialIntelligenceService artificialIntelligenceService;
+
     @Autowired
-    GameService(GameRepository gameRepository, TurnRepository turnRepository, CardService cardService, ArtificialIntelligenceService artificialIntelligenceService, MessageService messageService, TraitorsTownConfiguration configuration, PlayerService playerService) {
+    GameService(GameRepository gameRepository, TurnRepository turnRepository, CardService cardService, MessageService messageService, TraitorsTownConfiguration configuration, PlayerService playerService) {
         this.gameRepository = gameRepository;
         this.turnRepository = turnRepository;
         this.cardService = cardService;
-        this.artificialIntelligenceService = artificialIntelligenceService;
         this.messageService = messageService;
         this.configuration = configuration;
         this.playerService = playerService;
@@ -161,6 +162,10 @@ public class GameService {
     }
 
     private void makeAISuggestions(Game game) {
+        if (artificialIntelligenceService == null){
+            return;
+        }
+
         game.getAIPlayers()
                 .stream()
                 .filter(Player::isAlive)

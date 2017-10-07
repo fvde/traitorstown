@@ -37,10 +37,10 @@ public class PlayerResourceTest {
     @Parameters
     public static Collection<Object[]> data() {
         Player citizen = Player.builder().decks(Collections.emptyList()).ready(true).ai(false).build();
-        citizen.addEffect(CitizenEffect.builder().build());
+        citizen.addEffect(CitizenEffect.builder().build(), citizen);
 
         Player traitor = Player.builder().decks(Collections.emptyList()).ready(true).ai(false).build();
-        traitor.addEffect(TraitorEffect.builder().build());
+        traitor.addEffect(TraitorEffect.builder().build(), traitor);
 
         return Arrays.asList(new Object[][] {
                 // role, gold, stolen, expected stolen

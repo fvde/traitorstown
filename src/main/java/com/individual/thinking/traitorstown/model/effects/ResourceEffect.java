@@ -53,9 +53,16 @@ public class ResourceEffect extends Effect {
     @Override
     public boolean mayApply(Player origin, Player target) {
         if (operator.equals(EffectOperator.REMOVE) && resourceType.equals(ResourceType.GOLD)){
-            return target.getResource(ResourceType.GOLD) + target.getResource(ResourceType.STOLEN_GOLD) - amount >= Rules.MINIMUM_RESOURCES.get(resourceType);
+            int currentGold = getEffectTargetType().equals(EffectTargetType.SELF)
+                    ? origin.getResource(ResourceType.GOLD) + origin.getResource(ResourceType.STOLEN_GOLD)
+                    : target.getResource(ResourceType.GOLD) + target.getResource(ResourceType.STOLEN_GOLD);
+
+            return currentGold - amount >= Rules.MINIMUM_RESOURCES.get(resourceType);
         } else if (operator.equals(EffectOperator.REMOVE)){
-            return target.getResource(resourceType) - amount >= Rules.MINIMUM_RESOURCES.get(resourceType);
+            int currentAmount = getEffectTargetType().equals(EffectTargetType.SELF)
+                    ? origin.getResource(resourceType)
+                    : target.getResource(resourceType);
+            return currentAmount - amount >= Rules.MINIMUM_RESOURCES.get(resourceType);
         }
 
         return true;

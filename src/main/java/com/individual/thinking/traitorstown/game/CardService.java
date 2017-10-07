@@ -103,14 +103,14 @@ public class CardService {
                         ).build());
 
         createCardOfType(CardType.VOTE_KILL,
-                Card.builder().cardType(CardType.VOTE_KILL).name("Vote Kill").description("The accused is clearly a traitor. He should die!")
+                Card.builder().cardType(CardType.VOTE_KILL).name("Vote Kill").description("The accused is clearly a traitor. He must die!")
                         .singleTurnOnly(true)
                         .effects(asList(
                                 VoteKillEffect.builder().build())
                         ).build());
 
         createCardOfType(CardType.VOTE_SPARE,
-                Card.builder().cardType(CardType.VOTE_SPARE).name("Vote Spare").description("Never has there been a more honorable citizen. He should live!")
+                Card.builder().cardType(CardType.VOTE_SPARE).name("Vote Spare").description("Never has there been a more honorable citizen. He must live!")
                         .singleTurnOnly(true)
                         .effects(asList(
                                 VoteSpareEffect.builder().build())
